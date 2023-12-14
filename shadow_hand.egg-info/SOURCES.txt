@@ -1,0 +1,13 @@
+setup.py
+shadow_hand.egg-info/PKG-INFO
+shadow_hand.egg-info/SOURCES.txt
+shadow_hand.egg-info/dependency_links.txt
+shadow_hand.egg-info/requires.txt
+shadow_hand.egg-info/top_level.txt
+simulator/__init__.py
+simulator/pyopengl.py
+src/__init__.py
+src/test.py
+utils/__init__.py
+utils/control.py
+utils/dataset.py

@@ -1,0 +1,267 @@
+Wed Nov 22 14:44:29 2023
+WARNING: mju_openResource: unknown file 'shadow_hand/objects/shadow_hand/scene_right.xml'
+
+Tue Dec 12 09:51:26 2023
+WARNING: Nan, Inf or huge value in QVEL at DOF 0. The simulation is unstable. Time = 0.0100.
+
+Tue Dec 12 09:51:43 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 0. The simulation is unstable. Time = 0.0150.
+
+Tue Dec 12 09:53:02 2023
+WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 10.4050.
+
+Tue Dec 12 10:15:11 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 3. The simulation is unstable. Time = 4.5200.
+
+Tue Dec 12 10:18:38 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 3. The simulation is unstable. Time = 5.3600.
+
+Tue Dec 12 10:19:15 2023
+WARNING: Nan, Inf or huge value in QVEL at DOF 0. The simulation is unstable. Time = 1.6550.
+
+Tue Dec 12 10:19:33 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 3. The simulation is unstable. Time = 3.8000.
+
+Tue Dec 12 10:19:46 2023
+WARNING: Nan, Inf or huge value in QACC at DOF 3. The simulation is unstable. Time = 0.4250.
+
+Tue Dec 12 10:20:34 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 3. The simulation is unstable. Time = 5.3500.
+
+Tue Dec 12 10:21:59 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 3. The simulation is unstable. Time = 1.5600.
+
+Tue Dec 12 10:26:35 2023
+WARNING: Nan, Inf or huge value in QVEL at DOF 0. The simulation is unstable. Time = 13.8650.
+
+Tue Dec 12 10:26:35 2023
+WARNING: Nan, Inf or huge value in QACC at DOF 7. The simulation is unstable. Time = 0.1350.
+
+Tue Dec 12 14:27:04 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 3. The simulation is unstable. Time = 0.3050.
+
+Tue Dec 12 14:27:04 2023
+ERROR: Python exception raised
+
+Tue Dec 12 14:27:42 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 3. The simulation is unstable. Time = 0.3100.
+
+Tue Dec 12 14:27:42 2023
+ERROR: Python exception raised
+
+Tue Dec 12 14:28:56 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 3. The simulation is unstable. Time = 0.3100.
+
+Tue Dec 12 14:28:56 2023
+ERROR: Python exception raised
+
+Tue Dec 12 14:32:23 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 3. The simulation is unstable. Time = 0.3050.
+
+Tue Dec 12 14:32:23 2023
+ERROR: Python exception raised
+
+Tue Dec 12 15:36:16 2023
+ERROR: Python exception raised
+
+Tue Dec 12 15:36:47 2023
+ERROR: Python exception raised
+
+Tue Dec 12 15:37:31 2023
+ERROR: Python exception raised
+
+Tue Dec 12 15:37:55 2023
+ERROR: Python exception raised
+
+Tue Dec 12 15:38:25 2023
+ERROR: Python exception raised
+
+Tue Dec 12 15:40:44 2023
+ERROR: Python exception raised
+
+Tue Dec 12 15:41:12 2023
+ERROR: Python exception raised
+
+Tue Dec 12 15:42:42 2023
+ERROR: Python exception raised
+
+Tue Dec 12 15:44:23 2023
+ERROR: Python exception raised
+
+Tue Dec 12 15:46:31 2023
+ERROR: Python exception raised
+
+Tue Dec 12 15:47:09 2023
+ERROR: Python exception raised
+
+Tue Dec 12 15:48:23 2023
+ERROR: Python exception raised
+
+Tue Dec 12 15:49:15 2023
+ERROR: Python exception raised
+
+Tue Dec 12 15:49:42 2023
+ERROR: Python exception raised
+
+Tue Dec 12 15:54:20 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 3. The simulation is unstable. Time = 0.3125.
+
+Tue Dec 12 15:54:20 2023
+ERROR: Python exception raised
+
+Tue Dec 12 15:54:58 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 3. The simulation is unstable. Time = 0.3125.
+
+Tue Dec 12 15:54:58 2023
+ERROR: Python exception raised
+
+Tue Dec 12 15:56:27 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 3. The simulation is unstable. Time = 0.3125.
+
+Tue Dec 12 15:56:27 2023
+ERROR: Python exception raised
+
+Tue Dec 12 15:56:53 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 3. The simulation is unstable. Time = 0.3125.
+
+Tue Dec 12 15:56:53 2023
+ERROR: Python exception raised
+
+Tue Dec 12 15:57:29 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 3. The simulation is unstable. Time = 0.3125.
+
+Tue Dec 12 15:57:29 2023
+ERROR: Python exception raised
+
+Tue Dec 12 15:57:50 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 3. The simulation is unstable. Time = 0.3075.
+
+Tue Dec 12 15:57:50 2023
+ERROR: Python exception raised
+
+Tue Dec 12 15:59:29 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 3. The simulation is unstable. Time = 0.3125.
+
+Tue Dec 12 15:59:29 2023
+ERROR: Python exception raised
+
+Tue Dec 12 16:00:05 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 3. The simulation is unstable. Time = 0.3125.
+
+Tue Dec 12 16:00:05 2023
+ERROR: Python exception raised
+
+Tue Dec 12 16:01:27 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 3. The simulation is unstable. Time = 0.3125.
+
+Tue Dec 12 16:01:27 2023
+ERROR: Python exception raised
+
+Tue Dec 12 16:03:11 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 3. The simulation is unstable. Time = 0.3075.
+
+Tue Dec 12 16:03:11 2023
+ERROR: Python exception raised
+
+Tue Dec 12 16:03:45 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 3. The simulation is unstable. Time = 0.3075.
+
+Tue Dec 12 16:03:45 2023
+ERROR: Python exception raised
+
+Tue Dec 12 16:04:13 2023
+ERROR: Python exception raised
+
+Tue Dec 12 16:04:49 2023
+ERROR: Python exception raised
+
+Tue Dec 12 16:06:44 2023
+ERROR: Python exception raised
+
+Tue Dec 12 16:08:47 2023
+ERROR: Python exception raised
+
+Tue Dec 12 16:09:24 2023
+ERROR: Python exception raised
+
+Tue Dec 12 16:10:23 2023
+ERROR: Python exception raised
+
+Tue Dec 12 16:12:28 2023
+ERROR: Python exception raised
+
+Tue Dec 12 16:13:09 2023
+ERROR: Python exception raised
+
+Tue Dec 12 16:14:36 2023
+ERROR: Python exception raised
+
+Wed Dec 13 17:34:15 2023
+WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 0.5800.
+
+Wed Dec 13 21:47:03 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 0. The simulation is unstable. Time = 6.8150.
+
+Thu Dec 14 09:33:40 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 0. The simulation is unstable. Time = 1.9600.
+
+Thu Dec 14 09:33:40 2023
+WARNING: Nan, Inf or huge value in QVEL at DOF 0. The simulation is unstable. Time = 1.1200.
+
+Thu Dec 14 09:33:40 2023
+WARNING: Nan, Inf or huge value in QACC at DOF 3. The simulation is unstable. Time = 1.3100.
+
+Thu Dec 14 09:33:41 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 11. The simulation is unstable. Time = 0.2000.
+
+Thu Dec 14 09:33:41 2023
+WARNING: Nan, Inf or huge value in QVEL at DOF 1. The simulation is unstable. Time = 0.8700.
+
+Thu Dec 14 09:33:41 2023
+WARNING: Nan, Inf or huge value in QACC at DOF 28. The simulation is unstable. Time = 0.2600.
+
+Thu Dec 14 09:33:41 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 0. The simulation is unstable. Time = 0.4650.
+
+Thu Dec 14 09:33:41 2023
+WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 0.1500.
+
+Thu Dec 14 09:33:41 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 0. The simulation is unstable. Time = 0.2300.
+
+Thu Dec 14 09:34:01 2023
+WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 1.3950.
+
+Thu Dec 14 09:34:01 2023
+WARNING: Nan, Inf or huge value in QVEL at DOF 3. The simulation is unstable. Time = 1.6450.
+
+Thu Dec 14 09:34:01 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 0. The simulation is unstable. Time = 1.2450.
+
+Thu Dec 14 09:34:01 2023
+WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 0.2550.
+
+Thu Dec 14 09:34:01 2023
+WARNING: Nan, Inf or huge value in QVEL at DOF 0. The simulation is unstable. Time = 0.6950.
+
+Thu Dec 14 09:34:01 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 0. The simulation is unstable. Time = 1.9850.
+
+Thu Dec 14 09:34:01 2023
+WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 1.3000.
+
+Thu Dec 14 09:34:01 2023
+WARNING: Nan, Inf or huge value in QVEL at DOF 0. The simulation is unstable. Time = 0.1450.
+
+Thu Dec 14 09:34:01 2023
+WARNING: Nan, Inf or huge value in QPOS at DOF 0. The simulation is unstable. Time = 0.5750.
+
+Thu Dec 14 09:34:02 2023
+WARNING: Nan, Inf or huge value in QACC at DOF 16. The simulation is unstable. Time = 0.4850.
+
+Thu Dec 14 09:34:02 2023
+WARNING: Nan, Inf or huge value in QVEL at DOF 3. The simulation is unstable. Time = 0.2450.
+
+Thu Dec 14 14:28:07 2023
+WARNING: mju_openResource: unknown file 'objects/shadow_hand/./common/visual.xml'
+
