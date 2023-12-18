@@ -1,12 +1,12 @@
 import numpy as np
-from utils.dataset import NUM_ACTUATORS
+# from utils.dataset import NUM_ACTUATORS
 from abc import ABC, abstractmethod
 from typing import List, Dict 
 
 
 class Controller(ABC):
     def __init__(self, ctrl_limits: List[np.ndarray]):
-        assert len(ctrl_limits) == NUM_ACTUATORS
+        # assert len(ctrl_limits) == NUM_ACTUATORS
 
         self._ctrl_limits = ctrl_limits
         self._order = 0
@@ -41,7 +41,7 @@ class Controller(ABC):
         if next_ctrl is None:
             self._is_done = True
         else:
-            assert next_ctrl.shape[0] == NUM_ACTUATORS
+            # assert next_ctrl.shape[0] == NUM_ACTUATORS
 
             self._order += 1
 

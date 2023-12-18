@@ -61,11 +61,12 @@ class GLWFSim:
         # https://mujoco.readthedocs.io/en/stable/APIreference/APItypes.html#mjmodel
         self._model_file_path = shadow_hand_xml_filepath
         print(f"{self._model_file_path=}")
-        self._model = mj.MjModel.from_xml_path(filename=shadow_hand_xml_filepath)
+        self._model = mj.MjModel.from_xml_path(filename=self._model_file_path)
         print(f"{self._model=}")
+        self._data = mj.MjData(self._model)
+
         # self._model2 = mj.MjModel.from_xml_path(filename="/home/vims/git/dex-mani-mujoco/objects/universal_robots_ur10e/ur10e.xml")
 
-        self._data = mj.MjData(self._model)
         self._camera = mj.MjvCamera()
         self._options = mj.MjvOption()
 

@@ -18,9 +18,12 @@ from typing import Union, Dict
 import mujoco as mj
 def main():
 
-    xml_path = "objects/scene.xml"
+    # xml_path = "objects/universal_robots_ur10e/scene.xml"
+    # xml_path = "objects/universal_robots_ur10e/scene.xml"
     # xml_path = "objects/scene.xml"
-    # xml_path = "objects/shadow_hand/scene_right.xml"
+    # xml_path = "objects/scene.xml"
+    xml_path = "objects/shadow_hand/scene_right.xml"
+    # xml_path = "/home/vims/git/dex-mani-mujoco/objects/universal_robots_ur10e/scene.xml"
     signs_filepath = 'data/signs.json'
     ctrl_limits_filepath = "data/ctrl_limits.csv"
 

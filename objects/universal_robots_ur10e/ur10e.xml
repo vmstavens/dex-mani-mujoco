@@ -1,5 +1,6 @@
 <mujoco model="ur10e">
-  <compiler angle="radian" meshdir="universal_robots_ur10e/assets" autolimits="true"/>
+  <compiler angle="radian" meshdir="assets" autolimits="true"/>
+  <!-- <compiler angle="radian" meshdir="universal_robots_ur10e/assets" autolimits="true"/> -->
   <!-- <compiler angle="radian" meshdir="/home/vims/git/dex-mani-mujoco/objects/universal_robots_ur10e/assets" autolimits="true"/> -->
 
   <option integrator="implicitfast"/>

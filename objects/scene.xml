@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
-
-<mujoco model="scene">
+<mujoco model="robot_scene">
     <!-- <option timestep="0.005" integrator="RK4" solver="Newton" gravity="0 0 0"/> -->
     <option timestep="0.005" integrator="RK4" solver="Newton" gravity="0 0 -9.82"/>
     <option cone="elliptic" impratio="100"/>
 
-    <!-- <include file="shadow_hand/right_hand.xml"/> -->
     <include file="universal_robots_ur10e/ur10e.xml"/>
+    <!-- <include file="universal_robots_ur10e/ur10e.xml"/> -->
+    <!-- <include file="shadow_hand/right_hand.xml"/> -->
 
     <statistic extent="0.3" center="0.3 0 0"/>
 
