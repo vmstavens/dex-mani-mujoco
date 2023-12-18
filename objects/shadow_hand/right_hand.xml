@@ -1,5 +1,5 @@
 <mujoco model="right_shadow_hand">
-  <compiler angle="radian" meshdir="assets" autolimits="true"/>
+  <compiler angle="radian" meshdir="shadow_hand/assets" autolimits="true"/>
   <!-- <compiler angle="radian" coordinate="local" inertiafromgeom="true" meshdir="" /> -->
 
   <option impratio="10"/>
@@ -9,23 +9,25 @@
       <mesh scale="0.001 0.001 0.001"/>
       <joint axis="1 0 0" damping="0.05" armature="0.0002" frictionloss="0.01"/>
       <position forcerange="-1 1"/>
-
       <default class="wrist">
         <joint damping="0.5"/>
         <default class="wrist_y">
           <joint axis="0 1 0" range="-0.523599 0.174533"/>
           <position kp="10" ctrlrange="-0.523599 0.174533" forcerange="-10 10"/>
+          <!-- <position kp="10" ctrlrange="-0.523599 0.174533" forcerange="-10 10"/> -->
         </default>
         <default class="wrist_x">
           <joint range="-0.698132 0.488692"/>
           <position kp="8" ctrlrange="-0.698132 0.488692" forcerange="-5 5"/>
+          <!-- <position kp="8" ctrlrange="-0.698132 0.488692" forcerange="-5 5"/> -->
         </default>
       </default>
 
       <default class="thumb">
         <default class="thbase">
           <joint axis="0 0 -1" range="-1.0472 1.0472"/>
-          <position kp="0.4" ctrlrange="-1.0472 1.0472" forcerange="-3 3"/>
+          <position kp="20" ctrlrange="-1.0472 1.0472" forcerange="-3 3"/>
+          <!-- <position kp="0.4" ctrlrange="-1.0472 1.0472" forcerange="-3 3"/> -->
         </default>
         <default class="thproximal">
           <joint range="0 1.22173"/>
@@ -33,11 +35,13 @@
         </default>
         <default class="thhub">
           <joint range="-0.20944 0.20944"/>
-          <position kp="0.5" ctrlrange="-0.20944 0.20944"/>
+          <position kp="20" ctrlrange="-0.20944 0.20944"/>
+          <!-- <position kp="0.5" ctrlrange="-0.20944 0.20944"/> -->
         </default>
         <default class="thmiddle">
           <joint axis="0 -1 0" range="-0.698132 0.698132"/>
-          <position kp="1.5" ctrlrange="-0.698132 0.698132"/>
+          <position kp="20" ctrlrange="-0.698132 0.698132"/>
+          <!-- <position kp="1.5" ctrlrange="-0.698132 0.698132"/> -->
         </default>
         <default class="thdistal">
           <joint range="-0.261799 1.5708"/>
@@ -47,19 +51,23 @@
 
       <default class="metacarpal">
         <joint axis="0.573576 0 0.819152" range="0 0.785398"/>
-        <position ctrlrange="0 0.785398"/>
+        <position kp="20" ctrlrange="0 0.785398"/>
+        <!-- <position ctrlrange="0 0.785398"/> -->
       </default>
       <default class="knuckle">
         <joint axis="0 -1 0" range="-0.349066 0.349066"/>
-        <position ctrlrange="-0.349066 0.349066"/>
+        <position kp="20" ctrlrange="-0.349066 0.349066"/>
+        <!-- <position ctrlrange="-0.349066 0.349066"/> -->
       </default>
       <default class="proximal">
         <joint range="-0.261799 1.5708"/>
-        <position ctrlrange="-0.261799 1.5708"/>
+        <position kp="20" ctrlrange="-0.261799 1.5708"/>
+        <!-- <position ctrlrange="-0.261799 1.5708"/> -->
       </default>
       <default class="middle_distal">
         <joint range="0 1.5708"/>
-        <position kp="0.5" ctrlrange="0 3.1415"/>
+        <position kp="20" ctrlrange="0 3.1415"/>
+        <!-- <position kp="0.5" ctrlrange="0 3.1415"/> -->
       </default>
 
       <default class="plastic">
@@ -96,11 +104,11 @@
   </asset>
 
   <worldbody>
-    <!-- <joint type="free" stiffness="0" damping="0" frictionloss="0" armature="0"/> -->
-  
-    <body name="rh_forearm" childclass="right_hand" quat="1 -1 1 -1" pos="1 1 1">
-      
-      <joint type="free" name="rh_forearm_floating_joint"/>
+    <body name="rh_forearm" childclass="right_hand" quat="1 1 0 0" pos="-0.05 0.3 0.2">
+    <!-- <body name="rh_forearm" childclass="right_hand" quat="1 1 0 0" pos="1 1 1"> -->
+    <!-- <body name="rh_forearm" childclass="right_hand" quat="1 -1 1 -1" pos="1 1 1"> -->
+
+    <!-- <freejoint/> -->
 
       <inertial mass="3" pos="0 0 0.09" diaginertia="0.0138 0.0138 0.00744"/>
       <geom class="plastic_visual" mesh="forearm_0" material="gray"/>
@@ -300,7 +308,6 @@
       <joint joint="rh_LFJ1" coef="1"/>
     </fixed>
   </tendon>
-
   <actuator>
     <position name="rh_A_WRJ2" joint="rh_WRJ2" class="wrist_y"/>
     <position name="rh_A_WRJ1" joint="rh_WRJ1" class="wrist_x"/>
@@ -323,4 +330,11 @@
     <position name="rh_A_LFJ3" joint="rh_LFJ3" class="proximal"/>
     <position name="rh_A_LFJ0" tendon="rh_LFJ0" class="middle_distal"/>
   </actuator>
+
+
+  <!-- weld the hand to the arm (box) -->
+  <!-- <equality>
+    <weld body1="arm" body2="rh_forearm"/>
+  </equality> -->
+
 </mujoco>

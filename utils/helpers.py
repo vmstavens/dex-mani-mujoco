@@ -1,7 +1,7 @@
 import numpy as np
 import mujoco as mj
 from typing import List, Tuple
-from math import radians, degrees
+from math import radians
 
 class Vector3D:
     def __init__(self, x=0.0, y=0.0, z=0.0):
@@ -164,7 +164,6 @@ class Quaternion:
         """
 
         axis = axis.numpy()
-        print(axis, type(axis))
         axis /= np.linalg.norm(axis)  # Normalize the axis
 
         half_angle = angle / 2.0
@@ -299,6 +298,7 @@ class Pose:
     def translate(self, delta_position: Vector3D) -> 'Pose':
         """Translate the pose by a given delta_position."""
         new_position = self.position + delta_position
+        # return Pose(pos=new_position, quat=Quaternion(w=1.0,x=0.0,y=0.0,z=0.0))
         return Pose(pos=new_position, quat=self.quaternion)
 
     def rotate(self, delta_orientation: Quaternion) -> 'Pose':
@@ -393,7 +393,7 @@ def quaternion_to_rpy(q: Quaternion) -> Tuple[float,float,float]:
 
     return (roll_x, pitch_y, yaw_z)
 
-def rpy_to_quaternion(roll:float, pitch:float, yaw:float) -> Quaternion:
+def rpy_to_quaternion(roll:float = 0.0, pitch:float = 0.0, yaw:float = 0.0) -> Quaternion:
     """
     Convert roll-pitch-yaw angles to quaternion.
     """
@@ -454,8 +454,8 @@ def generate_pose_trajectory(start_pose: Pose, end_pose: Pose, n_steps:int ) -> 
     # poses.append(start_pose)
     for i in steps:
         interpolated_quaternion = quaternion_slerp(
-            q1    = normalize_quaternion( start_pose ), 
-            q2    = normalize_quaternion( end_pose ), 
+            q1    = start_pose.quaternion, 
+            q2    = end_pose.quaternion, 
             alpha = i)
 
         x = start_pose.position.x + i * (end_pose.position.x - start_pose.position.x)

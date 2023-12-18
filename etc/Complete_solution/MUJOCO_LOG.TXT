@@ -1,0 +1,24 @@
+Fri Dec 15 14:11:46 2023
+WARNING: mju_openResource: unknown file 'Ur5_robot/UR5e.xml'
+
+Fri Dec 15 14:11:57 2023
+WARNING: mju_openResource: unknown file 'Ur5_robot/UR5e.xml'
+
+Fri Dec 15 14:12:29 2023
+WARNING: File size over 2GB is not supported. File: '/home/vims/git/dex-mani-mujoco/Complete_solution/Ur5_robot'
+
+Fri Dec 15 14:12:29 2023
+WARNING: mju_openResource: unknown file '/home/vims/git/dex-mani-mujoco/Complete_solution/Ur5_robot'
+
+Fri Dec 15 14:12:48 2023
+WARNING: mju_openResource: unknown file '/home/vims/git/dex-mani-mujoco/Complete_solution/Ur5_robot/UR5e.xml'
+
+Fri Dec 15 14:17:58 2023
+WARNING: mju_openResource: unknown file 'Ur5_robot/UR5e.xml'
+
+Fri Dec 15 14:19:42 2023
+WARNING: Nan, Inf or huge value in QVEL at DOF 36. The simulation is unstable. Time = 48.8100.
+
+Fri Dec 15 14:19:42 2023
+WARNING: Nan, Inf or huge value in QACC at DOF 36. The simulation is unstable. Time = 0.0500.
+

@@ -12,7 +12,7 @@ class ExpertController(Controller):
 
     def _set_sign(self, sign: str):
         # print(self._signs)
-        # print(sign)
+        print(sign)
         self._ctrl_transition_iter = iter(self._signs[sign])
 
     def _get_next_control(self, sign: str, order: int) -> np.ndarray or None:
