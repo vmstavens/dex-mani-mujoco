@@ -75,12 +75,12 @@
 									<geom class="eef_collision" pos="0 0.097 0" quat="1 1 0 0" size="0.046 0.02"/>
 
 									<body name="ee_link" pos="0 0.11 0" quat="1 -1 0 0">
-											<inertial pos="-0.01 0 0" mass="0.001" diaginertia="1.66667e-08 1.66667e-08 1.66667e-08" />
-											<geom size="0.005 0.005 0.005" pos="-0.01 0 0" type="box" />
-											<site name="ur10e_ee" pos="0 0 1" quat="1 2 1 0"/>
+										<inertial pos="-0.01 0 0" mass="0.001" diaginertia="1.66667e-08 1.66667e-08 1.66667e-08" />
+										<geom size="0.005 0.005 0.005" pos="-0.01 0 0" type="box" />
+										<site name="ur10e_ee" pos="0 0 1" quat="1 2 1 0"/>
 
-											<!-- ====== shadow hand ====== -->
-											<include file="sh_right_hand.xml" />
+										<!-- ====== shadow hand ====== -->
+										<include file="sh_right_hand.xml" />
 									</body>
 								</body>
 							</body>
@@ -101,10 +101,12 @@
 		<include file="sh_actuators.xml" />
 	</actuator>
 
-	<!-- <keyframe>
+	<keyframe>
 		<key name="home" qpos="
 		-1.5708 -1.5708 1.5708 -1.5708 -1.5708 0
-		0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-		" ctrl="-1.5708 -1.5708 1.5708 -1.5708 -1.5708 0"/>
-	</keyframe> -->
+		0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+		" ctrl="-1.5708 -1.5708 1.5708 -1.5708 -1.5708 0
+		0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
+		<!-- " ctrl="-1.5708 -1.5708 1.5708 -1.5708 -1.5708 0"/> -->
+	</keyframe>
 </mujoco>
