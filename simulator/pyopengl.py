@@ -9,6 +9,7 @@ from typing import Tuple
 import numpy as np
 import time
 import math as m
+from math import pi
 import sys
 import pandas as pd
 from typing import List, Optional
@@ -55,30 +56,19 @@ class GLWFSim:
             cam_verbose: bool,
             sim_verbose: bool
     ):
-        # with open(shadow_hand_xml_filepath, 'r') as file:
-        #     xml_content = file.read()
-        #     print(xml_content)
+
         # https://mujoco.readthedocs.io/en/stable/APIreference/APItypes.html#mjmodel
         self._model_file_path = shadow_hand_xml_filepath
-        print(f"{self._model_file_path=}")
         self._model = mj.MjModel.from_xml_path(filename=self._model_file_path)
-        print(f"{self._model=}")
         self._data = mj.MjData(self._model)
-
-        # self._model2 = mj.MjModel.from_xml_path(filename="/home/vims/git/dex-mani-mujoco/objects/universal_robots_ur10e/ur10e.xml")
-
         self._camera = mj.MjvCamera()
         self._options = mj.MjvOption()
 
         self._keyboard_pos_step = 0.05
-
         self.dt = 1.0 / 100.0
 
-        # self.grasp_pose = Pose(pos = self.box_pose.position, quat = self.hand_pose.quaternion).translate(delta_position=Vector3D(x=-0.3, y=0.0, z=0.3)).rotate(delta_orientation = rpy_to_quaternion(roll=m.pi)  )
         self._window = mujoco.viewer.launch_passive(self._model, self._data,key_callback=self._keyboard_cb)
         self._scene = mj.MjvScene(self._model, maxgeom=10000)
-
-        self._i = 0
 
         self._pose_lock = Lock()
         self._data_lock = Lock()
@@ -87,11 +77,20 @@ class GLWFSim:
         # self._context = mj.MjrContext(self._model, mj.mjtFontScale.mjFONTSCALE_150.value)
 
         self._hand_controller = hand_controller
-        # self._pose_controller = PoseController(ctrl_limits=np.array([]))
         self._trajectory_steps = trajectory_steps
         self._cam_verbose = cam_verbose
         self._sim_verbose = sim_verbose
 
+        # self._arm = rtb.Robot(
+        #     [
+        #         rtb.RevoluteDH(d = 0.1807, alpha = pi / 2.0),   # J1
+        #         rtb.RevoluteDH(a = -0.6127),                    # J2
+        #         rtb.RevoluteDH(a = -0.57155),                   # J3
+        #         rtb.RevoluteDH(d = 0.17415, alpha = pi / 2.0),  # J4
+        #         rtb.RevoluteDH(d = 0.11985, alpha = -pi / 2.0), # J5
+        #         rtb.RevoluteDH(d = 0.11655),                    # J6
+        #     ], name="ur10e", base=sm.SE3.Trans(0,0,0)
+        # )
 
         # self._window = None
         # self._scene = None
@@ -139,44 +138,44 @@ class GLWFSim:
 
     #     return interpolated_poses
 
-    @staticmethod
-    def slerp(q1, q2, t):
-        dot_product = np.dot(q1, q2)
+    # @staticmethod
+    # def slerp(q1, q2, t):
+    #     dot_product = np.dot(q1, q2)
 
-        # Check if the quaternions are very close, use linear interpolation
-        if abs(dot_product) > 0.99:
-            result = (1 - t) * q1 + t * q2
-            result /= np.linalg.norm(result)
-            return result
+    #     # Check if the quaternions are very close, use linear interpolation
+    #     if abs(dot_product) > 0.99:
+    #         result = (1 - t) * q1 + t * q2
+    #         result /= np.linalg.norm(result)
+    #         return result
 
-        omega = np.arccos(dot_product)
-        sin_omega = np.sin(omega)
+    #     omega = np.arccos(dot_product)
+    #     sin_omega = np.sin(omega)
 
-        q_interpolated = (np.sin((1 - t) * omega) / sin_omega) * q1 + (np.sin(t * omega) / sin_omega) * q2
-        return q_interpolated
+    #     q_interpolated = (np.sin((1 - t) * omega) / sin_omega) * q1 + (np.sin(t * omega) / sin_omega) * q2
+    #     return q_interpolated
 
 
-    def interpolate_poses(self, initial_pose, final_pose, num_steps):
-        # Linear interpolation for position
-        positions = np.linspace(initial_pose.t, final_pose.t, num_steps)
+    # def interpolate_poses(self, initial_pose, final_pose, num_steps):
+    #     # Linear interpolation for position
+    #     positions = np.linspace(initial_pose.t, final_pose.t, num_steps)
 
-        # Spherical linear interpolation (slerp) for orientation
-        initial_quaternion = tf_2_quat(UnitQuaternion(initial_pose.R))
-        final_quaternion   = tf_2_quat(UnitQuaternion(final_pose.R))
+    #     # Spherical linear interpolation (slerp) for orientation
+    #     initial_quaternion = tf_2_quat(UnitQuaternion(initial_pose.R))
+    #     final_quaternion   = tf_2_quat(UnitQuaternion(final_pose.R))
 
-        slerp_interpolated_quaternions = [self.slerp(initial_quaternion, final_quaternion, t) for t in np.linspace(0, 1, num_steps)]
+    #     slerp_interpolated_quaternions = [self.slerp(initial_quaternion, final_quaternion, t) for t in np.linspace(0, 1, num_steps)]
 
-        # Convert interpolated quaternions to UnitQuaternion objects
-        orientations = [UnitQuaternion(q) for q in slerp_interpolated_quaternions]
+    #     # Convert interpolated quaternions to UnitQuaternion objects
+    #     orientations = [UnitQuaternion(q) for q in slerp_interpolated_quaternions]
 
-        poses = []
+    #     poses = []
 
-        print(orientations)
-        for i,p in enumerate(positions):
-            T = make_tf(quat=orientations[i]) @ make_tf(pos=p)
-            poses.append(T)
+    #     print(orientations)
+    #     for i,p in enumerate(positions):
+    #         T = make_tf(quat=orientations[i]) @ make_tf(pos=p)
+    #         poses.append(T)
 
-        return poses
+    #     return poses
 
 
     def launch_mujoco(self):
@@ -186,23 +185,32 @@ class GLWFSim:
                 time_prev = self._data.time
 
                 mj.mj_step(m=self._model, d=self._data)
+                # self._update()
+                print("----")
+                print(self._data.qpos)
+                print(len(self._data.qpos))
+                print("----")
+                home = [-1.5708, -1.5708, 1.5708, -1.5708, -1.5708, 0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+                # with self._data_lock:
+                for i in range(len(home)):
+                    self._data.qpos[i] = home[i]
+                # self._data.qpos[6] = home[6]
+                # with self._pose_lock:
+                #     if self._pose_trajectory:
+                #         initial_pose = self._data.mocap_pos
+                #         initial_pose = make_tf(pos=self._data.mocap_pos, quat=self._data.mocap_quat)
+                #         final_pose = self._pose_trajectory.pop(0)  # Use the first pose in the list
 
-                with self._pose_lock:
-                    if self._pose_trajectory:
-                        initial_pose = self._data.mocap_pos
-                        initial_pose = make_tf(pos=self._data.mocap_pos, quat=self._data.mocap_quat)
-                        final_pose = self._pose_trajectory.pop(0)  # Use the first pose in the list
+                #         # Interpolate poses smoothly
+                #         interpolated_poses = self.interpolate_poses(initial_pose, final_pose, num_steps=100)
 
-                        # Interpolate poses smoothly
-                        interpolated_poses = self.interpolate_poses(initial_pose, final_pose, num_steps=100)
+                #         for pose in interpolated_poses:
+                #             # with self._data_lock:
+                #             self._data.mocap_pos  = pose.t
+                #             self._data.mocap_quat = tf_2_quat(pose)
 
-                        for pose in interpolated_poses:
-                            # with self._data_lock:
-                            self._data.mocap_pos  = pose.t
-                            self._data.mocap_quat = tf_2_quat(pose)
-
-                            self._update()
-                            # mj.mj_step(m=self._model, d=self._data)
+                #             self._update()
+                #             # mj.mj_step(m=self._model, d=self._data)
 
                 viewer.sync()
 
@@ -277,7 +285,7 @@ class GLWFSim:
         self._set_quat(q = pose.quaternion)
 
     def _update(self):
-        
+
         mj.mjv_updateScene(
                 self._model,
                 self._data,
@@ -289,190 +297,17 @@ class GLWFSim:
             )
 
         # Step the simulation one last time to update with the final pose
-        with self._data_lock:
-            mj.mj_step(m=self._model, d=self._data)
+        # with self._data_lock:
+        #     mj.mj_step(m=self._model, d=self._data)
 
-        # Render the final scene
+        # # Render the final scene
         # mj.mjr_render(viewport=self._viewport, scn=self._scene, con=self._context)
 
-        # Swap OpenGL buffers (blocking call due to v-sync)
+        # # Swap OpenGL buffers (blocking call due to v-sync)
         # glfw.swap_buffers(window=self._window)
 
-        # Poll GLFW events
+        # # Poll GLFW events
         # glfw.poll_events()
-
-    # @property
-    # def transition_history(self) -> List[List[Optional[float]]]:
-    #     """Get the transition history."""
-    #     return self._transition_history
-
-    # def _interpolate_positions(self, current_pos: np.ndarray, target_pos: np.ndarray, alpha: float) -> np.ndarray:
-    #     """Interpolate positions."""
-    #     interpolated_pos = current_pos + alpha * (target_pos - current_pos)
-    #     return interpolated_pos
-
-    # def _interpolate_orientations(
-    #         self,
-    #         current_ori: Quaternion,
-    #         target_ori: Quaternion,
-    #         alpha: float
-    #     ) -> Quaternion:
-    #     """Interpolate orientations."""
-
-    #     interpolated_quaternion = quaternion_slerp(current_ori, target_ori, alpha)
-    #     return interpolated_quaternion
-
-    # def _execute_trajectory(self, trajectory: List[Pose]) -> None:
-    #     """Execute trajectory."""
-
-    #     pos = {
-    #         "x": [], "y": [], "z": [], 
-    #         "des_x": [], "des_y": [], "des_z": [], 
-    #         "qw" : [],"qx" : [],"qy" : [],"qz" : [],
-    #         "des_qw" : [],"des_qx" : [],"des_qy" : [],"des_qz" : [] 
-    #     }
-
-    #     for target_pose in trajectory:
-
-    #         self._set_pose( pose=target_pose )
-
-    #         # self.hand_pose = get_pose("right_shadow_hand",model=self._model, data=self._data)
-
-    #         pos["x"].append(self._data.qpos[0])
-    #         pos["y"].append(self._data.qpos[1])
-    #         pos["z"].append(self._data.qpos[2])
-
-    #         pos["qw"].append(self._data.qpos[3])
-    #         pos["qx"].append(self._data.qpos[4])
-    #         pos["qy"].append(self._data.qpos[5])
-    #         pos["qz"].append(self._data.qpos[6])
-
-    #         pos["des_x"].append(target_pose.position.x)
-    #         pos["des_y"].append(target_pose.position.y)
-    #         pos["des_z"].append(target_pose.position.z)
-
-    #         pos["des_qw"].append(target_pose.quaternion.w)
-    #         pos["des_qx"].append(target_pose.quaternion.x)
-    #         pos["des_qy"].append(target_pose.quaternion.y)
-    #         pos["des_qz"].append(target_pose.quaternion.z)
-
-    #         # Render the updated scene
-    #         self._update()
-
-    #     df = pd.DataFrame.from_dict(pos)
-    #     df.to_csv("traj-2.csv")
-    #     self.hand_pose = trajectory[-1]
-
-
-    # def set_pose(self, x=None, y=None, z=None,
-    #              qx=None, qy=None, qz=None, qw=None,
-    #              roll=None, pitch=None, yaw=None,
-    #              interpolation_time=1.0):
-
-    #     current_pose = self._data.qpos[:7]
-    #     current_pos = Vector3D.from_numpy(current_pose[:3])
-    #     current_ori = Quaternion.from_numpy(current_pose[3:])
-
-    #     pos = { "x":[], "y":[], "z":[], "des_x": [], "des_y": [], "des_z": [] }
-
-    #     # Save the starting time
-    #     start_time = time.time()
-    #     # ctrl = start_ctrl + i*(end_ctrl - start_ctrl)/n_steps
-
-    #     while time.time() - start_time < interpolation_time:
-    #         # Compute interpolation factor (0 to 1) using ease-in-out function
-    #         alpha = (time.time() - start_time) / interpolation_time
-    #         # smoothstep = lambda x : x * x * (3 - 2 * x)
-    #         # alpha = smoothstep((time.time() - start_time) / interpolation_time)
-
-    #         # Interpolate positions
-    #         if x is not None:
-    #             self._data.qpos[0] = current_pos.x + alpha * (x - current_pos.x)
-    #         if y is not None:
-    #             self._data.qpos[1] = current_pos.y + alpha * (y - current_pos.y)
-    #         if z is not None:
-    #             self._data.qpos[2] = current_pos.z + alpha * (z - current_pos.z)
-
-    #         pos["x"].append(self._data.qpos[0])
-    #         pos["y"].append(self._data.qpos[1])
-    #         pos["z"].append(self._data.qpos[2])
-
-    #         pos["des_x"].append(current_pos.x + alpha * (x - current_pos.x))
-    #         pos["des_y"].append(current_pos.y + alpha * (y - current_pos.y))
-    #         pos["des_z"].append(current_pos.z + alpha * (z - current_pos.z))
-
-            
-    #         # Interpolate orientations using slerp
-    #         if qw is not None:
-    #             target_quaternion = Quaternion(w=qw,x=qx,y=qy,z=qz)
-    #         else:
-    #             # Convert roll-pitch-yaw to quaternion
-    #             roll = roll if roll is not None else quaternion_to_rpy(current_ori)[0]
-    #             pitch = pitch if pitch is not None else quaternion_to_rpy(current_ori)[1]
-    #             yaw = yaw if yaw is not None else quaternion_to_rpy(q=current_ori)[2]
-    #             target_quaternion = rpy_to_quaternion(roll, pitch, yaw)
-
-    #         # q1 = Quaternion.from_numpy(current_ori)
-    #         # q2 = Quaternion.from_numpy(target_quaternion)
-
-    #         interpolated_quaternion = quaternion_slerp(current_ori, target_quaternion, alpha)
-    #         self._data.qpos[3:7] = interpolated_quaternion.numpy()
-
-    #         # Step the simulation
-    #         mj.mj_step(m=self._model, d=self._data)
-
-    #         # Render the updated scene
-    #         viewport_width, viewport_height = glfw.get_framebuffer_size(window=self._window)
-    #         viewport = mj.MjrRect(left=0, bottom=0, width=viewport_width, height=viewport_height)
-
-    #         mj.mjv_updateScene(
-    #             self._model,
-    #             self._data,
-    #             self._options,
-    #             None,
-    #             self._camera,
-    #             mj.mjtCatBit.mjCAT_ALL.value,
-    #             self._scene
-    #         )
-    #         mj.mjr_render(viewport=viewport, scn=self._scene, con=self._context)
-
-
-    #         # Swap OpenGL buffers (blocking call due to v-sync)
-    #         glfw.swap_buffers(window=self._window)
-
-    #         # Poll GLFW events
-    #         glfw.poll_events()
-
-    #     # Set the final pose after the interpolation is complete
-    #     if x is not None:
-    #         self._data.qpos[0] = x
-    #     if y is not None:
-    #         self._data.qpos[1] = y
-    #     if z is not None:
-    #         self._data.qpos[2] = z
-    #     if qw is not None:
-    #         self._data.qpos[3] = qw
-    #     if qy is not None:
-    #         self._data.qpos[4] = qx
-    #     if qz is not None:
-    #         self._data.qpos[5] = qy
-    #     if qw is not None:
-    #         self._data.qpos[6] = qz
-
-    #     # Step the simulation one last time to update with the final pose
-    #     mj.mj_step(m=self._model, d=self._data)
-
-    #     # Render the final scene
-    #     mj.mjr_render(viewport=viewport, scn=self._scene, con=self._context)
-
-    #     # Swap OpenGL buffers (blocking call due to v-sync)
-    #     glfw.swap_buffers(window=self._window)
-
-    #     # Poll GLFW events
-    #     glfw.poll_events()
-        
-    #     df = pd.DataFrame.from_dict(pos)
-    #     df.to_csv("test-linear-2.csv")
 
     # # Handles keyboard button events to interact with simulator
     def _keyboard_cb(self, key):
@@ -665,10 +500,9 @@ class GLWFSim:
 
     # Runs GLFW main loop
     def run(self):
+        self.mujoco_thrd = Thread(target=self.launch_mujoco, daemon=True)
+        self.mujoco_thrd.start()
         input()
-        # self.mujoco_thrd = Thread(target=self.launch_mujoco, daemon=True)
-        # self.mujoco_thrd.start()
-        # input()
         # self._window = glfw.create_window(1200, 900, 'Shadow Hand Simulation', None, None)
 
         # while not glfw.window_should_close(window=self._window) and not self._terminate_simulation:
@@ -707,5 +541,5 @@ class GLWFSim:
         #     glfw.swap_buffers(window=self._window)
 
         #     # process pending GUI events, call GLFW callbacks
-        #     glfw.poll_events()
+            # glfw.poll_events()
         # glfw.terminate()

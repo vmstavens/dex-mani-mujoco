@@ -309,6 +309,7 @@
       <joint joint="rh_LFJ1" coef="1"/>
     </fixed>
   </tendon>
+  
   <actuator>
     <position name="rh_A_WRJ2" joint="rh_WRJ2" class="wrist_y"/>
     <position name="rh_A_WRJ1" joint="rh_WRJ1" class="wrist_x"/>
