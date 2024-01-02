@@ -1,24 +1,24 @@
 
 
 <mujocoinclude>
-    <position name="rh_A_WRJ2" joint="rh_WRJ2" class="wrist_y"/>
-    <position name="rh_A_WRJ1" joint="rh_WRJ1" class="wrist_x"/>
-    <position name="rh_A_THJ5" joint="rh_THJ5" class="thbase"/>
-    <position name="rh_A_THJ4" joint="rh_THJ4" class="thproximal"/>
-    <position name="rh_A_THJ3" joint="rh_THJ3" class="thhub"/>
-    <position name="rh_A_THJ2" joint="rh_THJ2" class="thmiddle"/>
-    <position name="rh_A_THJ1" joint="rh_THJ1" class="thdistal"/>
-    <position name="rh_A_FFJ4" joint="rh_FFJ4" class="knuckle"/>
-    <position name="rh_A_FFJ3" joint="rh_FFJ3" class="proximal"/>
+    <position name="rh_A_WRJ2" joint="rh_WRJ2"  class="wrist_y"/>
+    <position name="rh_A_WRJ1" joint="rh_WRJ1"  class="wrist_x"/>
+    <position name="rh_A_THJ5" joint="rh_THJ5"  class="thbase"/>
+    <position name="rh_A_THJ4" joint="rh_THJ4"  class="thproximal"/>
+    <position name="rh_A_THJ3" joint="rh_THJ3"  class="thhub"/>
+    <position name="rh_A_THJ2" joint="rh_THJ2"  class="thmiddle"/>
+    <position name="rh_A_THJ1" joint="rh_THJ1"  class="thdistal"/>
+    <position name="rh_A_FFJ4" joint="rh_FFJ4"  class="knuckle"/>
+    <position name="rh_A_FFJ3" joint="rh_FFJ3"  class="proximal"/>
     <position name="rh_A_FFJ0" tendon="rh_FFJ0" class="middle_distal"/>
-    <position name="rh_A_MFJ4" joint="rh_MFJ4" class="knuckle"/>
-    <position name="rh_A_MFJ3" joint="rh_MFJ3" class="proximal"/>
+    <position name="rh_A_MFJ4" joint="rh_MFJ4"  class="knuckle"/>
+    <position name="rh_A_MFJ3" joint="rh_MFJ3"  class="proximal"/>
     <position name="rh_A_MFJ0" tendon="rh_MFJ0" class="middle_distal"/>
-    <position name="rh_A_RFJ4" joint="rh_RFJ4" class="knuckle"/>
-    <position name="rh_A_RFJ3" joint="rh_RFJ3" class="proximal"/>
+    <position name="rh_A_RFJ4" joint="rh_RFJ4"  class="knuckle"/>
+    <position name="rh_A_RFJ3" joint="rh_RFJ3"  class="proximal"/>
     <position name="rh_A_RFJ0" tendon="rh_RFJ0" class="middle_distal"/>
-    <position name="rh_A_LFJ5" joint="rh_LFJ5" class="metacarpal"/>
-    <position name="rh_A_LFJ4" joint="rh_LFJ4" class="knuckle"/>
-    <position name="rh_A_LFJ3" joint="rh_LFJ3" class="proximal"/>
+    <position name="rh_A_LFJ5" joint="rh_LFJ5"  class="metacarpal"/>
+    <position name="rh_A_LFJ4" joint="rh_LFJ4"  class="knuckle"/>
+    <position name="rh_A_LFJ3" joint="rh_LFJ3"  class="proximal"/>
     <position name="rh_A_LFJ0" tendon="rh_LFJ0" class="middle_distal"/>
 </mujocoinclude>

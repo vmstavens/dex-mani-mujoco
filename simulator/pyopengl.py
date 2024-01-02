@@ -2,27 +2,36 @@ import mujoco as mj
 import mujoco.viewer
 import mujoco
 from mujoco.glfw import glfw
-from controllers.controller import Controller
+# from controllers.controller import Controller
+# from controllers.expert import ExpertController
+from controllers.hand_controller import HandController
+from controllers.arm_controller import ArmController
 from utils import control
 import mujoco_py
-from typing import Tuple
+from typing import Tuple, List, Optional, Union, Dict
 import numpy as np
 import time
 import math as m
 from math import pi
 import sys
 import pandas as pd
-from typing import List, Optional
 from threading import Thread, Lock
 import roboticstoolbox as rtb
+from utils.mj import (
+    get_actuator_names,
+    get_joint_value,
+    set_joint_value
+)
 from spatialmath import (
     SE3, SO3, Quaternion, UnitQuaternion
     )
 from scipy.spatial.transform import Slerp
 from spatialmath.base import trnorm
-from scipy.spatial.transform import Slerp
+from dataclasses import dataclass
 
 import spatialmath as sm
+import spatialmath.base as smb
+from simulator.robots import SHUR
 # caution: path[0] is reserved for script path (or '' in REPL)
 sys.path.insert(1, 'shadow_hand/utils')
 
@@ -36,16 +45,38 @@ from utils.rtb import (
     rotate_x
 )
 
+
 from controllers.pose_controller import PoseController
+
+@dataclass
+class RobotConfig:
+    def __init__(self,joint_names, joint_values) -> None:
+        self._joint_values = joint_values
+        self._joint_names = joint_names
+    @property
+    def joint_values(self) -> List:
+        return self._joint_values
+    @property
+    def joint_names(self) -> List:
+        return self._joint_names
+    @property
+    def dict(self) -> Dict[str,List]:
+        result = {}
+        for i in range(len(self._joint_values)):
+            result[self._joint_names[i]] = self._joint_values[i]
+        return result
+    def __repr__(self) -> str:
+        return self.dict.__str__()
 
 class GLWFSim:
     def __init__(
-            self,
-            shadow_hand_xml_filepath: str,
-            hand_controller: Controller,
-            trajectory_steps: int,
-            cam_verbose: bool,
-            sim_verbose: bool
+        self,
+        shadow_hand_xml_filepath: str,
+        hand_controller: HandController,
+        arm_controller: HandController,
+        trajectory_steps: int,
+        cam_verbose: bool,
+        sim_verbose: bool
     ):
 
         # https://mujoco.readthedocs.io/en/stable/APIreference/APItypes.html#mjmodel
@@ -55,308 +86,241 @@ class GLWFSim:
         self._camera = mj.MjvCamera()
         self._options = mj.MjvOption()
 
+        self.N_ACTUATORS_HAND = 20
+        self.N_ACTUATORS_ARM = 6
+        self.N_ACTUATORS_ROBOT = self.N_ACTUATORS_HAND + self.N_ACTUATORS_ARM
+
         self._keyboard_pos_step = 0.05
         self.dt = 1.0 / 100.0
 
-        self._window = mujoco.viewer.launch_passive(self._model, self._data)
-        # self._window = mujoco.viewer.launch_passive(self._model, self._data,key_callback=self._keyboard_cb)
+        # self._window = mujoco.viewer.launch_passive(self._model, self._data)
+        self._window = mujoco.viewer.launch_passive(self._model, self._data,key_callback=self._keyboard_cb)
         self._scene = mj.MjvScene(self._model, maxgeom=10000)
 
-        self._pose_lock = Lock()
         self._data_lock = Lock()
         self._pose_trajectory = []
 
         self._hand_controller = hand_controller
+        self._arm_controller = arm_controller
+        self._robot_controller = None
         self._trajectory_steps = trajectory_steps
         self._cam_verbose = cam_verbose
         self._sim_verbose = sim_verbose
 
-        self._arm = rtb.DHRobot(
-            [
-                rtb.RevoluteDH(d = 0.1807, alpha = pi / 2.0),   # J1
-                rtb.RevoluteDH(a = -0.6127),                    # J2
-                rtb.RevoluteDH(a = -0.57155),                   # J3
-                rtb.RevoluteDH(d = 0.17415, alpha =  pi / 2.0),  # J4
-                rtb.RevoluteDH(d = 0.11985, alpha = -pi / 2.0), # J5
-                rtb.RevoluteDH(d = 0.11655),                    # J6
-            ], name="ur10e", base=sm.SE3.Trans(0,0,0)
+        # ur tcp to wrist joints
+        # UR_EE_TO_SH_WRIST_JOINTS = 0.21268 # m
+        # SH_WRIST_TO_SH_PALM      = 0.08721395775941231 # m
+
+        # self._arm = rtb.DHRobot(
+        #     [
+        #         rtb.RevoluteDH(d = 0.1807, alpha = pi / 2.0),        # J1
+        #         rtb.RevoluteDH(a = -0.6127),                         # J2
+        #         rtb.RevoluteDH(a = -0.57155),                        # J3
+        #         rtb.RevoluteDH(d = 0.17415, alpha =  pi / 2.0),      # J4
+        #         rtb.RevoluteDH(d = 0.11985, alpha = -pi / 2.0),      # J5
+        #         rtb.RevoluteDH(d = 0.11655),
+        #     ], name="ur10e", base=sm.SE3.Trans(0,0,0)
+        # )
+        # self._robot = rtb.DHRobot(
+        #     [
+        #         rtb.RevoluteDH(d = 0.1807, alpha = pi / 2.0),        # J1
+        #         rtb.RevoluteDH(a = -0.6127),                         # J2
+        #         rtb.RevoluteDH(a = -0.57155),                        # J3
+        #         rtb.RevoluteDH(d = 0.17415, alpha =  pi / 2.0),      # J4
+        #         rtb.RevoluteDH(d = 0.11985, alpha = -pi / 2.0),      # J5
+        #         rtb.RevoluteDH(d = 0.11655 + UR_EE_TO_SH_WRIST_JOINTS), # J6 + forearm
+        #         rtb.RevoluteDH(alpha = pi / 2),                      # WR1
+        #         rtb.RevoluteDH(alpha = pi / 2, offset= pi / 2),      # WR2
+        #         rtb.RevoluteDH(d = SH_WRIST_TO_SH_PALM),             # from wrist to palm
+        #     ], name="shur", base=sm.SE3.Trans(0,0,0)
+        # )
+
+        # self._trajectory_iter = []
+        # self._transition_history = []
+
+        # # set home pose
+        # self._HOME_ARM   = [-1.5708, -1.5708, 1.5708, -1.5708, -1.5708, 0]
+        # self._HOME_HAND  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        # self._HOME_ROBOT = [-1.5708, -1.5708, 1.5708, -1.5708, -1.5708, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        # self._ZERO_ROBOT = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+
+        # self._q_arm = np.zeros( self.N_ACTUATORS_ARM )
+        # self._q_hand = np.zeros( self.N_ACTUATORS_HAND )
+        # self._q_robot = np.zeros( self.N_ACTUATORS_ROBOT )
+
+        # self.__set_home()
+        # self.set_q_arm(q = self._HOME_ARM)
+
+        self.shur = SHUR(self._model,self._data)
+        self.shur.home()
+
+        mj.set_mjcb_control(self._controller_fn)
+
+    # def __set_home(self):
+    #     self.__set_q_hand(self._HOME_HAND)
+    #     self.__set_q_arm(self._HOME_ARM)
+
+    def __set_q_hand(self, q: Union[str,List]) -> None:
+        hand_actuator_names = []
+        for an in get_actuator_names(self._model):
+            prefix = an.split("_")[0]
+            if prefix == "rh" or prefix == "lh":
+                hand_actuator_names.append(an)
+        for i, han in enumerate(hand_actuator_names):
+            set_joint_value(data=self._data, q=q[i], joint_name=han)
+
+    def get_q_hand(self) -> RobotConfig:
+        """
+        Get the configuration of the hand's actuators in the MuJoCo simulation.
+
+        Returns:
+        - RobotConfig: An object containing joint values and names for the hand actuators.
+        """
+        hand_actuator_names = []
+        hand_actuator_values = []
+        for an in get_actuator_names(self._model):
+            prefix = an.split("_")[0]
+            if prefix == "rh" or prefix == "lh":
+                hand_actuator_names.append(an)
+        for han in hand_actuator_names:
+            hand_actuator_values.append(get_joint_value(self._data, han))
+        hc = RobotConfig(
+            joint_values = hand_actuator_values,
+            joint_names = hand_actuator_names
+        )
+        return hc
+
+    def __set_q_arm(self, q: Union[str,List]) -> None:
+        arm_actuator_names = []
+        for an in get_actuator_names(self._model):
+            prefix = an.split("_")[0]
+            if prefix == "ur10e":
+                arm_actuator_names.append(an)
+        for i, han in enumerate(arm_actuator_names):
+            set_joint_value(data=self._data, q=q[i], joint_name=han)
+
+    def get_q_arm(self) -> RobotConfig:
+        """
+        Get the configuration of the arm's actuators in the MuJoCo simulation.
+
+        Returns:
+        - RobotConfig: An object containing joint values and names for the arm actuators.
+        """
+        arm_actuator_names = []
+        arm_actuator_values = []
+        for an in get_actuator_names(self._model):
+            prefix = an.split("_")[0]
+            if prefix == "ur10e":
+                arm_actuator_names.append(an)
+        for han in arm_actuator_names:
+            arm_actuator_values.append(get_joint_value(self._data, han))
+        ac = RobotConfig(
+            joint_values = arm_actuator_values,
+            joint_names = arm_actuator_names
+        )
+        return ac
+
+    # traj methods #################################3
+
+    def set_q_hand(self, q: Union[str, List]) -> None:
+        """
+        Set the trajectory for the hand's actuators in the MuJoCo simulation.
+
+        Parameters:
+        - q (Union[str, List]): Either a configuration string or a list of control values for the hand.
+
+        Raises:
+        - AssertionError: If the length of q does not match the expected number of hand actuators.
+
+        Modifies:
+        - Sets the trajectory for the hand controllers using the provided configuration.
+        """
+        if isinstance(q,str):
+            q:list = self._hand_controller.cfg_to_q(q)
+        assert len(q) == self.N_ACTUATORS_HAND, f"Length of q should be {self.N_ACTUATORS_HAND}, q had length {len(q)}"
+        
+        self._hand_controller.set_traj( 
+            start_ctrl = self.get_q_hand().joint_values,
+            end_ctrl = q
         )
 
-        self._sign = ''
-        self._trajectory_iter = iter([])
-        self._transition_history = []
+    def set_q_arm(self, q: Union[str,List]) -> None:
+        """
+        Set the control values for the arm actuators in the MuJoCo simulation.
 
-        # set home pose
-        self.__HOME = [-1.5708, -1.5708, 1.5708, -1.5708, -1.5, 0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-        # self.__HOME = [-1.5708, -1.5708, 1.5708, -1.5708, -1.5708, 0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-        self.__set_q(q = self.__HOME)
+        Parameters:
+        - q (Union[str, List]): Either a configuration string or a list of control values for the arm.
 
-        # self._init_controller()
-        # mj.set_mjcb_control(self._controller_fn)
+        Raises:
+        - AssertionError: If the length of q does not match the expected number of arm actuators.
 
-    def __set_q(self, q: list) -> None:
-            for i in range(len(q)):
-                self._data.qpos[i] = q[i]
+        Modifies:
+        - Sets the control values for the arm actuators in the MuJoCo simulation.
+        """
+        if isinstance(q,str):
+            q:list = self._arm_controller.cfg_to_q(q)
+        assert len(q) == self.N_ACTUATORS_ARM, f"Length of q should be {self.N_ACTUATORS_ARM}, q had length {len(q)}"
+        
+        self._arm_controller.set_traj( 
+            start_ctrl = self.get_q_arm().joint_values,
+            end_ctrl = q
+        )
 
-    def launch_mujoco(self):
+    def viewer_cb(self):
         with self._window as viewer:
             while viewer.is_running():
                 step_start = time.time()
-
-                mj.mj_step(m=self._model, d=self._data)
-                mj.mjv_updateScene(
-                    self._model,
-                    self._data,
-                    self._options,
-                    None,
-                    self._camera,
-                    mj.mjtCatBit.mjCAT_ALL.value,
-                    self._scene
-                )
-                # self._update()
-                print("----")
-                print(self._data.qpos[:7])
-                print("----")
-                print(self._data.qpos[0])
-                self.__set_q(self.__HOME)
-
-                if (self._data.qpos[0] > -1 ):
-                    print("potential problem...")
-
                 viewer.sync()
+
+                with self._data_lock:
+                    mj.mjv_updateScene(
+                        self._model,
+                        self._data,
+                        self._options,
+                        None,
+                        self._camera,
+                        mj.mjtCatBit.mjCAT_ALL.value,
+                        self._scene
+                    )
+                    mj.mj_step(m=self._model, d=self._data)
 
                 # Rudimentary time keeping, will drift relative to wall clock.
                 time_until_next_step = self._model.opt.timestep - (time.time() - step_start)
-                print("slep tim: ",time_until_next_step)
                 if time_until_next_step > 0:
+                    # pass
                     time.sleep(time_until_next_step)
-
-    def _update(self):
-
-        mj.mjv_updateScene(
-                self._model,
-                self._data,
-                self._options,
-                None,
-                self._camera,
-                mj.mjtCatBit.mjCAT_ALL.value,
-                self._scene
-            )
-
-        # Step the simulation one last time to update with the final pose
-        with self._data_lock:
-            mj.mj_step(m=self._model, d=self._data)
-
-        # # Render the final scene
-        # mj.mjr_render(viewport=self._viewport, scn=self._scene, con=self._context)
-
-        # # Swap OpenGL buffers (blocking call due to v-sync)
-        # glfw.swap_buffers(window=self._window)
-
-        # # Poll GLFW events
-        # glfw.poll_events()
 
     # # Handles keyboard button events to interact with simulator
     def _keyboard_cb(self, key):
-    # def _keyboard_cb(self, window, key, scancode, act, mods)
-        # print("running")
-        print(f"{key=} | {glfw.PRESS=}")
-        # if key == glfw.PRESS:
-        if key == glfw.KEY_BACKSPACE:
-            with self._data_lock:
-                mj.mj_resetData(self._model, self._data)
-                mj.mj_forward(self._model, self._data)
-            print("> reset simulation succeeded...")
-        elif key == glfw.KEY_ESCAPE:
-            self._terminate_simulation = True
-            print("> terminated simulation...")
-        elif key == glfw.KEY_UP:
-            print("+x")
-            with self._data_lock:
-                self._data.mocap_pos[0, 0] += self._keyboard_pos_step
-        elif key == glfw.KEY_DOWN:
-            print("-x")
-            with self._data_lock:
-                self._data.mocap_pos[0, 0] -= self._keyboard_pos_step
-        elif key == glfw.KEY_LEFT:
-            print("+y")
-            with self._data_lock:
-                self._data.mocap_pos[0, 1] += self._keyboard_pos_step
-        elif key == glfw.KEY_RIGHT:
-            print("-y")
-            with self._data_lock:
-                self._data.mocap_pos[0, 1] -= self._keyboard_pos_step
-        elif key == glfw.KEY_PERIOD:
-            print("+z")
-            with self._data_lock:
-                self._data.mocap_pos[0, 2] += self._keyboard_pos_step
-        elif key == glfw.KEY_COMMA:
-            print("-z")
-            with self._data_lock:
-                self._data.mocap_pos[0, 2] -= self._keyboard_pos_step
-            # print(self._data.mocap_quat)
-        elif key == glfw.KEY_R:
-            # get pose of robot
-
-            n_steps = 10
-            with self._data_lock:
-                box_pose = get_pose("box", data=self._data, model=self._model)
-                hand_pose = get_pose("hand", data=self._data, model=self._model)
-            grasp_pose = box_pose.Tz(1.3)
-            grasp_pose = rotate_x(grasp_pose, m.pi/2)
-            
-            print("box pose =") 
-            print(box_pose)
-            print("hand pose =") 
-            print(hand_pose)
-            print("grasp pose =")
-            print(grasp_pose)
-
-            test = generate_pose_trajectory(
-                start_pose=hand_pose,
-                end_pose=grasp_pose,
-                n_steps=n_steps
-            )
-            self._pose_trajectory = test
-
-            print(self._pose_trajectory)
-
-        elif key == glfw.KEY_T:
-            print("Pressed 2...")
+        if key == glfw.KEY_K:
+            print(" >>>>> KEY K <<<<<")
+            print(" >>>>> verifying hand <<<<<")
+            self.shur.shadow_hand.set_q(q = "grasp")
         elif key == glfw.KEY_O:
-            print("open...")
-            self._sign = 'open'
-            self._hand_controller.set_sign(sign=self._sign)
-            # self._update()
-        elif key == glfw.KEY_P:
-            print("grasp...")
-            self._sign = 'grasp'
-            self._hand_controller.set_sign(sign=self._sign)
-            # self._update()
-        elif key == glfw.KEY_5:
-            self._sign = 'yes'
-            self._hand_controller.set_sign(sign=self._sign)
-        elif key == glfw.KEY_6:
-            self._sign = 'rock'
-            self._hand_controller.set_sign(sign=self._sign)
-        elif key == glfw.KEY_7:
-            self._sign = 'circle'
-            self._hand_controller.set_sign(sign=self._sign)
+            print(" >>>>> KEY O <<<<<+")
+            print(" >>>>> verifying arm <<<<<")
+            self.shur.ur10e.set_q(q = "up")
+        elif key == glfw.KEY_PERIOD:
+            print(" >>>>> KEY . <<<<<")
+            pos = [0.5, 0.5, 0.5]
+            ori = self.shur.ur10e.get_ee_pose().R
 
-    # Initializes hand controller
-    def _init_controller(self):
-        # self._sign = 'order'
-        self._sign = 'rest'
-        self._hand_controller.set_sign(sign=self._sign)
+            self.shur.ur10e.set_ee_pose(pos=pos, ori=ori)
+
+        elif key == glfw.KEY_H:
+            self.shur.home()
+        elif key == glfw.KEY_J:
+            print("doing nothing...")
 
     # Defines controller behavior
     def _controller_fn(self, model: mj.MjModel, data: mj.MjData) -> None:
-        # as long as no new goal is defined, then we simply return (this function is called often)
-        if self._hand_controller.is_done:
-            return
-
-        # Retrieves next trajectory control
-        # trajectory is a non-empty list of joint configurations e.g. q
-        next_ctrl = next(self._trajectory_iter, None)
-
-        # Executes control if ctrl is not None else creates next trajectory between a control transition
-        if next_ctrl is None:
-            with self._data_lock:
-                start_ctrl = data.ctrl
-                end_ctrl = self._hand_controller.get_next_control(sign=self._sign)
-
-            if end_ctrl is None:
-                if self._sim_verbose:
-                    print('Sign transitions completed')
-            else:
-                if self._sim_verbose:
-                    print(f'New control transition is set from {start_ctrl} to {end_ctrl}')
-
-                row = [self._sign, self._hand_controller.order - 1, end_ctrl]
-                self._transition_history.append(row)
-
-                # 100 step trajectory of the hand
-                control_trajectory = control.generate_control_trajectory(
-                    start_ctrl=start_ctrl,
-                    end_ctrl=end_ctrl,
-                    n_steps=self._trajectory_steps
-                )
-
-                # set the next control sequence equal to this control trajecotry
-                self._trajectory_iter = iter(control_trajectory)
-
-                if self._sim_verbose:
-                    print('New trajectory is computed')
-        else:
-            # set the data control to the next in the 100 element long list of q configs '
-            with self._data_lock:
-                data.ctrl = next_ctrl
+        if not self.shur.is_done:
+            self.shur.step()
 
     # Runs GLFW main loop
     def run(self):
-        print("etst")
-        with self._window as viewer:
-            print("etst2")
-            while viewer.is_running():
-                print("etst3")
-                step_start = time.time()
-                with self._data_lock:
-                    print(self._data.qpos[:7])
-                    print(self._data.qpos[0])
-                    self.__set_q(self.__HOME)
-
-                    if (abs(self._data.qpos[0]) < 1 ):
-                        print("potential problem...")
-                        # exit()
-
-                viewer.sync()
-
-                # Rudimentary time keeping, will drift relative to wall clock.
-                time_until_next_step = self._model.opt.timestep - (time.time() - step_start)
-                if time_until_next_step > 0:
-                    time.sleep(time_until_next_step)
-                self._update()
-        print("done")
-        # self.mujoco_thrd = Thread(target=self.launch_mujoco, daemon=True)
-        # self.mujoco_thrd.start()
-        # input()
-        # self._window = glfw.create_window(1200, 900, 'Shadow Hand Simulation', None, None)
-
-        # while not glfw.window_should_close(window=self._window) and not self._terminate_simulation:
-        #     time_prev = self._data.time
-
-        #     # print("test = ",self.hand_pose)
-        #     # self._set_pose(self.hand_pose)
-        #     # self._update()
-        #     while self._data.time - time_prev < 1.0/60.0:
-        #         mj.mj_step(m=self._model, d=self._data)
-
-        #     viewport_width, viewport_height = glfw.get_framebuffer_size(window=self._window)
-        #     viewport = mj.MjrRect(left=0, bottom=0, width=viewport_width, height=viewport_height)
-
-        #     if self._cam_verbose:
-        #         print(
-        #             f'Camera Azimuth = {self._camera.azimuth}, '
-        #             f'Camera Elevation = {self._camera.elevation}, '
-        #             f'Camera Distance = {self._camera.distance}, '
-        #             f'Camera Lookat = {self._camera.lookat}'
-        #         )
-
-        #     # Update scene and render
-        #     mj.mjv_updateScene(
-        #         self._model,
-        #         self._data,
-        #         self._options,
-        #         None,
-        #         self._camera,
-        #         mj.mjtCatBit.mjCAT_ALL.value,
-        #         self._scene
-        #     )
-        #     mj.mjr_render(viewport=viewport, scn=self._scene, con=self._context)
-
-        #     # swap OpenGL buffers (blocking call due to v-sync)
-        #     glfw.swap_buffers(window=self._window)
-
-        #     # process pending GUI events, call GLFW callbacks
-            # glfw.poll_events()
-        # glfw.terminate()
+        self.viewer_thrd = Thread(target=self.viewer_cb, daemon=True)
+        self.viewer_thrd.start()
+        print("run done...")
+        input()
+        print("DONE")

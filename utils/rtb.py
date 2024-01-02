@@ -1,10 +1,13 @@
 
 import roboticstoolbox as rtb
 import spatialmath as sm
+import spatialmath.base as smb
 import numpy as np
 from spatialmath import (
     SE3, SO3, UnitQuaternion
 )
+
+from typing import Union
 
 import mujoco as mj
 from scipy.spatial.transform import Slerp
@@ -21,10 +24,33 @@ def tf_2_quat(tf: SE3) -> np.ndarray:
     q = UnitQuaternion(tf.R)
     return np.append([q.s],q.v)
 
-def make_tf(pos: np.ndarray = [0,0,0], quat: np.ndarray = [1,0,0,0]) -> SE3:
-    R = quat_2_tf(quat)
+def make_tf(pos: Union[np.ndarray,list] = [0,0,0], ori: Union[np.ndarray,SE3] = [1,0,0,0]) -> SE3:
+    """
+    Create a SE3 transformation matrix.
+
+    Parameters:
+    - pos (np.ndarray): Translation vector [x, y, z].
+    - ori (Union[np.ndarray, SE3]): Orientation, can be a rotation matrix, quaternion, or SE3 object.
+
+    Returns:
+    - SE3: Transformation matrix.
+    """
+    if isinstance(ori, list):
+        ori = np.array(ori)
+
+    # Convert ori to SE3 if it's already a rotation matrix or a quaternion
+    if isinstance(ori, np.ndarray):
+        if ori.shape == (3, 3):  # Assuming ori is a rotation matrix
+            ori = SE3(smb.r2t(ori))
+        elif ori.shape == (4,):  # Assuming ori is a quaternion
+            ori = smb.r2t(UnitQuaternion(s=ori[0],v=ori[1:]).R)
+        elif ori.shape == (3,):  # Assuming ori is rpy
+            ori = SE3.Eul(ori, unit='rad')
+
+    # Create SE3 object for the translation
     t = SE3(pos)
-    T = R @ t
+    # Combine translation and orientation
+    T = t * ori
     return T
 
 def get_pose(name:str, model: mj.MjModel, data: mj.MjData) -> SE3:

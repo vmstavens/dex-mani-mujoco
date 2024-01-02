@@ -13,32 +13,26 @@ import utils
 from simulator import GLWFSim
 from controllers.model import ModelController
 from controllers.expert import ExpertController
+from controllers.hand_controller import HandController
+from controllers.arm_controller import ArmController
 from utils.control import read_sign_transitions, read_ctrl_limits
 from typing import Union, Dict
 import mujoco as mj
 def main():
 
-    # xml_path = "objects/universal_robots_ur10e/scene.xml"
-    # xml_path = "objects/universal_robots_ur10e/scene.xml"
-    # xml_path = "objects/scene.xml"
-    xml_path = "objects/shadow_ur/scene.xml"
-    # xml_path = "objects/shadow_hand/scene_right.xml"
-    # xml_path = "/home/vims/git/dex-mani-mujoco/objects/universal_robots_ur10e/scene.xml"
-    signs_filepath = 'data/signs.json'
-    ctrl_limits_filepath = "data/ctrl_limits.csv"
+    scene_path = "objects/shadow_ur/scene.xml"
+    hand_cfg_dir = "config/shadow_hand.json"
+    arm_cfg_dir = "config/ur10e.json"
 
-    print(f"{xml_path=}")
-    print(f"{signs_filepath=}")
-    print(f"{ctrl_limits_filepath=}")
-
-    # xml_path = "/home/vims/git/dex-mani-mujoco/mujoco_menagerie/shadow_hand/scene_right.xml"
-    signs = read_sign_transitions(json_filepath=signs_filepath)
-    ctrl_limits = read_ctrl_limits(csv_filepath=ctrl_limits_filepath)
+    print(f"{scene_path=}")
+    print(f"{hand_cfg_dir=}")
+    print(f"{arm_cfg_dir=}")
 
     sim = GLWFSim(
-        shadow_hand_xml_filepath=xml_path,
-        hand_controller=ExpertController(ctrl_limits=ctrl_limits,signs=signs),
-        trajectory_steps=10,
+        shadow_hand_xml_filepath=scene_path,
+        hand_controller=HandController(config_dir = hand_cfg_dir,ctrl_n_steps=10),
+        arm_controller=HandController(config_dir = arm_cfg_dir,ctrl_n_steps=10),
+        trajectory_steps=3,
         cam_verbose=False,
         sim_verbose=True
     )

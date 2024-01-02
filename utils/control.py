@@ -9,12 +9,24 @@ def read_sign_transitions(json_filepath: str) -> Dict[str, List[np.ndarray]]:
     signs = {}
     with open(json_filepath, mode='r', encoding='utf-8') as jsonfile:
         jsonobj = json.load(jsonfile)
-
         for sign, ctrl_list in jsonobj.items():
             ctrl_transitions = [np.float32(ctrl) for ctrl in ctrl_list]
             signs[sign] = ctrl_transitions
     return signs
 
+def read_config(json_filepath: str) -> Dict[str,Dict[str,List]]:
+    result = {}
+    with open(json_filepath, mode='r', encoding='utf-8') as jsonfile:
+        jsonobj = json.load(jsonfile)
+        for cfg, finger_js in jsonobj.items():
+            result[cfg] = {}
+            for finger_name, ctrl_list in finger_js.items():
+                if isinstance(ctrl_list,float):
+                    result[cfg][finger_name] = ctrl_list
+                else:
+                    ctrl_transitions = [np.float32(ctrl) for ctrl in ctrl_list]
+                    result[cfg][finger_name] = ctrl_transitions
+    return result
 
 # Reads the control limits (low position, high position) for each actuator
 def read_ctrl_limits(csv_filepath: str) -> List[np.ndarray]:
@@ -34,7 +46,10 @@ def read_ctrl_limits(csv_filepath: str) -> List[np.ndarray]:
 # Generates a control trajectory of N steps between start control and end control
 def generate_control_trajectory(start_ctrl: np.ndarray, end_ctrl: np.ndarray, n_steps: int) -> List[np.ndarray]:
     trajectory = []
+    start_ctrl = start_ctrl if isinstance(start_ctrl,np.ndarray) else np.array(start_ctrl)
+    end_ctrl   = end_ctrl if isinstance(end_ctrl,np.ndarray) else np.array(end_ctrl)
+
     for i in range(n_steps + 1):
         ctrl = start_ctrl + i*(end_ctrl - start_ctrl)/n_steps
-        trajectory.append(ctrl)
+        trajectory.append(ctrl.tolist())
     return trajectory

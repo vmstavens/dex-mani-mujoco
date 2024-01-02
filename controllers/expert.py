@@ -9,11 +9,20 @@ class ExpertController(Controller):
 
         self._signs = signs
         self._ctrl_transition_iter = None
+        self._sign = "rest"
 
     def _set_sign(self, sign: str):
         # print(self._signs)
-        print(sign)
+        self._sign = sign
         self._ctrl_transition_iter = iter(self._signs[sign])
+    
+    def sign_to_q(self, sign: str) -> np.ndarray:
+        return self._signs[sign]
 
     def _get_next_control(self, sign: str, order: int) -> np.ndarray or None:
+        print(self._ctrl_transition_iter)
         return next(self._ctrl_transition_iter, None)
+
+    @property
+    def sign(self) -> str:
+        return self._sign

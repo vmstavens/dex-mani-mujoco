@@ -1,7 +1,7 @@
 import numpy as np
 # from utils.dataset import NUM_ACTUATORS
 from abc import ABC, abstractmethod
-from typing import List, Dict 
+from typing import List, Dict, Union
 
 
 class Controller(ABC):
@@ -32,7 +32,7 @@ class Controller(ABC):
         pass
 
     # Returns the next control of the transition. The positions are clipped according to control limits just in case
-    def get_next_control(self, sign: str) -> np.ndarray or None:
+    def get_next_control(self, sign: str) -> Union[np.ndarray, None]:
         if self._is_done:
             return None
 

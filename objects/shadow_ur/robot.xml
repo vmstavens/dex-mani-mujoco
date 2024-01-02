@@ -1,9 +1,9 @@
 <mujoco model="shadow_ur">
-  <compiler angle="radian" meshdir="assets" autolimits="true"/>
-  <!-- <compiler angle="radian" meshdir="universal_robots_ur10e/assets" autolimits="true"/> -->
-  <!-- <compiler angle="radian" meshdir="/home/vims/git/dex-mani-mujoco/objects/universal_robots_ur10e/assets" autolimits="true"/> -->
+	<compiler angle="radian" meshdir="assets" autolimits="true"/>
+	<!-- <compiler angle="radian" meshdir="universal_robots_ur10e/assets" autolimits="true"/> -->
+	<!-- <compiler angle="radian" meshdir="/home/vims/git/dex-mani-mujoco/objects/universal_robots_ur10e/assets" autolimits="true"/> -->
 
-  <option integrator="implicitfast"/>
+	<option integrator="implicitfast"/>
 
 	<default>
 		<!-- ======= UR control classes ======= -->
@@ -24,7 +24,10 @@
 
 	<worldbody>
 		<light name="spotlight" mode="targetbodycom" target="wrist_2_link" pos="0 -1 2"/>
-		<body name="base" quat="1 0 0 1" childclass="ur10e">
+
+		<!-- <body name="base" quat="0.92388 0 0 0.38268" pos="0 0 1" childclass="ur10e"> -->
+		<body name="base" quat="0 0 0 1" pos="0 0 0" childclass="ur10e">
+		<!-- <body name="base" quat="0 0 0 1" pos="0 0 0" childclass="ur10e"> -->
 			<inertial mass="4.0" pos="0 0 0" diaginertia="0.0061063308908 0.0061063308908 0.01125"/>
 			<geom mesh="ur10e_base_0" material="urblack" class="visual"/>
 			<geom mesh="ur10e_base_1" material="jointgray" class="visual"/>
@@ -100,13 +103,4 @@
 		<!-- ======= Shadow actuators ======= -->
 		<include file="sh_actuators.xml" />
 	</actuator>
-
-	<keyframe>
-		<key name="home" qpos="
-		-1.5708 -1.5708 1.5708 -1.5708 -1.5708 0
-		0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-		" ctrl="-1.5708 -1.5708 1.5708 -1.5708 -1.5708 0
-		0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
-		<!-- " ctrl="-1.5708 -1.5708 1.5708 -1.5708 -1.5708 0"/> -->
-	</keyframe>
 </mujoco>
