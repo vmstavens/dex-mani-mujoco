@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 def read_config(json_filepath: str) -> Dict[str,Dict[str,List]]:
     result = {}
+    print(f"{json_filepath=}")
     with open(json_filepath, mode='r', encoding='utf-8') as jsonfile:
         jsonobj = json.load(jsonfile)
         for cfg, finger_js in jsonobj.items():

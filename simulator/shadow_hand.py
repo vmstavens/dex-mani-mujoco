@@ -1,6 +1,8 @@
 import mujoco as mj
 import numpy as np
 import roboticstoolbox as rtb
+import os
+import warnings
 
 from typing import List, Union
 from spatialmath import SE3
@@ -18,15 +20,21 @@ from utils.mj import (
 
 
 class ShadowHand:
-    def __init__(self, model: mj.MjModel, data: mj.MjData, config_dir:str = "config/shadow_hand.json") -> None:
+    def __init__(self, model: mj.MjModel, data: mj.MjData, config_dir:str = "config/") -> None:
         self._model = model
         self._data = data
         self._N_ACTUATORS:int = 20
         self._traj = []
         self._HOME = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        self._config_dir = config_dir
         self._name = "shadow_hand"
-        self._configs = read_config(self._config_dir)
+        self._config_dir = config_dir
+        if os.path.isfile(self._config_dir):
+            print(self._config_dir, type(self._config_dir))
+            self._configs = read_config(self._config_dir)
+        else:
+            self._config_dir = "config/shadow_hand.json"
+            warnings.warn(f"config_dir {self._config_dir} could not be found, using default config/shadow_hand.json")
+            self._configs = read_config(self._config_dir)
 
     @property
     def n_actuators(self) -> int:

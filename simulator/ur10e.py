@@ -3,7 +3,8 @@ import roboticstoolbox as rtb
 import spatialmath as sm
 import math as m
 import numpy as np
-
+import os
+import warnings
 from typing import List, Union
 
 from spatialmath import SE3
@@ -24,9 +25,10 @@ from utils.sim import (
 )
 
 class UR10e:
-    def __init__(self, model: mj.MjModel, data: mj.MjData, args, config_dir:str = "config/ur10e.json") -> None:
+    def __init__(self, model: mj.MjModel, data: mj.MjData, args, config_dir:str = "config/") -> None:
         
         self._args = args
+        self._name = "ur10e"
         
         self._robot = rtb.DHRobot(
             [
@@ -36,7 +38,7 @@ class UR10e:
                 rtb.RevoluteDH(d = 0.17415, alpha =  m.pi / 2.0), # J4
                 rtb.RevoluteDH(d = 0.11985, alpha = -m.pi / 2.0), # J5
                 rtb.RevoluteDH(d = 0.11655),                      # J6
-            ], name="ur10e", base=sm.SE3.Trans(0,0,0)
+            ], name=self._name, base=sm.SE3.Trans(0,0,0)
         )
         self._HOME   = [-1.5708, -1.5708, 1.5708, -1.5708, -1.5708, 0.0]
         self._model = model
@@ -44,8 +46,14 @@ class UR10e:
         self._N_ACTUATORS:int = 6
         self._traj = []
         self._config_dir = config_dir
-        self._configs = read_config(self._config_dir)
-        self._name = "ur10e"
+        print(self._config_dir, type(self._config_dir))
+        if os.path.isfile(self._config_dir):
+            print(self._config_dir, type(self._config_dir))
+            self._configs = read_config(self._config_dir)
+        else:
+            self._config_dir = "config/ur10e.json"
+            warnings.warn(f"config_dir {self._config_dir} could not be found, using default config/ur10e.json")
+            self._configs = read_config(self._config_dir)
 
     @property
     def rtb_robot(self) -> rtb.DHRobot:
