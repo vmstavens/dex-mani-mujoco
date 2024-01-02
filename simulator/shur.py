@@ -1,0 +1,150 @@
+from .shadow_hand import ShadowHand
+from .ur10e import UR10e
+from typing import List, Union
+
+import roboticstoolbox as rtb
+import mujoco as mj
+import math as m
+import spatialmath as sm
+import numpy as np
+
+from spatialmath import SE3
+
+from utils.sim import read_config, RobotConfig
+
+from utils.mj import (
+    get_actuator_names,
+    get_joint_value,
+    set_joint_value
+)
+
+class SHUR:
+    def __init__(self, model: mj.MjModel, data: mj.MjData, args) -> None:
+        
+        self._args = args
+        self._model = model
+        self._data = data
+        self._traj = []
+
+        UR_EE_TO_SH_WRIST_JOINTS = 0.21268             # m
+        SH_WRIST_TO_SH_PALM      = 0.08721395775941231 # m
+        
+        self._ur10e       = UR10e(model, data, args)
+        self._shadow_hand = ShadowHand(model, data, args)
+
+        self._robot = rtb.DHRobot(
+            [
+                rtb.RevoluteDH(d = 0.1807, alpha = m.pi / 2.0),         # J1
+                rtb.RevoluteDH(a = -0.6127),                            # J2
+                rtb.RevoluteDH(a = -0.57155),                           # J3
+                rtb.RevoluteDH(d = 0.17415, alpha =  m.pi / 2.0),       # J4
+                rtb.RevoluteDH(d = 0.11985, alpha = -m.pi / 2.0),       # J5
+                rtb.RevoluteDH(d = 0.11655 + UR_EE_TO_SH_WRIST_JOINTS), # J6 + forearm
+                rtb.RevoluteDH(alpha = m.pi / 2),                       # WR1
+                rtb.RevoluteDH(alpha = m.pi / 2, offset= m.pi / 2),     # WR2
+                rtb.RevoluteDH(d = SH_WRIST_TO_SH_PALM),                # from wrist to palm
+            ], name="shur", base=sm.SE3.Trans(0,0,0)
+        )
+
+        self._N_ACTUATORS:int = self.shadow_hand.n_actuators + self.ur10e.n_actuators
+
+    @property
+    def shadow_hand(self) -> ShadowHand:
+        return self._shadow_hand
+
+    @property
+    def ur10e(self) -> UR10e:
+        return self._ur10e
+
+    @property
+    def is_done(self) -> bool:
+        return self._is_done()
+
+    @property
+    def n_actuators(self) -> int:
+        return self._N_ACTUATORS
+
+    def _is_done(self) -> bool:
+        return True if (self.shadow_hand.is_done and self.ur10e.is_done) else False
+
+    def _set_q(self, q: Union[str,List]) -> None:
+        """
+        Set the control values for the arm actuators in the MuJoCo simulation.
+
+        This private method is responsible for updating the joint values of the arm actuators
+        based on the provided control values. It iterates through the arm actuators' names,
+        extracts the corresponding control values from the input list, and updates the MuJoCo
+        data with the new joint values.
+
+        Parameters:
+        - q (Union[str, List]): Either a configuration string or a list of control values
+        for the arm actuators.
+
+        Raises:
+        - AssertionError: If the length of q does not match the expected number of arm actuators.
+        """
+        arm_actuator_names = []
+        for an in get_actuator_names(self._model):
+            prefix = an.split("_")[0]
+            if prefix == "ur10e":
+                arm_actuator_names.append(an)
+        for i, han in enumerate(arm_actuator_names):
+            set_joint_value(data=self._data, q=q[i], joint_name=han)
+
+    def set_q(self, q: Union[str,List], n_steps: int = 10) -> None:
+        """
+        Set the control values for the arm actuators in the MuJoCo simulation.
+
+        Parameters:
+        - q (Union[str, List]): Either a configuration string or a list of control values for the arm.
+
+        Raises:
+        - AssertionError: If the length of q does not match the expected number of arm actuators.
+
+        Modifies:
+        - Sets the control values for the arm actuators in the MuJoCo simulation.
+        """
+        if isinstance(q,str):
+            q:list = self.cfg_to_q(q)
+        print(f"{q=}")
+        assert len(q) == self._N_ACTUATORS, f"Length of q should be {self._N_ACTUATORS}, q had length {len(q)}"
+        
+        q0 = np.array(self.get_q().joint_values)
+        qf = np.array(q)
+
+        self._traj = rtb.jtraj(
+            q0 = q0,
+            qf = qf,
+            t = n_steps
+        ).q.tolist()
+
+    def set_ee_pose(self, 
+            pos: List = [0.5,0.5,0.5], 
+            ori: Union[np.ndarray,SE3] = [1,0,0,0], 
+            n_steps:int = 100
+            ) -> None:
+
+        cartesian_traj = rtb.ctraj(
+            T0=self.get_ee_pose(),
+            T1=make_tf(pos=pos,ori=ori),
+            t=n_steps
+        )
+
+        for target in cartesian_traj:
+            q_sol, success, iterations, searches, residual = self._robot.ik_NR(Tep=target)
+            if not success:
+                raise ValueError("Inverse kinematics failed to find a solution.")
+            self._traj.append(q_sol)
+
+    def get_ee_pose(self) -> SE3:
+        return self._robot.fkine(self.get_q().joint_values)
+
+    def home(self) -> None:
+        self.shadow_hand.home()
+        self.ur10e.home()
+    
+    def step(self) -> None:
+        if not self.ur10e.is_done:
+            self.ur10e.step()
+        if not self.shadow_hand.is_done:
+            self.shadow_hand.step()

@@ -14,19 +14,7 @@ def read_sign_transitions(json_filepath: str) -> Dict[str, List[np.ndarray]]:
             signs[sign] = ctrl_transitions
     return signs
 
-def read_config(json_filepath: str) -> Dict[str,Dict[str,List]]:
-    result = {}
-    with open(json_filepath, mode='r', encoding='utf-8') as jsonfile:
-        jsonobj = json.load(jsonfile)
-        for cfg, finger_js in jsonobj.items():
-            result[cfg] = {}
-            for finger_name, ctrl_list in finger_js.items():
-                if isinstance(ctrl_list,float):
-                    result[cfg][finger_name] = ctrl_list
-                else:
-                    ctrl_transitions = [np.float32(ctrl) for ctrl in ctrl_list]
-                    result[cfg][finger_name] = ctrl_transitions
-    return result
+
 
 # Reads the control limits (low position, high position) for each actuator
 def read_ctrl_limits(csv_filepath: str) -> List[np.ndarray]:

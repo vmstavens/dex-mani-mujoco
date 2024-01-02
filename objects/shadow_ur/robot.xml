@@ -7,19 +7,19 @@
 
 	<default>
 		<!-- ======= UR control classes ======= -->
-		<include file="ur10e_classes.xml" />
+		<include file="ur10e/ur10e_classes.xml" />
 
 		<!-- ======= shadow control classes ======= -->
-		<include file="sh_classes.xml" />
+		<include file="sh/sh_classes.xml" />
 
 	</default>
 
 	<asset>
 		<!-- ======= UR Assets ======= -->
-		<include file="ur10e_assets.xml"/>
+		<include file="ur10e/ur10e_assets.xml"/>
 
 		<!-- ======= Shadow Assets ======= -->
-		<include file="sh_assets.xml"/>
+		<include file="sh/sh_assets.xml"/>
 	</asset>
 
 	<worldbody>
@@ -83,7 +83,7 @@
 										<site name="ur10e_ee" pos="0 0 1" quat="1 2 1 0"/>
 
 										<!-- ====== shadow hand ====== -->
-										<include file="sh_right_hand.xml" />
+										<include file="sh/sh_right_hand.xml" />
 									</body>
 								</body>
 							</body>
@@ -95,12 +95,12 @@
 	</worldbody>
 
 	<!-- ======= Shadow setup ======= -->
-	<include file="sh_setup.xml"/>
+	<include file="sh/sh_setup.xml"/>
 
 	<actuator>
 		<!-- ======= UR actuators ======= -->
-		<include file="ur10e_actuators.xml" />
+		<include file="ur10e/ur10e_actuators.xml" />
 		<!-- ======= Shadow actuators ======= -->
-		<include file="sh_actuators.xml" />
+		<include file="sh/sh_actuators.xml" />
 	</actuator>
 </mujoco>

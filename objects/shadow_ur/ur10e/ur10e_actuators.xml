@@ -1,0 +1,9 @@
+
+<mujocoinclude>
+    <general class="size4"         name="ur10e_shoulder_pan" joint="shoulder_pan_joint"/>
+    <general class="size4"         name="ur10e_shoulder_lift" joint="shoulder_lift_joint"/>
+    <general class="size3_limited" name="ur10e_elbow" joint="elbow_joint"/>
+    <general class="size2"         name="ur10e_wrist_1" joint="wrist_1_joint"/>
+    <general class="size2"         name="ur10e_wrist_2" joint="wrist_2_joint"/>
+    <general class="size2"         name="ur10e_wrist_3" joint="wrist_3_joint"/>
+</mujocoinclude>
