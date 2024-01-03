@@ -2,8 +2,11 @@ import json
 import numpy as np
 import os
 import warnings
+import mujoco as mj
 from typing import List, Dict
 from dataclasses import dataclass
+from spatialmath import SE3
+from utils.rtb import make_tf
 
 def read_config(json_filepath: str) -> Dict[str,Dict[str,List]]:
     result = {}
@@ -29,8 +32,35 @@ def read_config(json_filepath: str) -> Dict[str,Dict[str,List]]:
                     result[cfg][finger_name] = ctrl_transitions
     return result
 
+def config_to_q(cfg:str, configs:Dict, actuator_names: List[str]) -> List:
+    try:
+        cfg_json = configs[cfg]
+        q = []
+        for ac_name in actuator_names:
+            q.append(cfg_json[ac_name])
+        return q
+    except KeyError:
+        print("Wrong cfg string, try one of the following:")
+        for k,v in configs.items():
+            print(f"\t{k}")
 
+def get_object_pose(object_name:str, model: mj.MjModel, data: mj.MjData) -> SE3:
+    # Find the object ID by name
+    obj_id = mj.mj_name2id(model, mj.mjtObj.mjOBJ_BODY, object_name)
 
+    if obj_id == -1:
+        raise ValueError(f"Object with name '{object_name}' not found.")
+
+    # Get the object pose from the simulation data
+    obj_pose = data.xpos[obj_id], data.xquat[obj_id]
+
+    # Extract position and orientation
+    pos = obj_pose[0]
+    quat = obj_pose[1]
+
+    pose = make_tf(pos=pos,ori=quat)
+
+    return pose
 
 @dataclass
 class RobotConfig:

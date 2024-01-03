@@ -6,6 +6,16 @@ import time
 import sys
 from threading import Thread, Lock
 from simulator.shur import SHUR
+import math as m
+from spatialmath import SE3
+
+from utils.sim import (
+    get_object_pose
+)
+
+from utils.rtb import (
+    make_tf
+)
 
 class GLWFSim:
     def __init__(self, args):
@@ -66,15 +76,28 @@ class GLWFSim:
             print(" >>>>> verifying robot <<<<<")
             # test set q
             # self.shur.set_q()
-            pos = [0.5, 0.5, 0.5]
-            ori = self.shur.ur10e.get_ee_pose().R
-            self.shur.ur10e.set_ee_pose(pos=pos, ori=ori)
+            # pos = [0.5, 0.5, 0.5]
+            # ori = self.shur.ur10e.get_ee_pose().R
+            # self.shur.ur10e.set_ee_pose(pos=pos, ori=ori)
         elif key == glfw.KEY_COMMA:
-            print(" >>>>> KEY , <<<<<")
-            print(self.shur.get_q())
-
+            print("my ur ee pose")
+            print(self.shur.ur10e.get_ee_pose())
         elif key == glfw.KEY_SPACE:
-            self.shur.shadow_hand.set_q(q = "home")
+            print("setting home =")
+            self.shur.set_q(q = "home")
+            box_pose = get_object_pose("box1", model=self._model, data=self._data)
+            print("box pose")
+            print(box_pose)
+            print("my ur pose")
+            print(self.shur.ur10e.get_ee_pose())
+            print("my rotation")
+            print(SE3.Rz(m.pi/2.0))
+            T = make_tf(
+                pos = box_pose.t + [0,0,0.1],
+                ori = ( SE3.Ry(-m.pi/2.0) @ SE3.Rz(-m.pi / 2.0) @ self.shur.ur10e.get_ee_pose() ).R
+            )
+            self.shur.ur10e.set_ee_pose(pose=T)
+
         elif key == glfw.KEY_H:
             self.shur.home()
         elif key == glfw.KEY_J:

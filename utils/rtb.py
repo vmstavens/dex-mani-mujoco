@@ -50,7 +50,7 @@ def make_tf(pos: Union[np.ndarray,list] = [0,0,0], ori: Union[np.ndarray,SE3] = 
     # Create SE3 object for the translation
     t = SE3(pos)
     # Combine translation and orientation
-    T = t * ori
+    T = SE3(t * ori)
     return T
 
 def get_pose(name:str, model: mj.MjModel, data: mj.MjData) -> SE3:

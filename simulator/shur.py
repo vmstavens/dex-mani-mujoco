@@ -17,13 +17,14 @@ from spatialmath import SE3
 from utils.sim import (
     read_config,
     save_config, 
+    config_to_q,
     RobotConfig
 )
 
 from utils.mj import (
     get_actuator_names,
     get_actuator_value,
-    set_actuator_value
+    set_actuator_value,
 )
 
 class SHUR:
@@ -32,7 +33,6 @@ class SHUR:
         self._args = args
         self._model = model
         self._data = data
-        self._traj = []
         self._name = "shur"
 
         UR_EE_TO_SH_WRIST_JOINTS = 0.21268             # m
@@ -41,19 +41,19 @@ class SHUR:
         self._ur10e       = UR10e(model, data, args)
         self._shadow_hand = ShadowHand(model, data, args)
 
-        self._robot = rtb.DHRobot(
-            [
-                rtb.RevoluteDH(d = 0.1807, alpha = m.pi / 2.0),         # J1
-                rtb.RevoluteDH(a = -0.6127),                            # J2
-                rtb.RevoluteDH(a = -0.57155),                           # J3
-                rtb.RevoluteDH(d = 0.17415, alpha =  m.pi / 2.0),       # J4
-                rtb.RevoluteDH(d = 0.11985, alpha = -m.pi / 2.0),       # J5
-                rtb.RevoluteDH(d = 0.11655 + UR_EE_TO_SH_WRIST_JOINTS), # J6 + forearm
-                rtb.RevoluteDH(alpha = m.pi / 2),                       # WR1
-                rtb.RevoluteDH(alpha = m.pi / 2, offset= m.pi / 2),     # WR2
-                rtb.RevoluteDH(d = SH_WRIST_TO_SH_PALM),                # from wrist to palm
-            ], name=self._name, base=sm.SE3.Trans(0,0,0)
-        )
+        # self._robot = rtb.DHRobot(
+        #     [
+        #         rtb.RevoluteDH(d = 0.1807, alpha = m.pi / 2.0),         # J1
+        #         rtb.RevoluteDH(a = -0.6127),                            # J2
+        #         rtb.RevoluteDH(a = -0.57155),                           # J3
+        #         rtb.RevoluteDH(d = 0.17415, alpha =  m.pi / 2.0),       # J4
+        #         rtb.RevoluteDH(d = 0.11985, alpha = -m.pi / 2.0),       # J5
+        #         rtb.RevoluteDH(d = 0.11655 + UR_EE_TO_SH_WRIST_JOINTS + SH_WRIST_TO_SH_PALM), # J6 + forearm
+        #         # rtb.RevoluteDH(alpha = m.pi / 2),                       # WR1
+        #         # rtb.RevoluteDH(alpha = m.pi / 2, offset= m.pi / 2),     # WR2
+        #         # rtb.RevoluteDH(d = SH_WRIST_TO_SH_PALM),                # from wrist to palm
+        #     ], name=self._name, base=sm.SE3.Trans(0,0,0)
+        # )
 
         self._N_ACTUATORS:int = self.shadow_hand.n_actuators + self.ur10e.n_actuators
         self._actuator_names = self._get_actuator_names()
@@ -73,14 +73,11 @@ class SHUR:
 
     @property
     def is_done(self) -> bool:
-        return self._is_done()
+        return True if (self.shadow_hand.is_done and self.ur10e.is_done) else False
 
     @property
     def n_actuators(self) -> int:
         return self._N_ACTUATORS
-
-    def _is_done(self) -> bool:
-        return True if (self.shadow_hand.is_done and self.ur10e.is_done) else False
 
     def _get_actuator_names(self) -> List[str]:
         result = []
@@ -120,16 +117,12 @@ class SHUR:
         Raises:
         - AssertionError: If the length of q does not match the expected number of arm actuators.
         """
-        arm_actuator_names = []
+        robot_actuator_names = []
         for an in get_actuator_names(self._model):
-            prefix = an.split("_")[0]
-            if prefix == "ur10e" or prefix == "rh" or prefix == "lh":
-                arm_actuator_names.append(an)
-        for i, han in enumerate(arm_actuator_names):
-            set_actuator_value(data=self._data, q=q[i], actuator_name=han)
-
-    def cfg_to_q(self,q):
-        pass
+            if ("ur10e" in an) or ("rh" in an) or ("lh" in an):
+                robot_actuator_names.append(an)
+        for i in range(len(robot_actuator_names)):
+            set_actuator_value(data=self._data, q=q[i], actuator_name=robot_actuator_names[i])
 
     def set_q(self, q: Union[str, List, RobotConfig], n_steps: int = 10) -> None:
         """
@@ -145,7 +138,7 @@ class SHUR:
         - Sets the control values for the arm actuators in the MuJoCo simulation.
         """
         if isinstance(q,str):
-            q:list = self.cfg_to_q(q)
+            q:list = config_to_q(cfg=q,configs=self._configs,actuator_names=self._actuator_names)
         assert len(q) == self._N_ACTUATORS, f"Length of q should be {self._N_ACTUATORS}, q had length {len(q)}"
         
         q0 = np.array(self.get_q().actuator_values)
@@ -157,31 +150,10 @@ class SHUR:
             t = n_steps
         ).q.tolist()
 
-    def set_ee_pose(self, 
-            pos: List = [0.5,0.5,0.5], 
-            ori: Union[np.ndarray,SE3] = [1,0,0,0], 
-            n_steps:int = 100
-            ) -> None:
-
-        cartesian_traj = rtb.ctraj(
-            T0=self.get_ee_pose(),
-            T1=make_tf(pos=pos,ori=ori),
-            t=n_steps
-        )
-
-        for target in cartesian_traj:
-            q_sol, success, iterations, searches, residual = self._robot.ik_NR(Tep=target)
-            if not success:
-                raise ValueError("Inverse kinematics failed to find a solution.")
-            self._traj.append(q_sol)
-
-    def get_ee_pose(self) -> SE3:
-        return self._robot.fkine(self.get_q().actuator_values)
-
     def home(self) -> None:
         self.shadow_hand.home()
         self.ur10e.home()
-    
+
     def step(self) -> None:
         if not self.ur10e.is_done:
             self.ur10e.step()

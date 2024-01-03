@@ -11,6 +11,7 @@ from spatialmath import SE3
 from utils.sim import (
     read_config, 
     save_config,
+    config_to_q,
     RobotConfig
 )
 
@@ -23,6 +24,7 @@ from utils.mj import (
 
 class ShadowHand:
     def __init__(self, model: mj.MjModel, data: mj.MjData, args, chirality: str = "rh") -> None:
+        self._args = args
         self._model = model
         self._data = data
         self._N_ACTUATORS:int = 20
@@ -31,10 +33,7 @@ class ShadowHand:
         self._name = "shadow_hand"
         self._chirality = chirality
         self._actuator_names = self._get_actuator_names()
-        self._config_dir = args.config_dir + self._name + ".json"
-        if not os.path.exists(self._config_dir):
-            os.makedirs(os.path.dirname(self._config_dir), exist_ok=True)
-            warnings.warn(f"config_dir {self._config_dir} could not be found, create empty config")
+        self._config_dir = self._get_config_dir()
         self._configs = read_config(self._config_dir)
     @property
     def n_actuators(self) -> int:
@@ -47,6 +46,13 @@ class ShadowHand:
     @property
     def trajectory(self) -> SE3:
         return self._traj
+
+    def _get_config_dir(self):
+        self._config_dir = self._args.config_dir + self._name + ".json"
+        if not os.path.exists(self._config_dir):
+            os.makedirs(os.path.dirname(self._config_dir), exist_ok=True)
+            warnings.warn(f"config_dir {self._config_dir} could not be found, create empty config")
+        return self._config_dir
 
     def _get_actuator_names(self) -> List[str]:
         result = []
@@ -120,16 +126,11 @@ class ShadowHand:
         self._set_q(self._traj.pop(0))
 
     def _cfg_to_q(self, cfg:str) -> List:
-        try:
-            cfg_json = self._configs[cfg]
-            q = []
-            for ac_name in self._actuator_names:
-                q.append(cfg_json[ac_name])
-            return q
-        except KeyError:
-            print("Wrong cfg string, try one of the following:")
-            for k,v in self._configs.items():
-                print(f"\t{k}")
+        return config_to_q(
+            cfg            = cfg, 
+            configs        = self._configs, 
+            actuator_names = self._actuator_names
+        )
 
     def save_config(self, config_name:str = "placeholder") -> None:
         save_config(

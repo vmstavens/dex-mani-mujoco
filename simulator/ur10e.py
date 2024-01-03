@@ -5,7 +5,7 @@ import math as m
 import numpy as np
 import os
 import warnings
-from typing import List, Union
+from typing import List, Union, Dict
 
 from spatialmath import SE3
 
@@ -22,6 +22,7 @@ from utils.rtb import (
 from utils.sim import (
     read_config, 
     save_config,
+    config_to_q,
     RobotConfig
 )
 
@@ -39,20 +40,17 @@ class UR10e:
                 rtb.RevoluteDH(d = 0.17415, alpha =  m.pi / 2.0), # J4
                 rtb.RevoluteDH(d = 0.11985, alpha = -m.pi / 2.0), # J5
                 rtb.RevoluteDH(d = 0.11655),                      # J6
-            ], name=self._name, base=sm.SE3.Trans(0,0,0)
+            ], name=self._name, base=SE3.Rz(m.pi)                 # base transform due to fkd ur standard
         )
-        self._HOME   = [-1.5708, -1.5708, 1.5708, -1.5708, -1.5708, 0.0]
+        self._HOME   = [0.0, -1.5708, 1.5708, -1.5708, -1.5708, 0.0]
+        # self._HOME   = [-1.5708, -1.5708, 1.5708, -1.5708, -1.5708, 0.0]
         self._model = model
         self._data = data
         self._N_ACTUATORS:int = 6
         self._traj = []
-        self._config_dir = args.config_dir + self._name + ".json"
-        if os.path.exists(self._config_dir):
-            self._configs = read_config(self._config_dir)
-        else:
-            self._config_dir = "config/ur10e.json"
-            warnings.warn(f"config_dir {self._config_dir} could not be found, using default config/ur10e.json")
-            self._configs = read_config(self._config_dir)
+        self._actuator_names = self._get_actuator_names()
+        self._config_dir = self._get_config_dir()
+        self._configs = read_config(self._config_dir)
 
     @property
     def rtb_robot(self) -> rtb.DHRobot:
@@ -69,6 +67,20 @@ class UR10e:
     def _is_done(self) -> bool:
         return True if len(self._traj) == 0 else False
 
+    def _get_actuator_names(self) -> List[str]:
+        result = []
+        for ac_name in get_actuator_names(self._model):
+            if self._name in ac_name:
+                result.append(ac_name)
+        return result
+
+    def _get_config_dir(self):
+        self._config_dir = self._args.config_dir + self._name + ".json"
+        if not os.path.exists(self._config_dir):
+            os.makedirs(os.path.dirname(self._config_dir), exist_ok=True)
+            warnings.warn(f"config_dir {self._config_dir} could not be found, create empty config")
+        return self._config_dir
+
     def get_q(self) -> RobotConfig:
         """
         Get the configuration of the arm's actuators in the MuJoCo simulation.
@@ -79,8 +91,7 @@ class UR10e:
         arm_actuator_names = []
         arm_actuator_values = []
         for an in get_actuator_names(self._model):
-            prefix = an.split("_")[0]
-            if prefix == "ur10e":
+            if "ur10e" in an:
                 arm_actuator_names.append(an)
         for han in arm_actuator_names:
             arm_actuator_values.append(get_actuator_value(self._data, han))
@@ -90,7 +101,7 @@ class UR10e:
         )
         return ac
 
-    def _set_q(self, q: Union[str,List]) -> None:
+    def _set_q(self, q: List[float]) -> None:
         """
         Set the control values for the arm actuators in the MuJoCo simulation.
 
@@ -143,19 +154,42 @@ class UR10e:
     def set_ee_pose(self, 
             pos: List = [0.5,0.5,0.5], 
             ori: Union[np.ndarray,SE3] = [1,0,0,0], 
-            n_steps:int = 100
+            pose: Union[None, List[float], np.ndarray, SE3] = None,
+            n_steps:int = 10
             ) -> None:
 
+        # if reference_frame.lower() == "world":
+        #     target_pose = make_tf(pos, ori)
+        # elif reference_frame.lower() == "ee":
+        #     target_pose = self.get_ee_pose() * make_tf(pos, ori)
+        # else:
+        #     raise ValueError("Invalid reference_frame. Use 'world' or 'ee'.")
+
+
+        if pose is not None:
+            if isinstance(pose, SE3):
+                target_pose = pose
+            else:
+                # Assuming pose is a list or numpy array [x, y, z, qw, qx, qy, qz]
+                target_pose = SE3(pose[:3], pose[3:])
+        else:
+            # Use the provided position and orientation
+            target_pose = make_tf(pos=pos, ori=ori)
+
+        print("my ee frame")
+        print(self.get_ee_pose())
+        print("my target frame")
+        print(target_pose)
         cartesian_traj = rtb.ctraj(
             T0=self.get_ee_pose(),
-            T1=make_tf(pos=pos,ori=ori),
+            T1=target_pose,
             t=n_steps
         )
 
-        for target in cartesian_traj:
+        for i, target in enumerate(cartesian_traj):
             q_sol, success, iterations, searches, residual = self._robot.ik_NR(Tep=target)
             if not success:
-                raise ValueError("Inverse kinematics failed to find a solution.")
+                raise ValueError(f"Inverse kinematics failed to find a solution to ee pose {i}/{len(cartesian_traj)}. [INFO]: \n\t{q_sol=}\n\t{success=}\n\t{iterations=}\n\t{searches=}\n\t{residual=}")
             self._traj.append(q_sol)
 
     def get_ee_pose(self) -> SE3:
@@ -166,21 +200,11 @@ class UR10e:
             self._set_q(self._traj.pop(0))
 
     def _cfg_to_q(self, cfg:str) -> List:
-        try:
-            cfg_json = self._configs[cfg]
-            q = [
-                    cfg_json["shoulder_pan"],
-                    cfg_json["shoulder_liff"],
-                    cfg_json["shoulder_elbow"],
-                    cfg_json["wrist_1"],
-                    cfg_json["wrist_2"],
-                    cfg_json["wrist_3"]
-                ]
-            return q
-        except KeyError:
-            print("Wrong cfg string, try one of the following:")
-            for k,v in self._configs.items():
-                print(f"\t{k}")
+        return config_to_q(
+            cfg            = cfg, 
+            configs        = self._configs, 
+            actuator_names = self._actuator_names
+        )
 
     def home(self) -> None:
         self.set_q(self._HOME)
