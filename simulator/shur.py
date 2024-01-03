@@ -1,21 +1,29 @@
+from utils.rtb import make_tf
 from .shadow_hand import ShadowHand
 from .ur10e import UR10e
-from typing import List, Union
-
+from typing import List, Union, Dict
+import os 
+import warnings
 import roboticstoolbox as rtb
 import mujoco as mj
 import math as m
 import spatialmath as sm
 import numpy as np
+import json
+import random
 
 from spatialmath import SE3
 
-from utils.sim import read_config, RobotConfig
+from utils.sim import (
+    read_config,
+    save_config, 
+    RobotConfig
+)
 
 from utils.mj import (
     get_actuator_names,
-    get_joint_value,
-    set_joint_value
+    get_actuator_value,
+    set_actuator_value
 )
 
 class SHUR:
@@ -25,6 +33,7 @@ class SHUR:
         self._model = model
         self._data = data
         self._traj = []
+        self._name = "shur"
 
         UR_EE_TO_SH_WRIST_JOINTS = 0.21268             # m
         SH_WRIST_TO_SH_PALM      = 0.08721395775941231 # m
@@ -43,10 +52,16 @@ class SHUR:
                 rtb.RevoluteDH(alpha = m.pi / 2),                       # WR1
                 rtb.RevoluteDH(alpha = m.pi / 2, offset= m.pi / 2),     # WR2
                 rtb.RevoluteDH(d = SH_WRIST_TO_SH_PALM),                # from wrist to palm
-            ], name="shur", base=sm.SE3.Trans(0,0,0)
+            ], name=self._name, base=sm.SE3.Trans(0,0,0)
         )
 
         self._N_ACTUATORS:int = self.shadow_hand.n_actuators + self.ur10e.n_actuators
+        self._actuator_names = self._get_actuator_names()
+        self._config_dir = args.config_dir + self._name + ".json"
+        if not os.path.exists(self._config_dir):
+            os.makedirs(os.path.dirname(self._config_dir), exist_ok=True)
+            warnings.warn(f"config_dir {self._config_dir} could not be found, create empty config")
+        self._configs = read_config(self._config_dir)
 
     @property
     def shadow_hand(self) -> ShadowHand:
@@ -67,6 +82,28 @@ class SHUR:
     def _is_done(self) -> bool:
         return True if (self.shadow_hand.is_done and self.ur10e.is_done) else False
 
+    def _get_actuator_names(self) -> List[str]:
+        result = []
+        for ac_name in get_actuator_names(self._model):
+            if self.ur10e._name in ac_name or self.shadow_hand._chirality in ac_name:
+                result.append(ac_name)
+        return result
+
+    def get_q(self) -> RobotConfig:
+        robot_actuator_names = []
+        robot_actuator_values = []
+        for an in get_actuator_names(self._model):
+            prefix = an.split("_")[0]
+            if prefix == "rh" or prefix == "lh" or prefix == "ur10e":
+                robot_actuator_names.append(an)
+        for han in robot_actuator_names:
+            robot_actuator_values.append(get_actuator_value(self._data, han))
+        rc = RobotConfig(
+            actuator_values = robot_actuator_values,
+            actuator_names = robot_actuator_names
+        )
+        return rc
+
     def _set_q(self, q: Union[str,List]) -> None:
         """
         Set the control values for the arm actuators in the MuJoCo simulation.
@@ -86,12 +123,15 @@ class SHUR:
         arm_actuator_names = []
         for an in get_actuator_names(self._model):
             prefix = an.split("_")[0]
-            if prefix == "ur10e":
+            if prefix == "ur10e" or prefix == "rh" or prefix == "lh":
                 arm_actuator_names.append(an)
         for i, han in enumerate(arm_actuator_names):
-            set_joint_value(data=self._data, q=q[i], joint_name=han)
+            set_actuator_value(data=self._data, q=q[i], actuator_name=han)
 
-    def set_q(self, q: Union[str,List], n_steps: int = 10) -> None:
+    def cfg_to_q(self,q):
+        pass
+
+    def set_q(self, q: Union[str, List, RobotConfig], n_steps: int = 10) -> None:
         """
         Set the control values for the arm actuators in the MuJoCo simulation.
 
@@ -106,10 +146,9 @@ class SHUR:
         """
         if isinstance(q,str):
             q:list = self.cfg_to_q(q)
-        print(f"{q=}")
         assert len(q) == self._N_ACTUATORS, f"Length of q should be {self._N_ACTUATORS}, q had length {len(q)}"
         
-        q0 = np.array(self.get_q().joint_values)
+        q0 = np.array(self.get_q().actuator_values)
         qf = np.array(q)
 
         self._traj = rtb.jtraj(
@@ -137,7 +176,7 @@ class SHUR:
             self._traj.append(q_sol)
 
     def get_ee_pose(self) -> SE3:
-        return self._robot.fkine(self.get_q().joint_values)
+        return self._robot.fkine(self.get_q().actuator_values)
 
     def home(self) -> None:
         self.shadow_hand.home()
@@ -148,3 +187,10 @@ class SHUR:
             self.ur10e.step()
         if not self.shadow_hand.is_done:
             self.shadow_hand.step()
+
+    def save_config(self, config_name:str = "placeholder") -> None:
+        save_config(
+            config_dir  = self._config_dir,
+            config      = self.get_q(),
+            config_name = config_name
+        )

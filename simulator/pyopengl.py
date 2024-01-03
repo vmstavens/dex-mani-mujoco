@@ -69,7 +69,12 @@ class GLWFSim:
             pos = [0.5, 0.5, 0.5]
             ori = self.shur.ur10e.get_ee_pose().R
             self.shur.ur10e.set_ee_pose(pos=pos, ori=ori)
+        elif key == glfw.KEY_COMMA:
+            print(" >>>>> KEY , <<<<<")
+            print(self.shur.get_q())
 
+        elif key == glfw.KEY_SPACE:
+            self.shur.shadow_hand.set_q(q = "home")
         elif key == glfw.KEY_H:
             self.shur.home()
         elif key == glfw.KEY_J:

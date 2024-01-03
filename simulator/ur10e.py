@@ -11,8 +11,8 @@ from spatialmath import SE3
 
 from utils.mj import (
     get_actuator_names,
-    get_joint_value,
-    set_joint_value
+    get_actuator_value,
+    set_actuator_value
 )
 
 from utils.rtb import (
@@ -21,11 +21,12 @@ from utils.rtb import (
 
 from utils.sim import (
     read_config, 
+    save_config,
     RobotConfig
 )
 
 class UR10e:
-    def __init__(self, model: mj.MjModel, data: mj.MjData, args, config_dir:str = "config/") -> None:
+    def __init__(self, model: mj.MjModel, data: mj.MjData, args) -> None:
         
         self._args = args
         self._name = "ur10e"
@@ -45,10 +46,8 @@ class UR10e:
         self._data = data
         self._N_ACTUATORS:int = 6
         self._traj = []
-        self._config_dir = config_dir
-        print(self._config_dir, type(self._config_dir))
-        if os.path.isfile(self._config_dir):
-            print(self._config_dir, type(self._config_dir))
+        self._config_dir = args.config_dir + self._name + ".json"
+        if os.path.exists(self._config_dir):
             self._configs = read_config(self._config_dir)
         else:
             self._config_dir = "config/ur10e.json"
@@ -84,10 +83,10 @@ class UR10e:
             if prefix == "ur10e":
                 arm_actuator_names.append(an)
         for han in arm_actuator_names:
-            arm_actuator_values.append(get_joint_value(self._data, han))
+            arm_actuator_values.append(get_actuator_value(self._data, han))
         ac = RobotConfig(
-            joint_values = arm_actuator_values,
-            joint_names = arm_actuator_names
+            actuator_values = arm_actuator_values,
+            actuator_names = arm_actuator_names
         )
         return ac
 
@@ -113,7 +112,7 @@ class UR10e:
             if prefix == "ur10e":
                 arm_actuator_names.append(an)
         for i, han in enumerate(arm_actuator_names):
-            set_joint_value(data=self._data, q=q[i], joint_name=han)
+            set_actuator_value(data=self._data, q=q[i], actuator_name=han)
 
     def set_q(self, q: Union[str,List], n_steps: int = 10) -> None:
         """
@@ -129,11 +128,10 @@ class UR10e:
         - Sets the control values for the arm actuators in the MuJoCo simulation.
         """
         if isinstance(q,str):
-            q:list = self.cfg_to_q(q)
-        print(f"{q=}")
+            q:list = self._cfg_to_q(q)
         assert len(q) == self._N_ACTUATORS, f"Length of q should be {self._N_ACTUATORS}, q had length {len(q)}"
         
-        q0 = np.array(self.get_q().joint_values)
+        q0 = np.array(self.get_q().actuator_values)
         qf = np.array(q)
 
         self._traj = rtb.jtraj(
@@ -161,13 +159,13 @@ class UR10e:
             self._traj.append(q_sol)
 
     def get_ee_pose(self) -> SE3:
-        return self._robot.fkine(self.get_q().joint_values)
+        return self._robot.fkine(self.get_q().actuator_values)
 
     def step(self) -> None:
         if not self.is_done:
             self._set_q(self._traj.pop(0))
 
-    def cfg_to_q(self, cfg:str) -> List:
+    def _cfg_to_q(self, cfg:str) -> List:
         try:
             cfg_json = self._configs[cfg]
             q = [
@@ -186,3 +184,10 @@ class UR10e:
 
     def home(self) -> None:
         self.set_q(self._HOME)
+
+    def save_config(self, config_name:str = "placeholder") -> None:
+        save_config(
+            config_dir  = self._config_dir,
+            config      = self.get_q(),
+            config_name = config_name
+        )

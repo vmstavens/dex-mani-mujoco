@@ -1,18 +1,10 @@
 {
     "home": {
-        "shoulder_pan" : -1.5708,
-        "shoulder_liff" : -1.5708,
-        "shoulder_elbow" : 1.5708,
-        "wrist_1" : -1.5708,
-        "wrist_2" : -1.5708,
-        "wrist_3" : 0.0
-    },
-    "up": {
-        "shoulder_pan" : 0.0,
-        "shoulder_liff" : -1.5708,
-        "shoulder_elbow" : 0.0,
-        "wrist_1" : 0.0,
-        "wrist_2" : 0.0,
-        "wrist_3" : 0.0
+        "ur10e_shoulder_pan": -1.5707999999999984,
+        "ur10e_shoulder_lift": -1.5707999999999984,
+        "ur10e_elbow": 1.5707999999999984,
+        "ur10e_wrist_1": -1.5707999999999984,
+        "ur10e_wrist_2": -1.5707999999999984,
+        "ur10e_wrist_3": 0.0
     }
 }

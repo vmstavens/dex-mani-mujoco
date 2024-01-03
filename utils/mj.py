@@ -10,24 +10,24 @@ def get_actuator_names(model: mj.MjModel) -> List[str]:
     """
     return [model.actuator(i).name for i in range(model.nu)]
 
-def get_joint_value(data: mj.MjData, joint_name: str) -> float:
+def get_actuator_value(data: mj.MjData, actuator_name: str) -> float:
     """
     Retrieve the control value for a specific joint in the MuJoCo simulation.
 
     Parameters:
-    - joint_name (str): The name of the joint for which the control value is to be retrieved.
+    - actuator_name (str): The name of the joint for which the control value is to be retrieved.
 
     Returns:
     - float: The control value of the specified joint.
     """
-    return data.actuator(joint_name).ctrl[0]
+    return data.actuator(actuator_name).ctrl[0]
 
-def set_joint_value(data: mj.MjData,q:float, joint_name:str) -> None:
+def set_actuator_value(data: mj.MjData,q:float, actuator_name:str) -> None:
     """
     Set the control value for a specific joint in the MuJoCo simulation.
 
     Parameters:
     - q (float): The control value to be set for the joint.
-    - joint_name (str): The name of the joint for which the control value is to be set.
+    - actuator_name (str): The name of the joint for which the control value is to be set.
     """
-    data.actuator(joint_name).ctrl = q
+    data.actuator(actuator_name).ctrl = q

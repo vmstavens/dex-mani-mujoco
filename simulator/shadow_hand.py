@@ -2,6 +2,7 @@ import mujoco as mj
 import numpy as np
 import roboticstoolbox as rtb
 import os
+import json
 import warnings
 
 from typing import List, Union
@@ -9,33 +10,32 @@ from spatialmath import SE3
 
 from utils.sim import (
     read_config, 
+    save_config,
     RobotConfig
 )
 
 from utils.mj import (
     get_actuator_names,
-    get_joint_value,
-    set_joint_value
+    get_actuator_value,
+    set_actuator_value
 )
 
 
 class ShadowHand:
-    def __init__(self, model: mj.MjModel, data: mj.MjData, config_dir:str = "config/") -> None:
+    def __init__(self, model: mj.MjModel, data: mj.MjData, args, chirality: str = "rh") -> None:
         self._model = model
         self._data = data
         self._N_ACTUATORS:int = 20
         self._traj = []
         self._HOME = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         self._name = "shadow_hand"
-        self._config_dir = config_dir
-        if os.path.isfile(self._config_dir):
-            print(self._config_dir, type(self._config_dir))
-            self._configs = read_config(self._config_dir)
-        else:
-            self._config_dir = "config/shadow_hand.json"
-            warnings.warn(f"config_dir {self._config_dir} could not be found, using default config/shadow_hand.json")
-            self._configs = read_config(self._config_dir)
-
+        self._chirality = chirality
+        self._actuator_names = self._get_actuator_names()
+        self._config_dir = args.config_dir + self._name + ".json"
+        if not os.path.exists(self._config_dir):
+            os.makedirs(os.path.dirname(self._config_dir), exist_ok=True)
+            warnings.warn(f"config_dir {self._config_dir} could not be found, create empty config")
+        self._configs = read_config(self._config_dir)
     @property
     def n_actuators(self) -> int:
         return self._N_ACTUATORS
@@ -47,6 +47,13 @@ class ShadowHand:
     @property
     def trajectory(self) -> SE3:
         return self._traj
+
+    def _get_actuator_names(self) -> List[str]:
+        result = []
+        for ac_name in get_actuator_names(self._model):
+            if self._chirality in ac_name:
+                result.append(ac_name)
+        return result
 
     def _is_done(self) -> bool:
         return True if len(self._traj) == 0 else False
@@ -65,10 +72,10 @@ class ShadowHand:
             if prefix == "rh" or prefix == "lh":
                 hand_actuator_names.append(an)
         for han in hand_actuator_names:
-            hand_actuator_values.append(get_joint_value(self._data, han))
+            hand_actuator_values.append(get_actuator_value(self._data, han))
         hc = RobotConfig(
-            joint_values = hand_actuator_values,
-            joint_names = hand_actuator_names
+            actuator_values = hand_actuator_values,
+            actuator_names = hand_actuator_names
         )
         return hc
 
@@ -79,7 +86,7 @@ class ShadowHand:
             if prefix == "rh" or prefix == "lh":
                 hand_actuator_names.append(an)
         for i, han in enumerate(hand_actuator_names):
-            set_joint_value(data=self._data, q=q[i], joint_name=han)
+            set_actuator_value(data=self._data, q=q[i], actuator_name=han)
 
     def set_q(self, q: Union[str, List], n_steps: int = 10) -> None:
         """
@@ -95,10 +102,10 @@ class ShadowHand:
         - Sets the trajectory for the hand controllers using the provided configuration.
         """
         if isinstance(q,str):
-            q:list = self.cfg_to_q(q)
+            q:list = self._cfg_to_q(q)
         assert len(q) == self.n_actuators, f"Length of q should be {self.n_actuators}, q had length {len(q)}"
         
-        q0 = np.array(self.get_q().joint_values)
+        q0 = np.array(self.get_q().actuator_values)
         qf = np.array(q)
 
         self._traj = rtb.jtraj(
@@ -112,15 +119,24 @@ class ShadowHand:
             return None
         self._set_q(self._traj.pop(0))
 
-    def cfg_to_q(self, cfg:str) -> List:
+    def _cfg_to_q(self, cfg:str) -> List:
         try:
             cfg_json = self._configs[cfg]
-            q = cfg_json["wr"] + cfg_json["th"] + cfg_json["ff"] + cfg_json["mf"] + cfg_json["rf"] + cfg_json["lf"]
+            q = []
+            for ac_name in self._actuator_names:
+                q.append(cfg_json[ac_name])
             return q
         except KeyError:
             print("Wrong cfg string, try one of the following:")
-            for k,v in self._cfgs.items():
+            for k,v in self._configs.items():
                 print(f"\t{k}")
+
+    def save_config(self, config_name:str = "placeholder") -> None:
+        save_config(
+            config_dir  = self._config_dir,
+            config      = self.get_q(),
+            config_name = config_name
+        )
 
     def home(self) -> None:
         self.set_q(self._HOME)
