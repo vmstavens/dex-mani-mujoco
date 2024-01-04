@@ -5,14 +5,19 @@ import math as m
 import numpy as np
 import os
 import warnings
+import sys
+
 from typing import List, Union, Dict
 
 from spatialmath import SE3
 
 from utils.mj import (
     get_actuator_names,
+    get_joint_names,
+    get_joint_value,
     get_actuator_value,
-    set_actuator_value
+    set_actuator_value,
+    is_done_actuator
 )
 
 from utils.rtb import (
@@ -42,15 +47,16 @@ class UR10e:
                 rtb.RevoluteDH(d = 0.11655),                      # J6
             ], name=self._name, base=SE3.Rz(m.pi)                 # base transform due to fkd ur standard
         )
-        self._HOME   = [0.0, -1.5708, 1.5708, -1.5708, -1.5708, 0.0]
+        self._HOME   = [0.0, -1.5708, 1.5708, -1.5708, -1.5708, -1.57]
         # self._HOME   = [-1.5708, -1.5708, 1.5708, -1.5708, -1.5708, 0.0]
         self._model = model
         self._data = data
         self._N_ACTUATORS:int = 6
         self._traj = []
         self._actuator_names = self._get_actuator_names()
-        self._config_dir = self._get_config_dir()
-        self._configs = read_config(self._config_dir)
+        self._joint_names    = self._get_joint_names()
+        self._config_dir     = self._get_config_dir()
+        self._configs        = read_config(self._config_dir)
 
     @property
     def rtb_robot(self) -> rtb.DHRobot:
@@ -72,6 +78,13 @@ class UR10e:
         for ac_name in get_actuator_names(self._model):
             if self._name in ac_name:
                 result.append(ac_name)
+        return result
+
+    def _get_joint_names(self):
+        result = []
+        for jt_name in get_joint_names(self._model):
+            if self._name in jt_name:
+                result.append(jt_name)
         return result
 
     def _get_config_dir(self):
@@ -122,10 +135,14 @@ class UR10e:
             prefix = an.split("_")[0]
             if prefix == "ur10e":
                 arm_actuator_names.append(an)
-        for i, han in enumerate(arm_actuator_names):
-            set_actuator_value(data=self._data, q=q[i], actuator_name=han)
 
-    def set_q(self, q: Union[str,List], n_steps: int = 10) -> None:
+        for i, aan in enumerate(arm_actuator_names):
+            # d = 1e-4
+            # while abs(get_actuator_value(self._data, aan) - q[i] > d):
+            set_actuator_value(data=self._data, q=q[i], actuator_name=aan)
+
+    def set_q(self, q: Union[str,List], n_steps: int = 2) -> None:
+    # def set_q(self, q: Union[str,List], n_steps: int = 10) -> None:
         """
         Set the control values for the arm actuators in the MuJoCo simulation.
 
@@ -142,29 +159,27 @@ class UR10e:
             q:list = self._cfg_to_q(q)
         assert len(q) == self._N_ACTUATORS, f"Length of q should be {self._N_ACTUATORS}, q had length {len(q)}"
         
-        q0 = np.array(self.get_q().actuator_values)
+        if self.is_done:
+            q0 = np.array(self.get_q().actuator_values)
+        else:
+            q0 = self._traj[-1]
         qf = np.array(q)
 
-        self._traj = rtb.jtraj(
+        new_traj = rtb.jtraj(
             q0 = q0,
             qf = qf,
             t = n_steps
         ).q.tolist()
 
+        self._traj.extend(new_traj)
+
     def set_ee_pose(self, 
             pos: List = [0.5,0.5,0.5], 
             ori: Union[np.ndarray,SE3] = [1,0,0,0], 
             pose: Union[None, List[float], np.ndarray, SE3] = None,
-            n_steps:int = 10
+            solution_pool:int = 4,
+            n_steps:int = 2
             ) -> None:
-
-        # if reference_frame.lower() == "world":
-        #     target_pose = make_tf(pos, ori)
-        # elif reference_frame.lower() == "ee":
-        #     target_pose = self.get_ee_pose() * make_tf(pos, ori)
-        # else:
-        #     raise ValueError("Invalid reference_frame. Use 'world' or 'ee'.")
-
 
         if pose is not None:
             if isinstance(pose, SE3):
@@ -176,28 +191,50 @@ class UR10e:
             # Use the provided position and orientation
             target_pose = make_tf(pos=pos, ori=ori)
 
-        print("my ee frame")
-        print(self.get_ee_pose())
-        print("my target frame")
-        print(target_pose)
-        cartesian_traj = rtb.ctraj(
-            T0=self.get_ee_pose(),
-            T1=target_pose,
-            t=n_steps
-        )
+        q_sols = []
+        for _ in range(solution_pool):
+            q_sol, success, iterations, searches, residual = self._robot.ik_NR(Tep=target_pose)
+            q_sols.append( (q_sol, success, iterations, searches, residual) )
+        
+        if not np.any([ x[1] for x in q_sols ]):
+                raise ValueError(f"Inverse kinematics failed to find a solution to ee pose. Tried {solution_pool} times. [INFO]: \n\t{q_sol=}\n\t{success=}\n\t{iterations=}\n\t{searches=}\n\t{residual=}")
+        
+        d = sys.maxsize
 
-        for i, target in enumerate(cartesian_traj):
-            q_sol, success, iterations, searches, residual = self._robot.ik_NR(Tep=target)
-            if not success:
-                raise ValueError(f"Inverse kinematics failed to find a solution to ee pose {i}/{len(cartesian_traj)}. [INFO]: \n\t{q_sol=}\n\t{success=}\n\t{iterations=}\n\t{searches=}\n\t{residual=}")
-            self._traj.append(q_sol)
+        q0 = self.get_q().actuator_values if self.is_done else self._traj[-1]
+
+        for i in range(solution_pool):
+            q_diff = q_sols[i][0] - q0
+            if np.linalg.norm( q_diff ) < d:
+                qf = q_sols[i][0]
+                d = np.linalg.norm( q_diff )
+
+        new_traj = rtb.jtraj(
+            q0 = q0,
+            qf = qf,
+            t = n_steps
+        ).q.tolist()
+
+        if self.is_done:
+            self._traj = new_traj
+        else:
+            self._traj.extend(new_traj)
 
     def get_ee_pose(self) -> SE3:
-        return self._robot.fkine(self.get_q().actuator_values)
+        return SE3(self._robot.fkine(self.get_q().actuator_values))
+
+    def _are_done_actuators(self) -> bool:
+        for i,jn in enumerate(self._joint_names):
+            if not is_done_actuator(self._data,joint_name=jn,actuator_name=self._actuator_names[i]):
+                return False
+        return True
 
     def step(self) -> None:
-        if not self.is_done:
-            self._set_q(self._traj.pop(0))
+        self._set_q(self._traj[0])
+        if not self._are_done_actuators():
+            return
+        
+        self._set_q(self._traj.pop(0))
 
     def _cfg_to_q(self, cfg:str) -> List:
         return config_to_q(
@@ -207,7 +244,7 @@ class UR10e:
         )
 
     def home(self) -> None:
-        self.set_q(self._HOME)
+        self.set_q(q = "home")
 
     def save_config(self, config_name:str = "placeholder") -> None:
         save_config(

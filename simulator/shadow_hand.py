@@ -140,7 +140,7 @@ class ShadowHand:
         )
 
     def home(self) -> None:
-        self.set_q(self._HOME)
+        self.set_q(q = "home")
 
     class ShadowFinger:
         def __init__(self) -> None:

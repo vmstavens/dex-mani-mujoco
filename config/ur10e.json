@@ -1,10 +1,18 @@
 {
     "home": {
-        "ur10e_shoulder_pan": -1.5707999999999984,
+        "ur10e_shoulder_pan": 0.0,
         "ur10e_shoulder_lift": -1.5707999999999984,
         "ur10e_elbow": 1.5707999999999984,
         "ur10e_wrist_1": -1.5707999999999984,
         "ur10e_wrist_2": -1.5707999999999984,
+        "ur10e_wrist_3": 0.0
+    },
+    "up": {
+        "ur10e_shoulder_pan": 0.0,
+        "ur10e_shoulder_lift": -1.5707999999999984,
+        "ur10e_elbow": 0.0,
+        "ur10e_wrist_1": 0.0,
+        "ur10e_wrist_2": 0.0,
         "ur10e_wrist_3": 0.0
     }
 }
