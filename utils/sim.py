@@ -32,12 +32,13 @@ def read_config(json_filepath: str) -> Dict[str,Dict[str,List]]:
                     result[cfg][finger_name] = ctrl_transitions
     return result
 
-def config_to_q(cfg:str, configs:Dict, actuator_names: List[str]) -> List:
+def config_to_q(cfg:str, configs:Dict, actuator_names: List[str]) -> List[float]:
     try:
         cfg_json = configs[cfg]
         q = []
         for ac_name in actuator_names:
             q.append(cfg_json[ac_name])
+        print(q)
         return q
     except KeyError:
         print("Wrong cfg string, try one of the following:")

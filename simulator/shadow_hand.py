@@ -18,7 +18,9 @@ from utils.sim import (
 from utils.mj import (
     get_actuator_names,
     get_actuator_value,
-    set_actuator_value
+    set_actuator_value,
+    is_done_actuator,
+    get_joint_names
 )
 
 
@@ -33,6 +35,7 @@ class ShadowHand:
         self._name = "shadow_hand"
         self._chirality = chirality
         self._actuator_names = self._get_actuator_names()
+        self._joint_names = self._get_joint_names()
         self._config_dir = self._get_config_dir()
         self._configs = read_config(self._config_dir)
     @property
@@ -57,6 +60,13 @@ class ShadowHand:
     def _get_actuator_names(self) -> List[str]:
         result = []
         for ac_name in get_actuator_names(self._model):
+            if self._chirality in ac_name:
+                result.append(ac_name)
+        return result
+
+    def _get_joint_names(self) -> List[str]:
+        result = []
+        for ac_name in get_joint_names(self._model):
             if self._chirality in ac_name:
                 result.append(ac_name)
         return result
@@ -141,6 +151,12 @@ class ShadowHand:
 
     def home(self) -> None:
         self.set_q(q = "home")
+
+    def _are_done_actuators(self) -> bool:
+        for i,jn in enumerate(self._joint_names):
+            if not is_done_actuator(self._data,joint_name=jn,actuator_name=self._actuator_names[i]):
+                return False
+        return True
 
     class ShadowFinger:
         def __init__(self) -> None:

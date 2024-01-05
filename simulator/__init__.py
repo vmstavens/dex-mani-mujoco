@@ -1,2 +1,2 @@
 from .pyopengl import GLWFSim
-from .shur import SHUR
+from .shur import Robot

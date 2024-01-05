@@ -60,7 +60,7 @@ class UR10e:
 
     @property
     def rtb_robot(self) -> rtb.DHRobot:
-        return self._arm
+        return self._robot
 
     @property
     def n_actuators(self) -> int:
@@ -141,36 +141,24 @@ class UR10e:
             # while abs(get_actuator_value(self._data, aan) - q[i] > d):
             set_actuator_value(data=self._data, q=q[i], actuator_name=aan)
 
-    def set_q(self, q: Union[str,List], n_steps: int = 2) -> None:
-    # def set_q(self, q: Union[str,List], n_steps: int = 10) -> None:
-        """
-        Set the control values for the arm actuators in the MuJoCo simulation.
-
-        Parameters:
-        - q (Union[str, List]): Either a configuration string or a list of control values for the arm.
-
-        Raises:
-        - AssertionError: If the length of q does not match the expected number of arm actuators.
-
-        Modifies:
-        - Sets the control values for the arm actuators in the MuJoCo simulation.
-        """
+    def set_q(self, q: Union[str,List], n_steps: int = 10) -> None:
         if isinstance(q,str):
             q:list = self._cfg_to_q(q)
         assert len(q) == self._N_ACTUATORS, f"Length of q should be {self._N_ACTUATORS}, q had length {len(q)}"
+        
+        qf = np.array(q)
+
         
         if self.is_done:
             q0 = np.array(self.get_q().actuator_values)
         else:
             q0 = self._traj[-1]
         qf = np.array(q)
-
         new_traj = rtb.jtraj(
             q0 = q0,
             qf = qf,
             t = n_steps
         ).q.tolist()
-
         self._traj.extend(new_traj)
 
     def set_ee_pose(self, 

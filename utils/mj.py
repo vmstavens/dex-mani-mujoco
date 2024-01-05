@@ -36,7 +36,6 @@ def set_actuator_value(data: mj.MjData, q:float, actuator_name:str) -> None:
 def get_joint_names(model: mj.MjModel) -> List[str]:
     return [model.joint(i).name for i in range(model.nu)]
 
-
 def get_joint_value(data: mj.MjData, joint_name: str, rad: bool = True) -> float:
     return data.joint(joint_name).qpos[0] if rad else degrees(data.joint(joint_name).qpos[0])
 

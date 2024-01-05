@@ -5,7 +5,7 @@ from mujoco.glfw import glfw
 import time
 import sys
 from threading import Thread, Lock
-from simulator.shur import SHUR
+from simulator.shur import Robot
 import math as m
 from spatialmath import SE3
 
@@ -41,8 +41,8 @@ class GLWFSim:
 
         self._data_lock = Lock()
 
-        self.shur = SHUR(self._model, self._data, args)
-        self.shur.home()
+        self.robot = Robot(self._model, self._data, args)
+        self.robot.home()
 
         mj.set_mjcb_control(self._controller_fn)
 
@@ -65,66 +65,63 @@ class GLWFSim:
                     mj.mj_step(m=self._model, d=self._data)
 
                 # Rudimentary time keeping, will drift relative to wall clock.
-                # time_until_next_step = self._model.opt.timestep - (time.time() - step_start)
-                # if time_until_next_step > 0:
-                #     time.sleep(time_until_next_step)
+                time_until_next_step = self._model.opt.timestep - (time.time() - step_start)
+                if time_until_next_step > 0:
+                    time.sleep(time_until_next_step)
 
     # # Handles keyboard button events to interact with simulator
     def _keyboard_cb(self, key):
         if key == glfw.KEY_K:
-            print(" >>>>> KEY K <<<<<")
-            print(" >>>>> verifying hand <<<<<")
-            self.shur.shadow_hand.set_q(q = "grasp")
+            pass
         elif key == glfw.KEY_O:
-            print(" >>>>> KEY O <<<<<+")
-            print(" >>>>> verifying arm <<<<<")
-            self.shur.ur10e.set_q(q = "up")
+            pass
         elif key == glfw.KEY_PERIOD:
-            print(" >>>>> KEY . <<<<<")
-            print(" >>>>> verifying robot <<<<<")
-            # test set q
-            # self.shur.set_q()
-            # pos = [0.5, 0.5, 0.5]
-            # ori = self.shur.ur10e.get_ee_pose().R
-            # self.shur.ur10e.set_ee_pose(pos=pos, ori=ori)
+            pass
         elif key == glfw.KEY_COMMA:
-            print("my ur ee pose")
-            print(self.shur.ur10e.get_ee_pose())
-            print(get_joint_names(self._model))
-            # print(get_joint_value(self._data,"shoulder_pan_joint"))
-            # print(is_done_actuator(self._data, actuator_name="ur10e_shoulder_pan", joint_name="shoulder_pan_joint"))
+            pass
         elif key == glfw.KEY_SPACE:
-            # print("setting home =")
-            self.shur.set_q(q = "home")
-            box1_pose = get_object_pose("box1", model=self._model, data=self._data)
-            box2_pose = get_object_pose("box2", model=self._model, data=self._data)
-            
-            self.shur.ur10e.set_q("up")
+            # self.robot.set_q_gripper(q = "grasp")
+            self.robot.set_q_arm(q = "up")
+            # self.robot.set_q_arm(q = "home")
 
-            T_w_pick_up = make_tf(
-                pos = box1_pose.t + [-0.3,0,0.35],
-                ori = SE3.Ry(m.pi/2.0) * SE3.Rz(m.pi/2.0)
-            )
-            self.shur.shadow_hand.set_q(q = "open")
-            self.shur.ur10e.set_ee_pose(T_w_pick_up)
-            # palm_ori = self.shur.ur10e.get_ee_pose().R
+            # print("setting home =")
+            # self.robot.set_q(q = "home")
+            # box1_pose = get_object_pose("box1", model=self._model, data=self._data)
+            # box2_pose = get_object_pose("box2", model=self._model, data=self._data)
             
-            T_w_grasp = make_tf(
-                pos = box1_pose.t + [-0.3,0,0.1],
-                ori = SE3.Ry(m.pi/2.0) * SE3.Rz(m.pi/2.0)
-            )
-            self.shur.ur10e.set_ee_pose(T_w_grasp)
-            self.shur.shadow_hand.set_q(q = "grasp")
+            # self.robot.ur10e.set_q("up")
+
+            # T_w_pick_up = make_tf(
+            #     pos = box1_pose.t + [-0.3,0,0.35],
+            #     ori = SE3.Ry(m.pi/2.0) * SE3.Rz(m.pi/2.0)
+            # )
+            # self.robot.shadow_hand.set_q(q = "open")
+            # self.robot.ur10e.set_ee_pose(T_w_pick_up)
+            # # palm_ori = self.robot.ur10e.get_ee_pose().R
+            
+            # T_w_grasp = make_tf(
+            #     pos = box1_pose.t + [-0.3,0,0.1],
+            #     ori = SE3.Ry(m.pi/2.0) * SE3.Rz(m.pi/2.0)
+            # )
+            # self.robot.ur10e.set_ee_pose(T_w_grasp)
+            # self.robot.shadow_hand.set_q(q = "grasp")
+
+            # self.robot.set_q("up")
+            # self.robot.set_q("home")
+
+            # demo
+            # self.robot.ur10e.set_q("up")
+            # self.robot.ur10e.set_q("home")
 
         elif key == glfw.KEY_H:
-            self.shur.home()
+            self.robot.home()
         elif key == glfw.KEY_J:
             print("doing nothing...")
 
     # Defines controller behavior
     def _controller_fn(self, model: mj.MjModel, data: mj.MjData) -> None:
-        if not self.shur.is_done:
-            self.shur.step()
+        if not self.robot.is_done:
+            self.robot.step()
 
     # Runs GLFW main loop
     def run(self):

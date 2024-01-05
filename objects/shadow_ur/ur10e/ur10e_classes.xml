@@ -6,13 +6,13 @@
       <position ctrlrange="-6.2831 6.2831"/>
       <general biastype="affine" ctrlrange="-6.2831 6.2831" gainprm="5000" biasprm="0 -5000 -500"/>
       <default class="size4">
-        <joint damping="5" stiffness="7"/>
-        <!-- <joint damping="10"/> -->
+        <!-- <joint damping="5" stiffness="7"/> -->
+        <joint damping="10"/>
         <general forcerange="-330 330"/>
       </default>
       <default class="size3">
-        <!-- <joint damping="5"/> -->
-        <joint damping="5" stiffness="7"/>
+        <joint damping="5"/>
+        <!-- <joint damping="5" stiffness="7"/> -->
         <general forcerange="-150 150"/>
         <default class="size3_limited">
           <joint range="-3.1415 3.1415"/>
@@ -20,8 +20,8 @@
         </default>
       </default>
       <default class="size2">
-        <joint damping="5" stiffness="7"/>
-        <!-- <joint damping="2"/> -->
+        <!-- <joint damping="5" stiffness="7"/> -->
+        <joint damping="2"/>
         <general forcerange="-56 56"/>
       </default>
       <default class="visual">
