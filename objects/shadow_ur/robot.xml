@@ -85,7 +85,7 @@
 										<site name="ur10e_ee" pos="0 0 1" quat="1 2 1 1"/>
 
 										<!-- ====== shadow hand ====== -->
-										<include file="sh/sh_right_hand.xml" />
+										<!-- <include file="sh/sh_right_hand.xml" /> -->
 									</body>
 								</body>
 							</body>
@@ -97,12 +97,12 @@
 	</worldbody>
 
 	<!-- ======= Shadow setup ======= -->
-	<include file="sh/sh_setup.xml"/>
+	<!-- <include file="sh/sh_setup.xml"/> -->
 
 	<actuator>
 		<!-- ======= UR actuators ======= -->
 		<include file="ur10e/ur10e_actuators.xml" />
 		<!-- ======= Shadow actuators ======= -->
-		<include file="sh/sh_actuators.xml" />
+		<!-- <include file="sh/sh_actuators.xml" /> -->
 	</actuator>
 </mujoco>

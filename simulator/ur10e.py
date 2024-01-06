@@ -47,12 +47,10 @@ class UR10e:
                 rtb.RevoluteDH(d = 0.11655),                      # J6
             ], name=self._name, base=SE3.Rz(m.pi)                 # base transform due to fkd ur standard
         )
-        self._HOME   = [0.0, -1.5708, 1.5708, -1.5708, -1.5708, -1.57]
-        # self._HOME   = [-1.5708, -1.5708, 1.5708, -1.5708, -1.5708, 0.0]
+
         self._model = model
         self._data = data
         self._N_ACTUATORS:int = 6
-        self._traj = []
         self._actuator_names = self._get_actuator_names()
         self._joint_names    = self._get_joint_names()
         self._config_dir     = self._get_config_dir()

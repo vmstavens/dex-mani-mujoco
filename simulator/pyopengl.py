@@ -5,7 +5,7 @@ from mujoco.glfw import glfw
 import time
 import sys
 from threading import Thread, Lock
-from simulator.shur import Robot
+from simulator.robot import Robot, UR10e
 import math as m
 from spatialmath import SE3
 
@@ -41,8 +41,9 @@ class GLWFSim:
 
         self._data_lock = Lock()
 
-        self.robot = Robot(self._model, self._data, args)
-        self.robot.home()
+        self._arm = UR10e(self._model, self._data, args)
+        self.robot = Robot(arm=self._arm,args=args)
+        # self.robot.home()
 
         mj.set_mjcb_control(self._controller_fn)
 
@@ -71,17 +72,19 @@ class GLWFSim:
 
     # # Handles keyboard button events to interact with simulator
     def _keyboard_cb(self, key):
-        if key == glfw.KEY_K:
-            pass
-        elif key == glfw.KEY_O:
-            pass
-        elif key == glfw.KEY_PERIOD:
-            pass
-        elif key == glfw.KEY_COMMA:
-            pass
+        if key == glfw.KEY_H:
+            self.robot.home()
         elif key == glfw.KEY_SPACE:
             # self.robot.set_q_gripper(q = "grasp")
-            self.robot.set_q_arm(q = "up")
+            print("-----------------------------")
+            self.robot.set_q(q_robot = "up")
+            self.robot.set_q(q_robot = "home")
+            self.robot.set_q(q_arm   = "up")
+            # print(self.robot.set_q(q_robot = "up"))
+            # print(self.robot.set_q(q_robot = "home"))
+            # print(self.robot.set_q(q_arm   = "up"))
+            print("-----------------------------")
+
             # self.robot.set_q_arm(q = "home")
 
             # print("setting home =")
@@ -113,15 +116,15 @@ class GLWFSim:
             # self.robot.ur10e.set_q("up")
             # self.robot.ur10e.set_q("home")
 
-        elif key == glfw.KEY_H:
-            self.robot.home()
+
         elif key == glfw.KEY_J:
             print("doing nothing...")
 
     # Defines controller behavior
     def _controller_fn(self, model: mj.MjModel, data: mj.MjData) -> None:
-        if not self.robot.is_done:
-            self.robot.step()
+        pass
+        # if not self.robot.is_done:
+        #     self.robot.step()
 
     # Runs GLFW main loop
     def run(self):
