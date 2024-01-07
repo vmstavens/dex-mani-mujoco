@@ -42,11 +42,12 @@ class GLWFSim:
         self._data_lock = Lock()
 
         self._ur10e = UR10e(self._model, self._data, args)
-        # self._rh = ShadowHand(self._model, self._data, args)
+        self._rh = ShadowHand(self._model, self._data, args)
 
         self.robot = Robot(
-            arm = self._ur10e,
-            args = args)
+            arm     = self._ur10e,
+            gripper = self._rh,
+            args    = args)
         self.robot.home()
 
         mj.set_mjcb_control(self._controller_fn)
@@ -78,12 +79,17 @@ class GLWFSim:
     def _keyboard_cb(self, key):
         if key == glfw.KEY_H:
             self.robot.home()
+
+        # elif key == glfw.KEY_COMMA:
         elif key == glfw.KEY_SPACE:
             self.robot.set_q(q_robot = "up")
-            self.robot.set_q(q_robot = "home")
-            self.robot.set_q(q_arm   = "up")
             self.robot.arm.set_q( q = "home")
-
+            # self.robot.set_q(q_gripper="open")
+            self.robot.gripper.set_q(q="grasp")
+            self.robot.gripper.set_q(q="open")
+            # print(len(self.robot._traj))
+            # for t in self.robot._traj:
+            #     print(t)
             # self.robot.set_q_arm(q = "home")
 
             # print("setting home =")

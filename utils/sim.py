@@ -64,21 +64,21 @@ def get_object_pose(object_name:str, model: mj.MjModel, data: mj.MjData) -> SE3:
 
 @dataclass
 class RobotConfig:
-    def __init__(self,actuator_names: List[str], actuator_values: List[float], name:str = "placeholder") -> None:
-        self._actuator_values = actuator_values
-        self._actuator_names = actuator_names
+    def __init__(self, joint_names: List[str], joint_values: List[float], name:str = "placeholder") -> None:
+        self._joint_values = joint_values
+        self._joint_names = joint_names
         self._name = name
     @property
-    def actuator_values(self) -> List:
-        return self._actuator_values
+    def joint_values(self) -> List:
+        return self._joint_values
     @property
-    def actuator_names(self) -> List:
-        return self._actuator_names
+    def joint_names(self) -> List:
+        return self._joint_names
     @property
     def dict(self) -> Dict[str,List]:
         result = {}
-        for i in range(len(self._actuator_values)):
-            result[self._actuator_names[i]] = self._actuator_values[i]
+        for i in range(len(self._joint_values)):
+            result[self._joint_names[i]] = self._joint_values[i]
         return result
     def __repr__(self) -> str:
         return json.dumps(self.dict, indent=1)

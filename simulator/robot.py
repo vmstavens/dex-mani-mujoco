@@ -73,6 +73,13 @@ class BaseRobot(ABC):
     def home(self) -> None:
         self.set_q(q_robot = "home")
 
+    def _get_actuator_values(self) -> List[str]:
+        result = []
+        for ac_name in get_actuator_names(self.mj_model):
+            if self.name in ac_name:
+                result.append( get_actuator_value(ac_name) )
+        return result
+
     def _get_actuator_names(self) -> List[str]:
         result = []
         for ac_name in get_actuator_names(self.mj_model):
@@ -141,19 +148,18 @@ class Robot(BaseRobot):
         self._joint_names    = self._get_joint_names()
         self._actuator_names = self._get_actuator_names()
         self._configs        = self._get_configs()
-        self._traj           = [self.get_q().actuator_values]
+        self._traj           = [self.get_q().joint_values]
 
         # to also give access to high level arm.set_q and gripper.set_q
         if self._has_gripper:
             self._gripper._set_robot_handle(self)
         if self._has_arm:
             self._arm._set_robot_handle(self)
-        
 
     @property
     def arm(self) -> BaseRobot:
         return self._arm
-    
+
     @property
     def gripper(self)-> BaseRobot:
         return self._gripper
@@ -186,12 +192,27 @@ class Robot(BaseRobot):
     def n_actuators(self) -> int:
         return self._arm.n_actuators if not self._has_gripper else self._gripper.n_actuators + self._arm.n_actuators
 
+    def _get_actuator_values(self) -> List[str]:
+        result = []
+        for ac_name in get_actuator_names(self.mj_model):
+            if self.arm.name in ac_name or self.gripper.name in ac_name:
+                result.append( get_actuator_value(self.mj_data, ac_name))
+        return result
+
+    def _get_actuator_names(self) -> List[str]:
+        result = []
+        for ac_name in get_actuator_names(self.mj_model):
+            if self.arm.name in ac_name or self.gripper.name in ac_name:
+                result.append(ac_name)
+        return result
+
     def _config_to_q(self, config: str) -> List[float]:
-        return config_to_q(
+        q = config_to_q(
                     cfg = config, 
                     configs = self._configs, 
                     actuator_names = self._actuator_names
                 )
+        return q
 
     def _set_q(self, q: Union[str,List]) -> None:
         """
@@ -210,13 +231,31 @@ class Robot(BaseRobot):
         - AssertionError: If the length of q does not match the expected number of arm actuators.
         """
         robot_actuator_names = []
-        for an in get_actuator_names(self._model):
+        actuator_names = get_actuator_names(self._model)
+        for an in actuator_names:
             if self.arm.name in an or self.gripper:
                 robot_actuator_names.append(an)
+        # print(f"{q=}",len(q))
+        # print(f"{robot_actuator_names=}",len(robot_actuator_names))
         for i in range(len(robot_actuator_names)):
             set_actuator_value(data=self._data, q=q[i], actuator_name=robot_actuator_names[i])
 
-    def set_q(self, q_robot: Union[str, List, RobotConfig] = None, q_arm: Union[str, List, RobotConfig] = None, q_gripper: Union[str, List, RobotConfig] = None, n_steps: int = 2) -> None:
+    def get_q(self) -> List[float]:
+        robot_joint_names = []
+        robot_joint_values = []
+        for an in get_joint_names(self.mj_model):
+            prefix = an.split("_")[0]
+            if self.arm.name in prefix or self.gripper.name:
+                robot_joint_names.append(an)
+        for ran in robot_joint_names:
+            robot_joint_values.append(get_joint_value(self.mj_data, ran))
+        rc = RobotConfig(
+            joint_values = robot_joint_values,
+            joint_names = robot_joint_names
+        )
+        return rc
+
+    def set_q(self, q_robot: Union[str, List, RobotConfig] = None, q_arm: Union[str, List, RobotConfig] = None, q_gripper: Union[str, List, RobotConfig] = None) -> None:
 
         if q_robot is None and q_arm is None and q_gripper is None:
             warnings.warn(f"No q value provided to set_q(), returning...")
@@ -229,7 +268,7 @@ class Robot(BaseRobot):
                 warnings.warn(f"A value was set for q, along with one for q_gripper, q_gripper is being ignored")
 
         if self.is_done:
-            qf = self.get_q().actuator_values
+            qf = self._get_actuator_values()
         else:
             qf = self._traj[-1].copy()
 
@@ -237,7 +276,7 @@ class Robot(BaseRobot):
             if isinstance(q_arm, str):
                 q_arm: List[float] = self.arm._config_to_q(config=q_arm)
             if isinstance(q_arm, RobotConfig):
-                q_arm: List[float] = q_arm.actuator_values
+                q_arm: List[float] = q_arm.joint_values
             assert len(q_arm) == self.arm.n_actuators, f"Length of q_arm should be {self.arm.n_actuators}, q_arm had length {len(q_arm)}"
             qf[:self.arm.n_actuators] = q_arm
 
@@ -245,25 +284,27 @@ class Robot(BaseRobot):
             if isinstance(q_gripper, str):
                 q_gripper: List[float] = self.gripper._config_to_q(config=q_gripper)
             if isinstance(q_gripper, RobotConfig):
-                q_gripper: List[float] = q_gripper.actuator_values
+                q_gripper: List[float] = q_gripper.joint_values
             assert len(q_gripper) == self.gripper.n_actuators, f"Length of q_gripper should be {self.gripper.n_actuators}, q_gripper had length {len(q_gripper)}"
-            qf[self.arm.n_actuators:] = q_gripper
+            qf[-self.gripper.n_actuators:] = q_gripper
 
         if q_robot is not None:
             if isinstance(q_robot, str):
                 q_robot: List[float] = self._config_to_q(config=q_robot)
             if isinstance(q_robot, RobotConfig):
-                q_robot: List[float] = q_robot.actuator_values
+                q_robot: List[float] = q_robot.joint_values
             assert len(q_robot) == self.n_actuators, f"Length of q_robot should be {self.n_actuators}, q_robot had length {len(q_robot)}"
             qf = q_robot
 
         self._traj.extend([qf])
 
     def step(self) -> None:
-        self._set_q(self._traj[0])
         if not self.are_done_actuators():
+            q0 = self._traj[0]
+            self._set_q(q0)
             return
-        self._set_q(self._traj.pop(0))
+        q = self._traj.pop(0)
+        self._set_q(q)
 
 class UR10e(BaseRobot):
     def __init__(self, model: mj.MjModel, data: mj.MjData, args) -> None:
@@ -307,9 +348,61 @@ class UR10e(BaseRobot):
     def name(self) -> str:
         return "ur10e"
 
+    def _set_robot_handle(self, robot_handle):
+        self._robot_handle = robot_handle
+
+    def _config_to_q(self, config: str) -> List[float]:
+        return config_to_q(
+                    cfg = config, 
+                    configs = self._configs, 
+                    actuator_names = self._actuator_names
+                )
+
+    def set_q(self, q : Union[str, List, RobotConfig]):
+        if isinstance(q, str):
+            q: List[float] = self._config_to_q(config=q)
+        if isinstance(q, RobotConfig):
+            q: List[float] = q.joint_values
+        assert len(q) == self.n_actuators, f"Length of q should be {self.n_actuators}, q had length {len(q)}"
+        
+        if self._robot_handle.is_done:
+            qf = self._robot_handle.get_q().joint_values
+        else:
+            qf = self._robot_handle._traj[-1].copy()
+
+        qf[:self.n_actuators] = q
+
+        self._robot_handle._traj.extend([qf])
+
+class ShadowHand(BaseRobot):
+    def __init__(self, model: mj.MjModel, data: mj.MjData, args) -> None:
+        super().__init__()
+        
+        self._args = args
+
+        self._model = model
+        self._data = data
+        self._actuator_names = self._get_actuator_names()
+        self._joint_names    = self._get_joint_names()
+        self._config_dir     = self._get_config_dir()
+        self._configs        = self._get_configs()
+
+        self._robot_handle = None
     @property
-    def rtb_robot(self) -> rtb.DHRobot:
-        return self._robot
+    def args(self):
+        return self._args
+
+    @property
+    def mj_data(self) -> mj.MjData:
+        return self._data
+    
+    @property
+    def mj_model(self) -> mj.MjModel:
+        return self._model
+
+    @property
+    def name(self) -> str:
+        return self._args.sh_chirality
 
     def _set_robot_handle(self, robot_handle):
         self._robot_handle = robot_handle
@@ -325,21 +418,19 @@ class UR10e(BaseRobot):
         if isinstance(q, str):
             q: List[float] = self._config_to_q(config=q)
         if isinstance(q, RobotConfig):
-            q: List[float] = q.actuator_values
+            q: List[float] = q.joint_values
         assert len(q) == self.n_actuators, f"Length of q should be {self.n_actuators}, q had length {len(q)}"
         
         if self._robot_handle.is_done:
-            qf = self._robot_handle.get_q().actuator_values
+            qf = self._robot_handle.get_q().joint_values
         else:
             qf = self._robot_handle._traj[-1].copy()
 
-        qf[:self.n_actuators] = q
+        qf[-self.n_actuators:] = q
+        print("qf =",qf)
 
         self._robot_handle._traj.extend([qf])
-
-class ShadowHand(BaseRobot):
-    def __init__():
-        pass
+        print(len(self._robot_handle._traj))
 
     # def set_q(self, q: Union[str,List], n_steps: int = 10) -> None:
     #     if isinstance(q,str):
