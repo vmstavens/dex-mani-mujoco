@@ -10,6 +10,7 @@ def main():
     parser = argparse.ArgumentParser(description='MuJoCo simulation of dexterous manipulation, grasping and tactile perception.') 
     parser.add_argument('--scene_path', default="objects/shadow_ur/scene.xml")
     parser.add_argument('--config_dir', default="config/")
+    parser.add_argument('--sh_chirality', default="rh")
 
     args, _ = parser.parse_known_args()
 

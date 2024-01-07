@@ -5,7 +5,7 @@ from mujoco.glfw import glfw
 import time
 import sys
 from threading import Thread, Lock
-from simulator.robot import Robot, UR10e
+from simulator.robot import Robot, UR10e, ShadowHand
 import math as m
 from spatialmath import SE3
 
@@ -41,9 +41,13 @@ class GLWFSim:
 
         self._data_lock = Lock()
 
-        self._arm = UR10e(self._model, self._data, args)
-        self.robot = Robot(arm=self._arm,args=args)
-        # self.robot.home()
+        self._ur10e = UR10e(self._model, self._data, args)
+        self._rh = ShadowHand(self._model, self._data, args)
+
+        self.robot = Robot(
+            arm = self._ur10e,
+            args = args)
+        self.robot.home()
 
         mj.set_mjcb_control(self._controller_fn)
 
@@ -75,15 +79,9 @@ class GLWFSim:
         if key == glfw.KEY_H:
             self.robot.home()
         elif key == glfw.KEY_SPACE:
-            # self.robot.set_q_gripper(q = "grasp")
-            print("-----------------------------")
             self.robot.set_q(q_robot = "up")
             self.robot.set_q(q_robot = "home")
             self.robot.set_q(q_arm   = "up")
-            # print(self.robot.set_q(q_robot = "up"))
-            # print(self.robot.set_q(q_robot = "home"))
-            # print(self.robot.set_q(q_arm   = "up"))
-            print("-----------------------------")
 
             # self.robot.set_q_arm(q = "home")
 
@@ -122,9 +120,8 @@ class GLWFSim:
 
     # Defines controller behavior
     def _controller_fn(self, model: mj.MjModel, data: mj.MjData) -> None:
-        pass
-        # if not self.robot.is_done:
-        #     self.robot.step()
+        if not self.robot.is_done:
+            self.robot.step()
 
     # Runs GLFW main loop
     def run(self):

@@ -137,15 +137,15 @@ class Robot(BaseRobot):
         self._arm_gripper    = True if arm     is not None else False
         self._joint_names    = self._get_joint_names()
         self._actuator_names = self._get_actuator_names()
-        self._configs = self._get_configs()
+        self._configs        = self._get_configs()
         self._traj           = [self.get_q().actuator_values]
 
     @property
-    def arm(self):
+    def arm(self) -> BaseRobot:
         return self._arm
     
     @property
-    def gripper(self):
+    def gripper(self)-> BaseRobot:
         return self._gripper
 
     @property
@@ -177,13 +177,11 @@ class Robot(BaseRobot):
         return self._arm.n_actuators if not self._has_gripper else self._gripper.n_actuators + self._arm.n_actuators
 
     def _config_to_q(self, config: str) -> List[float]:
-        q = config_to_q(
-            cfg            = config, 
-            configs        = self._configs, 
-            actuator_names = self._actuator_names
-        )
-        # print("robot",config,q)
-        return q
+        return config_to_q(
+                    cfg = config, 
+                    configs = self._configs, 
+                    actuator_names = self._actuator_names
+                )
 
     def _set_q(self, q: Union[str,List]) -> None:
         """
@@ -209,7 +207,7 @@ class Robot(BaseRobot):
             set_actuator_value(data=self._data, q=q[i], actuator_name=robot_actuator_names[i])
 
     def set_q(self, q_robot: Union[str, List, RobotConfig] = None, q_arm: Union[str, List, RobotConfig] = None, q_gripper: Union[str, List, RobotConfig] = None, n_steps: int = 2) -> None:
-        # print("0 =",q_robot, q_arm, q_gripper)
+
         if q_robot is None and q_arm is None and q_gripper is None:
             warnings.warn(f"No q value provided to set_q(), returning...")
             return
@@ -220,54 +218,42 @@ class Robot(BaseRobot):
             if q_gripper is not None:
                 warnings.warn(f"A value was set for q, along with one for q_gripper, q_gripper is being ignored")
 
-        qf = self._traj[-1]
+        if self.is_done:
+            qf = self.get_q().actuator_values
+        else:
+            qf = self._traj[-1].copy()
 
         if q_arm is not None:
             if isinstance(q_arm, str):
-                # print("q_arm =", q_arm)
                 q_arm: List[float] = self.arm._config_to_q(config=q_arm)
-                # print("q_arm =", q_arm)
-            # if isinstance(q_arm, RobotConfig):
-            #     q_arm: List[float] = q_arm.actuator_values
+            if isinstance(q_arm, RobotConfig):
+                q_arm: List[float] = q_arm.actuator_values
             assert len(q_arm) == self.arm.n_actuators, f"Length of q_arm should be {self.arm.n_actuators}, q_arm had length {len(q_arm)}"
-            # 
             qf[:self.arm.n_actuators] = q_arm
 
         if q_gripper is not None:
             if isinstance(q_gripper, str):
                 q_gripper: List[float] = self.gripper._config_to_q(config=q_gripper)
-            # if isinstance(q_gripper, RobotConfig):
-            #     q_gripper: List[float] = q_gripper.actuator_values
+            if isinstance(q_gripper, RobotConfig):
+                q_gripper: List[float] = q_gripper.actuator_values
             assert len(q_gripper) == self.gripper.n_actuators, f"Length of q_gripper should be {self.gripper.n_actuators}, q_gripper had length {len(q_gripper)}"
             qf[self.arm.n_actuators:] = q_gripper
 
         if q_robot is not None:
             if isinstance(q_robot, str):
-                # print("q_robot =", q_robot)
                 q_robot: List[float] = self._config_to_q(config=q_robot)
-                # print("q_robot =", q_robot)
-            # if isinstance(q_robot, RobotConfig):
-            #     q_robot: List[float] = q_robot.actuator_values
+            if isinstance(q_robot, RobotConfig):
+                q_robot: List[float] = q_robot.actuator_values
             assert len(q_robot) == self.n_actuators, f"Length of q_robot should be {self.n_actuators}, q_robot had length {len(q_robot)}"
             qf = q_robot
 
-        print(self._traj)
         self._traj.extend([qf])
-        print(self._traj)
-        print("----")
-        return qf
 
     def step(self) -> None:
-        if self.are_done_actuators():
-            pass
-        if self.are_done_actuators():
-            self._set_q(self._traj[0])
-        if self.is_done:
-            self._set_q(self._traj.pop(0))
-
-        # if self.are_done_actuators():
-        #     self._set_q(self._traj.pop(0))
-
+        self._set_q(self._traj[0])
+        if not self.are_done_actuators():
+            return
+        self._set_q(self._traj.pop(0))
 
 class UR10e(BaseRobot):
     def __init__(self, model: mj.MjModel, data: mj.MjData, args) -> None:
@@ -314,14 +300,16 @@ class UR10e(BaseRobot):
         return self._robot
 
     def _config_to_q(self, config: str) -> List[float]:
+        return config_to_q(
+                    cfg = config, 
+                    configs = self._configs, 
+                    actuator_names = self._actuator_names
+                )
 
-        q = config_to_q(
-            cfg            = config, 
-            configs        = self._configs, 
-            actuator_names = self._actuator_names
-        )
-        # print("arm",config, q)
-        return q
+    def set_q():
+        pass
+class ShadowHand(BaseRobot):
+    def __init__():
 
     # def set_q(self, q: Union[str,List], n_steps: int = 10) -> None:
     #     if isinstance(q,str):
