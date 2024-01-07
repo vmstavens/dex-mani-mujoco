@@ -42,7 +42,7 @@ class GLWFSim:
         self._data_lock = Lock()
 
         self._ur10e = UR10e(self._model, self._data, args)
-        self._rh = ShadowHand(self._model, self._data, args)
+        # self._rh = ShadowHand(self._model, self._data, args)
 
         self.robot = Robot(
             arm = self._ur10e,
@@ -82,6 +82,7 @@ class GLWFSim:
             self.robot.set_q(q_robot = "up")
             self.robot.set_q(q_robot = "home")
             self.robot.set_q(q_arm   = "up")
+            self.robot.arm.set_q( q = "home")
 
             # self.robot.set_q_arm(q = "home")
 

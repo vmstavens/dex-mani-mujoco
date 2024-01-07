@@ -131,14 +131,24 @@ class Robot(BaseRobot):
         self._args           = args
         self._model          = arm.mj_model
         self._data           = arm.mj_data
+        
         self._arm            = arm
+        
         self._gripper        = gripper
+
         self._has_gripper    = True if gripper is not None else False
-        self._arm_gripper    = True if arm     is not None else False
+        self._has_arm        = True if arm     is not None else False
         self._joint_names    = self._get_joint_names()
         self._actuator_names = self._get_actuator_names()
         self._configs        = self._get_configs()
         self._traj           = [self.get_q().actuator_values]
+
+        # to also give access to high level arm.set_q and gripper.set_q
+        if self._has_gripper:
+            self._gripper._set_robot_handle(self)
+        if self._has_arm:
+            self._arm._set_robot_handle(self)
+        
 
     @property
     def arm(self) -> BaseRobot:
@@ -279,6 +289,8 @@ class UR10e(BaseRobot):
         self._config_dir     = self._get_config_dir()
         self._configs        = self._get_configs()
 
+        self._robot_handle = None
+
     @property
     def args(self):
         return self._args
@@ -299,6 +311,9 @@ class UR10e(BaseRobot):
     def rtb_robot(self) -> rtb.DHRobot:
         return self._robot
 
+    def _set_robot_handle(self, robot_handle):
+        self._robot_handle = robot_handle
+
     def _config_to_q(self, config: str) -> List[float]:
         return config_to_q(
                     cfg = config, 
@@ -306,10 +321,25 @@ class UR10e(BaseRobot):
                     actuator_names = self._actuator_names
                 )
 
-    def set_q():
-        pass
+    def set_q(self, q : Union[str, List, RobotConfig]):
+        if isinstance(q, str):
+            q: List[float] = self._config_to_q(config=q)
+        if isinstance(q, RobotConfig):
+            q: List[float] = q.actuator_values
+        assert len(q) == self.n_actuators, f"Length of q should be {self.n_actuators}, q had length {len(q)}"
+        
+        if self._robot_handle.is_done:
+            qf = self._robot_handle.get_q().actuator_values
+        else:
+            qf = self._robot_handle._traj[-1].copy()
+
+        qf[:self.n_actuators] = q
+
+        self._robot_handle._traj.extend([qf])
+
 class ShadowHand(BaseRobot):
     def __init__():
+        pass
 
     # def set_q(self, q: Union[str,List], n_steps: int = 10) -> None:
     #     if isinstance(q,str):
