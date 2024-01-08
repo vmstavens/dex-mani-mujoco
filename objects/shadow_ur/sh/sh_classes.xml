@@ -10,8 +10,12 @@
         <joint damping="0.5"/>
         
         <default class="wrist_y">
-          <joint axis="0 1 0" range="-0.523599 0.174533"/>
+          <!-- changed -->
+          <joint axis="0 1 0" range="-0.489 0.174533"/>
+          <!-- <joint axis="0 1 0" range="-0.523599 0.174533"/> -->
+
           <position kp="10" ctrlrange="-0.523599 0.174533" forcerange="-10 10"/>
+
         </default>
         
         <default class="wrist_x">
@@ -48,14 +52,17 @@
           <joint axis="0.573576 0 0.819152" range="0 0.785398"/>
           <position kp="20" ctrlrange="0 0.785398"/>
       </default>
+
       <default class="knuckle">
           <joint axis="0 -1 0" range="-0.349066 0.349066"/>
           <position kp="20" ctrlrange="-0.349066 0.349066"/>
       </default>
+      
       <default class="proximal">
           <joint range="-0.261799 1.5708"/>
           <position kp="20" ctrlrange="-0.261799 1.5708"/>
       </default>
+      
       <default class="middle_distal">
           <joint range="0 1.5708"/>
           <position kp="20" ctrlrange="0 3.1415"/>

@@ -80,12 +80,14 @@ class GLWFSim:
         if key == glfw.KEY_H:
             self.robot.home()
 
-        # elif key == glfw.KEY_COMMA:
+        elif key == glfw.KEY_COMMA:
+            pass
         elif key == glfw.KEY_SPACE:
-            self.robot.set_q(q_robot = "up")
-            self.robot.arm.set_q( q = "home")
+            # self.robot.set_q(q_robot = "up")
+            # self.robot.arm.set_q( q = "home")
             # self.robot.set_q(q_gripper="open")
-            self.robot.gripper.set_q(q="grasp")
+            self.robot.gripper.set_q(q="open")
+            self.robot.gripper.set_q(q="home")
             self.robot.gripper.set_q(q="open")
             # print(len(self.robot._traj))
             # for t in self.robot._traj:
