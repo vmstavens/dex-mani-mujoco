@@ -1,3 +1,4 @@
+from numpy import ndarray
 from utils.rtb import make_tf
 from .shadow_hand import ShadowHand
 from .ur10e import UR10e
@@ -61,6 +62,19 @@ class BaseRobot(ABC):
 
     @abstractmethod
     def _config_to_q(self, config: str) -> List[float]:
+        pass
+
+    @abstractmethod
+    def set_ee_pose(self, 
+            pos: List = [0.5,0.5,0.5], 
+            ori: Union[np.ndarray,SE3] = [1,0,0,0], 
+            pose: Union[None, List[float], np.ndarray, SE3] = None,
+            solution_pool:int = 4,
+            ) -> None:
+        pass
+
+    @abstractmethod
+    def get_ee_pose(self) -> SE3:
         pass
 
     def set_q(self) -> None:
@@ -317,13 +331,23 @@ class Robot(BaseRobot):
         self._traj.extend([ qf ])
 
     def step(self) -> None:
-        self.gripper._are_done_actuators()
         if self.arm._are_done_actuators() and self.gripper._are_done_actuators():
             # to ensure an element always exsists in _traj. otherwise 
             # gripper and arm cant be controlled independently
+            self._set_q(self._traj[0])
             if len(self._traj) > 1:
                 self._traj.pop(0)
-            self._set_q(self._traj[0])
+
+    def set_ee_pose(
+            self, 
+            pos: List = [0.5, 0.5, 0.5], 
+            ori: Union[np.ndarray,SE3] = [1, 0, 0, 0], 
+            pose: Union[List[float], ndarray, SE3] = None, 
+            solution_pool: int = 4) -> None:
+        raise NotImplementedError(self.__class__.__name__ + ' cannot set ee pose for Robot') 
+
+    def get_ee_pose(self) -> SE3:
+            raise NotImplementedError(self.__class__.__name__ + ' cannot get ee pose for Robot') 
 
 class UR10e(BaseRobot):
     def __init__(self, model: mj.MjModel, data: mj.MjData, args) -> None:
@@ -333,13 +357,13 @@ class UR10e(BaseRobot):
         
         self._robot = rtb.DHRobot(
             [
-                rtb.RevoluteDH(d = 0.1807, alpha = m.pi / 2.0),   # J1
-                rtb.RevoluteDH(a = -0.6127),                      # J2
-                rtb.RevoluteDH(a = -0.57155),                     # J3
-                rtb.RevoluteDH(d = 0.17415, alpha =  m.pi / 2.0), # J4
-                rtb.RevoluteDH(d = 0.11985, alpha = -m.pi / 2.0), # J5
-                rtb.RevoluteDH(d = 0.11655),                      # J6
-            ], name=self.name, base=SE3.Rz(m.pi)                  # base transform due to fkd ur standard
+                rtb.RevoluteDH(d = 0.1807, alpha = m.pi / 2.0  , qlim=(-m.pi,m.pi)), # J1
+                rtb.RevoluteDH(a = -0.6127                     , qlim=(-m.pi,m.pi)), # J2
+                rtb.RevoluteDH(a = -0.57155                    , qlim=(-m.pi,m.pi)), # J3
+                rtb.RevoluteDH(d = 0.17415, alpha =  m.pi / 2.0, qlim=(-m.pi,m.pi)), # J4
+                rtb.RevoluteDH(d = 0.11985, alpha = -m.pi / 2.0, qlim=(-m.pi,m.pi)), # J5
+                rtb.RevoluteDH(d = 0.11655                     , qlim=(-m.pi,m.pi)), # J6
+            ], name=self.name, base=SE3.Rz(m.pi)                                     # base transform due to fkd ur standard
         )
 
         self._model = model
@@ -395,7 +419,6 @@ class UR10e(BaseRobot):
             ori: Union[np.ndarray,SE3] = [1,0,0,0], 
             pose: Union[None, List[float], np.ndarray, SE3] = None,
             solution_pool:int = 4,
-            n_steps:int = 2
             ) -> None:
 
         if pose is not None:
@@ -414,28 +437,21 @@ class UR10e(BaseRobot):
             q_sols.append( (q_sol, success, iterations, searches, residual) )
         
         if not np.any([ x[1] for x in q_sols ]):
-                raise ValueError(f"Inverse kinematics failed to find a solution to ee pose. Tried {solution_pool} times. [INFO]: \n\t{q_sol=}\n\t{success=}\n\t{iterations=}\n\t{searches=}\n\t{residual=}")
+            raise ValueError(f"Inverse kinematics failed to find a solution to ee pose. Tried {solution_pool} times. [INFO]: \n\t{q_sol=}\n\t{success=}\n\t{iterations=}\n\t{searches=}\n\t{residual=}")
         
         d = sys.maxsize
 
-        q0 = self._traj[-1]
+        q0 = self._robot_handle._traj[-1].copy()[:self.n_actuators]
+        qf = self._robot_handle._traj[-1].copy()
 
         for i in range(solution_pool):
             q_diff = q_sols[i][0] - q0
-            if np.linalg.norm( q_diff ) < d:
-                qf = q_sols[i][0]
-                d = np.linalg.norm( q_diff )
+            q_dist = np.linalg.norm( q_diff )
+            if q_dist < d:
+                qf[:self.n_actuators] = self._clamp_q(q_sols[i][0])
+                d = q_dist
 
-        new_traj = rtb.jtraj(
-            q0 = q0,
-            qf = qf,
-            t = n_steps
-        ).q.tolist()
-
-        if self.is_done:
-            self._traj = new_traj
-        else:
-            self._traj.extend(new_traj)
+        self._robot_handle._traj.extend([ qf ])
 
     def get_ee_pose(self) -> SE3:
         return SE3(self._robot.fkine(self.get_q().joint_values))
@@ -524,3 +540,13 @@ class ShadowHand(BaseRobot):
 
         self._robot_handle._traj.extend([qf])
 
+    def set_ee_pose(
+            self, 
+            pos: List = [0.5, 0.5, 0.5], 
+            ori: Union[np.ndarray,SE3] = [1, 0, 0, 0], 
+            pose: Union[List[float], ndarray, SE3] = None, 
+            solution_pool: int = 4) -> None:
+        raise NotImplementedError(self.__class__.__name__ + ' cannot set ee pose for gripper') 
+
+    def get_ee_pose(self) -> SE3:
+        raise NotImplementedError(self.__class__.__name__ + ' cannot set ee pose for gripper') 

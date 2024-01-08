@@ -85,26 +85,30 @@ class GLWFSim:
         elif key == glfw.KEY_SPACE:
             # self.robot.set_q(q_robot = "up")
             # self.robot.arm.set_q( q = "home")
-            # self.robot.set_q(q_gripper="open")
-            self.robot.gripper.set_q(q="open")
-            self.robot.gripper.set_q(q="home")
-            self.robot.gripper.set_q(q="open")
-            # print(len(self.robot._traj))
-            # for t in self.robot._traj:
-            #     print(t)
-            # self.robot.set_q_arm(q = "home")
+            # self.robot.gripper.set_q(q="open")
+            # self.robot.gripper.set_q(q="home")
+            # self.robot.gripper.set_q(q="open")
 
-            # print("setting home =")
-            # self.robot.set_q(q = "home")
-            # box1_pose = get_object_pose("box1", model=self._model, data=self._data)
-            # box2_pose = get_object_pose("box2", model=self._model, data=self._data)
-            
-            # self.robot.ur10e.set_q("up")
+            self.robot.arm.set_q(q = "up")
 
-            # T_w_pick_up = make_tf(
-            #     pos = box1_pose.t + [-0.3,0,0.35],
-            #     ori = SE3.Ry(m.pi/2.0) * SE3.Rz(m.pi/2.0)
-            # )
+            box1_pose = get_object_pose("box1", model=self._model, data=self._data)
+            box2_pose = get_object_pose("box2", model=self._model, data=self._data)
+
+            T_w_pick_up = make_tf(
+                pos = box1_pose.t + [-0.32,0 -0.05,0.35],
+                ori = SE3.Ry(m.pi/2.0) * SE3.Rz(m.pi/2.0)
+            )
+
+            T_w_grasp = make_tf(
+                pos = box1_pose.t + [-0.3,0-0.05,0.04],
+                ori = SE3.Ry(m.pi/2.0) * SE3.Rz(m.pi/2.0)
+            )
+
+            self.robot.arm.set_ee_pose(T_w_pick_up)
+            self.robot.gripper.set_q(q = "open")
+            self.robot.arm.set_ee_pose(T_w_grasp)
+            self.robot.gripper.set_q(q = "grasp")
+
             # self.robot.shadow_hand.set_q(q = "open")
             # self.robot.ur10e.set_ee_pose(T_w_pick_up)
             # # palm_ori = self.robot.ur10e.get_ee_pose().R
@@ -113,7 +117,7 @@ class GLWFSim:
             #     pos = box1_pose.t + [-0.3,0,0.1],
             #     ori = SE3.Ry(m.pi/2.0) * SE3.Rz(m.pi/2.0)
             # )
-            # self.robot.ur10e.set_ee_pose(T_w_grasp)
+            # self.robot.arm.set_ee_pose(T_w_grasp)
             # self.robot.shadow_hand.set_q(q = "grasp")
 
             # self.robot.set_q("up")
