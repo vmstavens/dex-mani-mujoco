@@ -28,7 +28,8 @@
       <default class="thumb">
         <default class="thbase">
             <joint axis="0 0 -1" range="-1.0472 1.0472"/>
-            <position kp="20" ctrlrange="-1.0472 1.0472" forcerange="-3 3"/>
+            <position kp="30" ctrlrange="-1.0472 1.0472" forcerange="-3 3"/>
+            <!-- <position kp="20" ctrlrange="-1.0472 1.0472" forcerange="-3 3"/> -->
         </default>
         <default class="thproximal">
             <joint range="0 1.22173"/>
@@ -36,11 +37,13 @@
         </default>
         <default class="thhub">
             <joint range="-0.20944 0.20944"/>
-            <position kp="20" ctrlrange="-0.20944 0.20944"/>
+            <position kp="30" ctrlrange="-0.20944 0.20944"/>
+            <!-- <position kp="20" ctrlrange="-0.20944 0.20944"/> -->
         </default>
         <default class="thmiddle">
             <joint axis="0 -1 0" range="-0.698132 0.698132"/>
-            <position kp="20" ctrlrange="-0.698132 0.698132"/>
+            <position kp="30" ctrlrange="-0.698132 0.698132"/>
+            <!-- <position kp="20" ctrlrange="-0.698132 0.698132"/> -->
         </default>
         <default class="thdistal">
             <joint range="-0.261799 1.5708"/>
@@ -50,22 +53,26 @@
 
       <default class="metacarpal">
           <joint axis="0.573576 0 0.819152" range="0 0.785398"/>
-          <position kp="20" ctrlrange="0 0.785398"/>
+          <position kp="30" ctrlrange="0 0.785398"/>
+          <!-- <position kp="20" ctrlrange="0 0.785398"/> -->
       </default>
 
       <default class="knuckle">
           <joint axis="0 -1 0" range="-0.349066 0.349066"/>
-          <position kp="20" ctrlrange="-0.349066 0.349066"/>
+          <position kp="30" ctrlrange="-0.349066 0.349066"/>
+          <!-- <position kp="20" ctrlrange="-0.349066 0.349066"/> -->
       </default>
       
       <default class="proximal">
           <joint range="-0.261799 1.5708"/>
-          <position kp="20" ctrlrange="-0.261799 1.5708"/>
+          <position kp="30" ctrlrange="-0.261799 1.5708"/>
+          <!-- <position kp="20" ctrlrange="-0.261799 1.5708"/> -->
       </default>
       
       <default class="middle_distal">
           <joint range="0 1.5708"/>
-          <position kp="20" ctrlrange="0 3.1415"/>
+          <position kp="30" ctrlrange="0 3.1415"/>
+          <!-- <position kp="20" ctrlrange="0 3.1415"/> -->
       </default>
 
       <default class="plastic">

@@ -13,6 +13,7 @@ import numpy as np
 import json
 import sys
 import random
+import time
 
 from spatialmath import SE3
 
@@ -193,6 +194,9 @@ class Robot(BaseRobot):
         if self._has_arm:
             self._arm._set_robot_handle(self)
 
+        self._trajectory_timeout = self._args.trajectory_timeout
+        self._trajectory_time = 0.0 # s
+
     @property
     def arm(self) -> BaseRobot:
         return self._arm
@@ -272,6 +276,9 @@ class Robot(BaseRobot):
         for i in range(len(robot_actuator_names)):
             set_actuator_value(data=self._data, q=q[i], actuator_name=robot_actuator_names[i])
 
+    def is_timout(self) -> bool:
+        return (time.monotonic() - self._trajectory_time) > self._trajectory_timeout
+
     def get_q(self) -> RobotConfig:
         robot_joint_names = []
         robot_joint_values = []
@@ -331,9 +338,10 @@ class Robot(BaseRobot):
         self._traj.extend([ qf ])
 
     def step(self) -> None:
-        if self.arm._are_done_actuators() and self.gripper._are_done_actuators():
+        if ( self.arm._are_done_actuators() and self.gripper._are_done_actuators() ) or self.is_timout():
             # to ensure an element always exsists in _traj. otherwise 
             # gripper and arm cant be controlled independently
+            self._trajectory_time = time.monotonic()
             self._set_q(self._traj[0])
             if len(self._traj) > 1:
                 self._traj.pop(0)
