@@ -6,7 +6,7 @@
 	<!-- <option timestep="0.0001" integrator="RK4" solver="Newton" gravity="0 0 -9.82"/> -->
 	<!-- <option timestep="0.005" integrator="RK4" solver="Newton" gravity="0 0 -9.81"/> -->
 	
-	<include file="ur10e_rh/ur10e_rh.xml"/>
+	<include file="hande/hande.xml"/>
 
 	<statistic center="0.4 0 0.4" extent="1"/>
 

@@ -8,7 +8,6 @@ import argparse
 
 def main():
     parser = argparse.ArgumentParser(description='MuJoCo simulation of dexterous manipulation, grasping and tactile perception.') 
-    # parser.add_argument('--scene_path',         type=str,   default="objects/ur10e_rh/scene.xml")
     parser.add_argument('--scene_path',         type=str,   default="objects/scene_pick_n_place.xml")
     parser.add_argument('--config_dir',         type=str,   default="config/")
     parser.add_argument('--sh_chirality',       type=str,   default="rh")

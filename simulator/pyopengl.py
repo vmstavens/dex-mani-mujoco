@@ -36,7 +36,7 @@ class GLWFSim:
         self._options = mj.MjvOption()
 
         # self._window = mujoco.viewer.launch_passive(self._model, self._data)
-        self._window = mujoco.viewer.launch_passive(self._model, self._data,key_callback=self._keyboard_cb)
+        self._window = mujoco.viewer.launch_passive(self._model, self._data,key_callback=self._keyboard_callback)
         self._scene = mj.MjvScene(self._model, maxgeom=10000)
 
         self._data_lock = Lock()
@@ -52,7 +52,7 @@ class GLWFSim:
 
         mj.set_mjcb_control(self._controller_fn)
 
-    def viewer_cb(self):
+    def viewer_callback(self):
         with self._window as viewer:
             while viewer.is_running():
                 step_start = time.time()
@@ -76,7 +76,7 @@ class GLWFSim:
                     time.sleep(time_until_next_step)
 
     # # Handles keyboard button events to interact with simulator
-    def _keyboard_cb(self, key):
+    def _keyboard_callback(self, key):
         box1_pose = get_object_pose("box1", model=self._model, data=self._data)
         box2_pose = get_object_pose("box2", model=self._model, data=self._data)
         if key == glfw.KEY_H:
@@ -137,7 +137,7 @@ class GLWFSim:
 
     # Runs GLFW main loop
     def run(self):
-        self.viewer_thrd = Thread(target=self.viewer_cb, daemon=True)
+        self.viewer_thrd = Thread(target=self.viewer_callback, daemon=True)
         self.viewer_thrd.daemon = True
         self.viewer_thrd.start()
         input()
