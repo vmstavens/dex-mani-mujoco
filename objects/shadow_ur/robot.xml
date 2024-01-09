@@ -25,7 +25,7 @@
 	<worldbody>
 		<light name="spotlight" mode="targetbodycom" target="wrist_2_link" pos="0 -1 2"/>
 
-		<body name="base" quat="1 0 0 0" pos="0 0 0.05" childclass="ur10e">
+		<body name="base" quat="1 0 0 0" pos="0 0 0" childclass="ur10e">
 		<!-- <body name="base" quat="1 0 0 0" pos="0 0 0.5" childclass="ur10e"> -->
 		<!-- <body name="base" quat="0.92388 0 0 0.38268" pos="0 0 1" childclass="ur10e"> -->
 		<!-- <body name="base" quat="0 0 0 1" pos="0 0 0" childclass="ur10e"> -->

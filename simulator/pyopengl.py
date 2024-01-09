@@ -77,6 +77,8 @@ class GLWFSim:
 
     # # Handles keyboard button events to interact with simulator
     def _keyboard_cb(self, key):
+        box1_pose = get_object_pose("box1", model=self._model, data=self._data)
+        box2_pose = get_object_pose("box2", model=self._model, data=self._data)
         if key == glfw.KEY_H:
             self.robot.home()
 
@@ -89,26 +91,49 @@ class GLWFSim:
             # self.robot.gripper.set_q(q="home")
             # self.robot.gripper.set_q(q="open")
 
-            self.robot.arm.set_q(q = "up")
+            # self.robot.arm.set_q(q = "up")
 
-            box1_pose = get_object_pose("box1", model=self._model, data=self._data)
-            box2_pose = get_object_pose("box2", model=self._model, data=self._data)
+            q_pick_up = {
+                "ur10e_shoulder_pan_joint": -0.9610317406481865,
+                "ur10e_shoulder_lift_joint": -1.5502823078908237,
+                "ur10e_elbow_joint": -2.091593176403119,
+                "ur10e_wrist_1_joint": -2.655088563301384,
+                "ur10e_wrist_2_joint": 0.6088429682430168,
+                "ur10e_wrist_3_joint": 0.0005436264214320968
+            }
+            q_pick_up = [v for k,v in q_pick_up.items()]
 
-            T_w_pick_up = make_tf(
-                pos = box1_pose.t + [-0.32,0 -0.05,0.35],
-                ori = SE3.Ry(m.pi/2.0) * SE3.Rz(m.pi/2.0)
-            )
+            # q_grasp = {
+            #     "ur10e_shoulder_pan_joint": -0.9263504904976173,
+            #     "ur10e_shoulder_lift_joint": -1.9130301564704193,
+            #     "ur10e_elbow_joint": -2.3802542358484513,
+            #     "ur10e_wrist_1_joint": -2.05555859077024,
+            #     "ur10e_wrist_2_joint": 0.6403986739987306,
+            #     "ur10e_wrist_3_joint": 2.778605863121308e-05
+            # }
+            # q_grasp = [v for k,v in q_grasp.items()]
+
+            self.robot.arm.set_q(q = q_pick_up)
+            # self.robot.gripper.set_q(q = "open")
+            # self.robot.arm.set_q(q = q_grasp)
+            # self.robot.gripper.set_q(q = "grasp")
+
+
+            # T_w_pick_up = make_tf(
+            #     pos = box1_pose.t + [-0.32,0 -0.0,0.35],
+            #     ori = SE3.Ry(m.pi/2.0) * SE3.Rz(m.pi/2.0)
+            # )
 
             T_w_grasp = make_tf(
-                pos = box1_pose.t + [-0.3,0-0.05,0.04],
+                pos = box1_pose.t + [-0.3, 0-0.03, 0.06],
                 ori = SE3.Ry(m.pi/2.0) * SE3.Rz(m.pi/2.0)
             )
 
-            self.robot.arm.set_ee_pose(T_w_pick_up)
+            # self.robot.arm.set_ee_pose(T_w_pick_up)
             self.robot.gripper.set_q(q = "open")
             self.robot.arm.set_ee_pose(T_w_grasp)
             self.robot.gripper.set_q(q = "grasp")
-
+            self.robot.arm.set_q(q = q_pick_up)
             # self.robot.shadow_hand.set_q(q = "open")
             # self.robot.ur10e.set_ee_pose(T_w_pick_up)
             # # palm_ori = self.robot.ur10e.get_ee_pose().R
@@ -134,6 +159,7 @@ class GLWFSim:
     # Defines controller behavior
     def _controller_fn(self, model: mj.MjModel, data: mj.MjData) -> None:
         if not self.robot.is_done:
+            print(self.robot.arm.get_q())
             self.robot.step()
 
     # Runs GLFW main loop

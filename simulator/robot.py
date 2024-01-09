@@ -352,9 +352,9 @@ class Robot(BaseRobot):
 class UR10e(BaseRobot):
     def __init__(self, model: mj.MjModel, data: mj.MjData, args) -> None:
         super().__init__()
-        
+
         self._args = args
-        
+
         self._robot = rtb.DHRobot(
             [
                 rtb.RevoluteDH(d = 0.1807, alpha = m.pi / 2.0  , qlim=(-m.pi,m.pi)), # J1
