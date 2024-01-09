@@ -85,14 +85,7 @@ class GLWFSim:
         elif key == glfw.KEY_COMMA:
             pass
         elif key == glfw.KEY_SPACE:
-            # self.robot.set_q(q_robot = "up")
-            # self.robot.arm.set_q( q = "home")
-            # self.robot.gripper.set_q(q="open")
-            # self.robot.gripper.set_q(q="home")
-            # self.robot.gripper.set_q(q="open")
-
-            # self.robot.arm.set_q(q = "up")
-
+            print(" >>> initiated pick and place task <<<")
             q_pick_up = {
                 "ur10e_shoulder_pan_joint": -0.9610317406481865,
                 "ur10e_shoulder_lift_joint": -1.5502823078908237,
@@ -132,24 +125,6 @@ class GLWFSim:
             self.robot.arm.set_ee_pose(T_w_place)
             self.robot.gripper.set_q(q = "open")
             self.robot.arm.set_ee_pose(T_w_box2)
-
-            # self.robot.shadow_hand.set_q(q = "open")
-            # self.robot.ur10e.set_ee_pose(T_w_pick_up)
-            # # palm_ori = self.robot.ur10e.get_ee_pose().R
-            
-            # T_w_grasp = make_tf(
-            #     pos = box1_pose.t + [-0.3,0,0.1],
-            #     ori = SE3.Ry(m.pi/2.0) * SE3.Rz(m.pi/2.0)
-            # )
-            # self.robot.arm.set_ee_pose(T_w_grasp)
-            # self.robot.shadow_hand.set_q(q = "grasp")
-
-            # self.robot.set_q("up")
-            # self.robot.set_q("home")
-
-            # demo
-            # self.robot.ur10e.set_q("up")
-            # self.robot.ur10e.set_q("home")
 
 
         elif key == glfw.KEY_J:
