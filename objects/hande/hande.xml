@@ -1,5 +1,5 @@
 <mujoco model="robotiq_hande">
-    <compiler angle="radian" meshdir="assets/stl/" />
+    <compiler angle="radian" meshdir="hande/assets/stl/" />
     <size njmax="500" nconmax="100" />
     <asset>
         <mesh name="hand-e" file="hand-e.stl" />

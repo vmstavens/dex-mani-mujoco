@@ -1,5 +1,15 @@
-# added
+# added ##################################
 MUJOCO_LOG.TXT
+
+# 3d files
+flexcell.mtl
+flexcell.obj
+flexcell.stl
+flexcell.stp
+flexcell-binary.stl
+
+
+# added - end ############################
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
