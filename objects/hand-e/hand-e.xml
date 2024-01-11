@@ -1,0 +1,19 @@
+<mujoco model="hand-e">
+	<body name="hand-e">
+		<geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.1 0.1 0.1 1" mesh="hand-e" />
+		<geom type="mesh" rgba="0.1 0.1 0.1 1" mesh="hand-e" />
+		
+		<body name="hande_left_finger" pos="0 0 0.099">
+			<inertial pos="0.02262 -0.00759 0.00738" quat="0.871952 0.0369732 -0.211073 0.440205" mass="0.03804" diaginertia="1.22763e-05 1.22763e-05 1.22763e-05" />
+			<joint name="hande_left_finger_joint" class="hand-e_lf"/>
+			<geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.4 0.4 0.4 1" mesh="finger_1" />
+			<geom type="mesh" rgba="0.4 0.4 0.4 1" mesh="finger_1" />
+		</body>
+		<body name="hande_right_finger" pos="0 0 0.099">
+			<inertial pos="-0.02262 0.00759 0.00738" quat="0.871952 -0.0369732 0.211073 0.440205" mass="0.03804" diaginertia="1.22763e-05 1.22763e-05 1.22763e-05" />
+			<joint name="hande_right_finger_joint" class="hand-e_rf" />
+			<geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.4 0.4 0.4 1" mesh="finger_2" />
+			<geom type="mesh" rgba="0.4 0.4 0.4 1" mesh="finger_2" />
+		</body>
+	</body>
+</mujoco>

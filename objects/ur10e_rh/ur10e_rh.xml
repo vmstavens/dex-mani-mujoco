@@ -1,35 +1,28 @@
 <mujoco model="ur10e_rh">
-	<compiler angle="radian" meshdir="ur10e_rh/assets" autolimits="true"/>
-	<!-- <compiler angle="radian" meshdir="universal_robots_ur10e/assets" autolimits="true"/> -->
-	<!-- <compiler angle="radian" meshdir="/home/vims/git/dex-mani-mujoco/objects/universal_robots_ur10e/assets" autolimits="true"/> -->
-
-	<option integrator="implicitfast"/>
+	<compiler angle="radian" meshdir="" autolimits="true"/>
+	<!-- <compiler angle="radian" meshdir="ur10e_rh/assets" autolimits="true"/> -->
 
 	<default>
 		<!-- ======= UR control classes ======= -->
-		<include file="ur10e_rh/ur10e/ur10e_classes.xml" />
+		<include file="ur10e/ur10e_classes.xml" />
 
 		<!-- ======= shadow control classes ======= -->
-		<include file="ur10e_rh/sh/sh_classes.xml" />
+		<include file="sh/sh_classes.xml" />
 
 	</default>
 
 	<asset>
 		<!-- ======= UR Assets ======= -->
-		<include file="ur10e_rh/ur10e/ur10e_assets.xml"/>
+		<include file="ur10e/ur10e_assets.xml"/>
 
 		<!-- ======= Shadow Assets ======= -->
-		<include file="ur10e_rh/sh/sh_assets.xml"/>
+		<include file="sh/sh_assets.xml"/>
 	</asset>
 
 	<worldbody>
 		<light name="spotlight" mode="targetbodycom" target="wrist_2_link" pos="0 -1 2"/>
 
 		<body name="base" quat="1 0 0 0" pos="0 0 0" childclass="ur10e">
-		<!-- <body name="base" quat="1 0 0 0" pos="0 0 0.5" childclass="ur10e"> -->
-		<!-- <body name="base" quat="0.92388 0 0 0.38268" pos="0 0 1" childclass="ur10e"> -->
-		<!-- <body name="base" quat="0 0 0 1" pos="0 0 0" childclass="ur10e"> -->
-		<!-- <body name="base" quat="0 0 0 1" pos="0 0 0" childclass="ur10e"> -->
 			<inertial mass="4.0" pos="0 0 0" diaginertia="0.0061063308908 0.0061063308908 0.01125"/>
 			<geom mesh="ur10e_base_0" material="urblack" class="visual"/>
 			<geom mesh="ur10e_base_1" material="jointgray" class="visual"/>
@@ -85,7 +78,7 @@
 										<site name="ur10e_ee" pos="0 0 1" quat="1 2 1 1"/>
 
 										<!-- ====== shadow hand ====== -->
-										<include file="ur10e_rh/sh/sh_right_hand.xml" />
+										<include file="sh/sh_right_hand.xml" />
 									</body>
 								</body>
 							</body>
@@ -97,12 +90,13 @@
 	</worldbody>
 
 	<!-- ======= Shadow setup ======= -->
-	<include file="ur10e_rh/sh/sh_setup.xml"/>
+	<include file="sh/sh_setup.xml"/>
 
 	<actuator>
 		<!-- ======= UR actuators ======= -->
-		<include file="ur10e_rh/ur10e/ur10e_actuators.xml" />
+		<include file="ur10e/ur10e_actuators.xml" />
+
 		<!-- ======= Shadow actuators ======= -->
-		<include file="ur10e_rh/sh/sh_actuators.xml" />
+		<include file="sh/sh_actuators.xml" />
 	</actuator>
 </mujoco>

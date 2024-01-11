@@ -25,7 +25,7 @@ from utils.mj import (
 )
 
 
-class ShadowHand(BaseRobot):
+class HandE(BaseRobot):
     def __init__(self, model: mj.MjModel, data: mj.MjData, args) -> None:
         super().__init__()
         
@@ -55,7 +55,7 @@ class ShadowHand(BaseRobot):
 
     @property
     def name(self) -> str:
-        return self._args.sh_chirality
+        return "hand-e"
 
     def _set_robot_handle(self, robot_handle):
         self._robot_handle = robot_handle

@@ -1,0 +1,15 @@
+<mujocoinclude>
+	<default class="hand-e">
+		
+		<default class="hand-e_lf">,
+			<joint range="0.0 0.025" pos="0 0 0" axis="-1 0 0" type="slide" limited="true" damping=".1" solreflimit="4e-3 1" solimplimit=".95 .99 1e-3"/>
+			<position kp="30" ctrlrange="-1 1" forcerange="-180 180" />
+		</default>
+
+		<default class="hand-e_rf">
+			<joint range="0.0 0.025" pos="0 0 0" axis="1 0 0" type="slide" limited="true" damping=".1" solreflimit="4e-3 1" solimplimit=".95 .99 1e-3"/>
+			<position kp="30" ctrlrange="-1 1" forcerange="-180 180" />
+		</default>
+
+	</default>
+</mujocoinclude>

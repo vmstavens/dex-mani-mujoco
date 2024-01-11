@@ -1,0 +1,93 @@
+<mujoco model="ur10e_rh">
+	<compiler angle="radian" meshdir="ur10e_rh/assets" autolimits="true"/>
+
+	<default>
+		<!-- ======= UR control classes ======= -->
+		<include file="ur10e_rh/ur10e/ur10e_classes.xml" />
+	</default>
+
+	<asset>
+		<!-- ======= UR Assets ======= -->
+		<include file="ur10e_rh/ur10e/ur10e_assets.xml"/>
+	</asset>
+
+	<worldbody>
+		<light name="spotlight" mode="targetbodycom" target="wrist_2_link" pos="0 -1 2"/>
+
+		<body name="base" quat="1 0 0 0" pos="0 0 0" childclass="ur10e">
+			<inertial mass="4.0" pos="0 0 0" diaginertia="0.0061063308908 0.0061063308908 0.01125"/>
+			<geom mesh="ur10e_base_0" material="urblack" class="visual"/>
+			<geom mesh="ur10e_base_1" material="jointgray" class="visual"/>
+			<body name="shoulder_link" pos="0 0 0.181">
+				<inertial pos="0 0 0" mass="7.778" diaginertia="0.0314743 0.0314743 0.0218756"/>
+				<joint name="ur10e_shoulder_pan_joint" class="size4" axis="0 0 1"/>
+				<geom mesh="ur10e_shoulder_0" material="urblue" class="visual"/>
+				<geom mesh="ur10e_shoulder_1" material="urblack" class="visual"/>
+				<geom mesh="ur10e_shoulder_2" material="jointgray" class="visual"/>
+				<geom class="collision" size="0.078 0.08" pos="0 0 -0.05"/>
+				<body name="upper_arm_link" pos="0 0.176 0" quat="1 0 1 0">
+					<inertial pos="0 0 0.3065" mass="12.93" diaginertia="0.423074 0.423074 0.0363656"/>
+					<joint name="ur10e_shoulder_lift_joint" class="size4"/>
+					<geom mesh="ur10e_upperarm_0" material="urblack" class="visual"/>
+					<geom mesh="ur10e_upperarm_1" material="jointgray" class="visual"/>
+					<geom mesh="ur10e_upperarm_2" material="urblue" class="visual"/>
+					<geom mesh="ur10e_upperarm_3" material="linkgray" class="visual"/>
+					<geom class="collision" pos="0 -0.05 0" quat="1 1 0 0" size="0.078 0.08"/>
+					<geom class="collision" size="0.06 0.3" pos="0 0 0.3"/>
+					<body name="forearm_link" pos="0 -0.137 0.613">
+						<inertial pos="0 0 0.2855" mass="3.87" diaginertia="0.11059 0.11059 0.0108844"/>
+						<joint name="ur10e_elbow_joint" class="size3_limited"/>
+						<geom mesh="ur10e_forearm_0" material="urblue" class="visual"/>
+						<geom mesh="ur10e_forearm_1" material="urblack" class="visual"/>
+						<geom mesh="ur10e_forearm_2" material="jointgray" class="visual"/>
+						<geom mesh="ur10e_forearm_3" material="linkgray" class="visual"/>
+						<geom class="collision" pos="0 0.08 0" quat="1 1 0 0" size="0.058 0.065"/>
+						<geom class="collision" size="0.043 0.28" pos="0 0 0.29"/>
+						<body name="wrist_1_link" pos="0 0 0.571" quat="1 0 1 0">
+							<inertial pos="0 0.135 0" quat="0.5 0.5 -0.5 0.5" mass="1.96" diaginertia="0.0055125 0.00510825 0.00510825"/>
+							<joint name="ur10e_wrist_1_joint" class="size2"/>
+							<geom mesh="ur10e_wrist1_0" material="urblack" class="visual"/>
+							<geom mesh="ur10e_wrist1_1" material="urblue" class="visual"/>
+							<geom mesh="ur10e_wrist1_2" material="jointgray" class="visual"/>
+							<geom class="collision" pos="0 0.06 0" quat="1 1 0 0" size="0.05 0.07"/>
+							<body name="wrist_2_link" pos="0 0.135 0">
+								<inertial pos="0 0 0.12" quat="0.5 0.5 -0.5 0.5" mass="1.96" diaginertia="0.0055125 0.00510825 0.00510825"/>
+								<joint name="ur10e_wrist_2_joint" axis="0 0 1" class="size2"/>
+								<geom mesh="ur10e_wrist2_0" material="urblack" class="visual"/>
+								<geom mesh="ur10e_wrist2_1" material="urblue" class="visual"/>
+								<geom mesh="ur10e_wrist2_2" material="jointgray" class="visual"/>
+								<geom class="collision" size="0.046 0.065" pos="0 0 0.05"/>
+								<geom class="collision" pos="0 0.028 0.12" quat="1 1 0 0" size="0.046 0.043"/>
+								<body name="wrist_3_link" pos="0 0 0.12">
+									<inertial pos="0 0.092 0" quat="0 1 -1 0" mass="0.202" diaginertia="0.000204525 0.000144346 0.000144346"/>
+									<joint name="ur10e_wrist_3_joint" class="size2"/>
+									<geom material="linkgray" mesh="ur10e_wrist3" class="visual"/>
+									<geom class="eef_collision" pos="0 0.097 0" quat="1 1 0 0" size="0.046 0.02"/>
+
+									<body name="ee_link" pos="0 0.11 0" quat="1 -1 0 0">
+										<inertial pos="-0.01 0 0" mass="0.001" diaginertia="1.66667e-08 1.66667e-08 1.66667e-08" />
+										<geom size="0.005 0.005 0.005" pos="-0.01 0 0" type="box" />
+										<site name="ur10e_ee" pos="0 0 1" quat="1 2 1 1"/>
+
+										<!-- ====== shadow hand ====== -->
+										<include file="ur10e_rh/sh/sh_right_hand.xml" />
+									</body>
+								</body>
+							</body>
+						</body>
+					</body>
+				</body>
+			</body>
+		</body>
+	</worldbody>
+
+	<!-- ======= Shadow setup ======= -->
+	<include file="ur10e_rh/sh/sh_setup.xml"/>
+
+	<actuator>
+		<!-- ======= UR actuators ======= -->
+		<include file="ur10e_rh/ur10e/ur10e_actuators.xml" />
+		<!-- ======= Shadow actuators ======= -->
+		<include file="ur10e_rh/sh/sh_actuators.xml" />
+	</actuator>
+</mujoco>

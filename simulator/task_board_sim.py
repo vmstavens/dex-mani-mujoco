@@ -3,6 +3,7 @@ import mujoco.viewer
 import mujoco_py
 from mujoco.glfw import glfw
 from simulator.base_mujoco_sim import BaseMuJuCoSim
+from robots import Robot, UR10e, HandE
 
 class TaskBoardSim(BaseMuJuCoSim):
     def __init__(self, args):
@@ -13,6 +14,11 @@ class TaskBoardSim(BaseMuJuCoSim):
         self._options = self._get_mj_options()
         self._window  = self._get_mj_window()
         self._scene   = self._get_mj_scene()
+
+        self._arm = UR10e(self._model, self._data, args)
+        self._gripper = HandE(self._model, self._data, args)
+
+        self.robot = Robot(arm=self._arm, gripper=self._gripper)
 
         mj.set_mjcb_control(self.controller_callback)
 
