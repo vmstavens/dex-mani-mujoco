@@ -18,7 +18,7 @@ class TaskBoardSim(BaseMuJuCoSim):
         self._arm = UR10e(self._model, self._data, args)
         self._gripper = HandE(self._model, self._data, args)
 
-        self.robot = Robot(arm=self._arm, gripper=self._gripper)
+        self.robot = Robot(arm=self._arm, gripper=self._gripper, args=args)
 
         mj.set_mjcb_control(self.controller_callback)
 
