@@ -25,8 +25,11 @@ class TaskBoardSim(BaseMuJuCoSim):
     # # Handles keyboard button events to interact with simulator
     def keyboard_callback(self, key):
         if key == glfw.KEY_SPACE:
-            pass
+            self.robot.gripper.set_q(q = [0.025, 0.025])
+            print(self.robot.gripper.info)
 
     # Defines controller behavior
     def controller_callback(self, model: mj.MjModel, data: mj.MjData) -> None:
-        return
+        pass
+        # if not self.robot.is_done:
+        #     self.robot.step()

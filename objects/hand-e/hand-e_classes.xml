@@ -2,13 +2,18 @@
 	<default class="hand-e">
 		
 		<default class="hand-e_lf">,
-			<joint range="0.0 0.025" pos="0 0 0" axis="-1 0 0" type="slide" limited="true" damping=".1" solreflimit="4e-3 1" solimplimit=".95 .99 1e-3"/>
-			<position kp="30" ctrlrange="-1 1" forcerange="-180 180" />
+			<joint range="-0.025 0.025" pos="0 0 0" axis="-1 0 0" type="slide" limited="true"/>
+			<!-- <joint range="-0.025 0.025" pos="0 0 0" axis="-1 0 0" type="slide" limited="true" armature="0.005" damping="0.1" solimplimit="0.95 0.99 0.001" solreflimit="0.005 1"/> -->
+			<!-- <joint range="-0.025 0.025" pos="0 0 0" axis="-1 0 0" type="slide" limited="true" armature="0.005" damping="0.1" solimplimit="0.95 0.99 0.001" solreflimit="0.005 1"/> -->
+			<position ctrlrange="-0.025 0.025" forcerange="-400 400" />
+			<!-- <position ctrlrange="-0.025 0.025" forcerange="-180 180" /> -->
 		</default>
 
 		<default class="hand-e_rf">
-			<joint range="0.0 0.025" pos="0 0 0" axis="1 0 0" type="slide" limited="true" damping=".1" solreflimit="4e-3 1" solimplimit=".95 .99 1e-3"/>
-			<position kp="30" ctrlrange="-1 1" forcerange="-180 180" />
+			<joint range="-0.025 0.025" pos="0 0 0" axis="1 0 0" type="slide" limited="true"/>
+			<!-- <joint range="-0.025 0.025" pos="0 0 0" axis="1 0 0" type="slide" limited="true" armature="0.005" damping="0.1" solimplimit="0.95 0.99 0.001" solreflimit="0.005 1"/> -->
+			<position ctrlrange="-0.025 0.025" forcerange="-400 400" />
+			<!-- <position ctrlrange="-0.025 0.025" forcerange="-180 180" /> -->
 		</default>
 
 	</default>

@@ -38,8 +38,6 @@ class HandE(BaseRobot):
         self._config_dir     = self._get_config_dir()
         self._configs        = self._get_configs()
 
-        self._coupled_joints = self._get_coupled_joints()
-
         self._robot_handle = None
     @property
     def args(self):
@@ -67,14 +65,6 @@ class HandE(BaseRobot):
                     actuator_names = self._actuator_names
                 )
 
-    def _get_coupled_joints(self) -> List[Tuple[str,str]]:
-        return [ 
-                (self.name + "_FFJ1",self.name + "_FFJ2"), 
-                (self.name + "_MFJ1",self.name + "_MFJ2"), 
-                (self.name + "_RFJ1",self.name + "_RFJ2"), 
-                (self.name + "_LFJ1",self.name + "_LFJ2") 
-                ]
-
     def _are_done_actuators(self) -> bool:
         joint_names = self._joint_names
         actuator_names = self._actuator_names
@@ -87,14 +77,7 @@ class HandE(BaseRobot):
             if jid in an
         ]
 
-        coupled_joint_checks = [
-            (get_joint_value(self.mj_data, tup[0]) + get_joint_value(self.mj_data, tup[1])) < 1e-1
-            for tup in self._coupled_joints
-        ]
-
-        all_checks = actuator_checks + coupled_joint_checks
-
-        return np.all(all_checks)
+        return np.all(actuator_checks)
 
     def set_q(self, q : Union[str, List, RobotConfig]):
         if isinstance(q, str):

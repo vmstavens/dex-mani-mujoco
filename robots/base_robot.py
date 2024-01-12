@@ -28,25 +28,65 @@ from abc import ABC, abstractmethod, abstractproperty
 
 class BaseRobot(ABC):
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def name(self) -> str:
         pass
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def args(self):
+        pass
+
+    @property
+    @abstractmethod
+    def mj_data(self) -> mj.MjData:
+        pass
+
+    @property
+    @abstractmethod
+    def mj_model(self) -> mj.MjModel:
         pass
 
     @property
     def n_actuators(self) -> int:
         return len(self._get_actuator_names())
 
-    @abstractproperty
-    def mj_data(self) -> mj.MjData:
-        pass
+    @property
+    def info(self) -> str:
+        result = f"Robot info for {self.name}:\n"
+        result += f"\tNumber of actuators: {self.n_actuators}\n"
 
-    @abstractproperty
-    def mj_model(self) -> mj.MjModel:
-        pass
+        joint_names = self._get_joint_names()
+        actuator_names = self._get_actuator_names()
+
+        result += "\tJoint names:\n"
+        result += "\t\t" + ", ".join(joint_names) + "\n"
+
+        result += "\tActuator names:\n"
+        result += "\t\t" + ", ".join(actuator_names) + "\n"
+
+        # Add joint limits and values
+        result += "\tJoint limits and values:\n"
+        max_joint_name_length = max(len(joint_name) for joint_name in joint_names)
+        for joint_name in joint_names:
+            joint_limits = self._get_joint_limits(joint_name)
+            joint_value = get_joint_value(self.mj_data, joint_name)
+            result += f"\t\t{joint_name.ljust(max_joint_name_length)}: Limits - {joint_limits[0]:.3f} to {joint_limits[1]:.3f}, Value : {joint_value:.3f}\n"
+
+        # Add actuator limits and values
+        result += "\tActuator limits and values:\n"
+        max_actuator_name_length = max(len(actuator_name) for actuator_name in actuator_names)
+        for actuator_name in actuator_names:
+            actuator_limits = self._get_actuator_limits(actuator_name)
+            actuator_value = get_actuator_value(self.mj_data, actuator_name)
+            result += f"\t\t{actuator_name.ljust(max_actuator_name_length)}: Limits - {actuator_limits[0]:.3f} to {actuator_limits[1]:.3f}, Value : {actuator_value:.3f}\n"
+
+
+        result += f"\tConfig directory: {self._get_config_dir()}\n"
+
+        return result
+
 
     @abstractmethod
     def _config_to_q(self, config: str) -> List[float]:
@@ -109,6 +149,7 @@ class BaseRobot(ABC):
     def _clamp_q(self, q: List[float]) -> List[float]:
         actuator_names = self._get_actuator_names()
         actuator_limits = [get_actuator_range(self.mj_model, jn) for jn in actuator_names]
+        print(actuator_limits)
         clamped_qs = []
         for i in range(len(q)):
             clamped_q = np.clip(a = q[i], a_min = actuator_limits[i][0], a_max = actuator_limits[i][1])

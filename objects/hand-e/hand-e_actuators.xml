@@ -1,4 +1,4 @@
 <mujocoinclude>
-    <position name="hand-e_lf" joint="hande_left_finger_joint"  class="hand-e_lf"/>
-    <position name="hand-e_rh" joint="hande_right_finger_joint" class="hand-e_rf"/>
+    <position name="hand-e_lf" joint="hand-e_left_finger_joint"  class="hand-e_lf"/>
+    <position name="hand-e_rh" joint="hand-e_right_finger_joint" class="hand-e_rf"/>
 </mujocoinclude>
