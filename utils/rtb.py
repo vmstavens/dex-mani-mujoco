@@ -121,11 +121,6 @@ def quaternion_slerp(q1: np.ndarray, q2: np.ndarray, alpha: float) -> np.ndarray
 def generate_pose_trajectory(start_pose: SE3, end_pose: SE3, n_steps:int ) -> SE3:
     poses = SE3()
     steps = np.linspace(0,1,n_steps)
-    print("in genera")
-    print("start_pose =")
-    print(start_pose)
-    print("end_pose =")
-    print(end_pose)
     poses.append(start_pose)
     for i in steps:
         q_i = quaternion_slerp(
@@ -141,7 +136,6 @@ def generate_pose_trajectory(start_pose: SE3, end_pose: SE3, n_steps:int ) -> SE
 
         pose = make_tf(pos=p_i)
         # pose = quat_2_tf(q_i) @ make_tf(pos=p_i)
-        print("pose=",pose)
         poses.append( pose ) 
         # poses.append( list( np.append([x,y,z],interpolated_quaternion) ) )
 
@@ -158,7 +152,6 @@ def rotate_x(T: SE3, angle: float, in_degrees: bool = False) -> SE3:
     rotated_position = rotation_matrix * T.t
 
     se3_object = SE3(rotation_matrix)
-    print(se3_object)
 
     # Return a new SE3 with the updated position and rotation
     return make_tf(pos=rotated_position, quat=[1,0,0,0])

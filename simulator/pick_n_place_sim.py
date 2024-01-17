@@ -9,6 +9,10 @@ from robots import Robot, ShadowHand, UR10e
 from simulator.base_mujoco_sim import BaseMuJuCoSim
 import math as m
 from spatialmath import SE3
+import rospy
+
+from geometry_msgs.msg import Pose
+from std_msgs.msg import Float64MultiArray
 
 import spatialmath.base as smb
 
@@ -17,7 +21,7 @@ from utils.sim import (
 )
 
 from utils.rtb import (
-    make_tf
+    make_tf,
 )
 
 from utils.mj import (
@@ -26,8 +30,11 @@ from utils.mj import (
     is_done_actuator
 )
 
+from utils.geometry import geometry
+
 class PickNPlaceSim(BaseMuJuCoSim):
     def __init__(self, args):
+        super().__init__()
         self.args = args
         self._model   = self._get_mj_model()
         self._data    = self._get_mj_data(self._model)
@@ -35,6 +42,18 @@ class PickNPlaceSim(BaseMuJuCoSim):
         self._options = self._get_mj_options()
         self._window  = self._get_mj_window()
         self._scene   = self._get_mj_scene()
+ 
+        rospy.init_node(name=self._args.sim_name)
+
+        self._cmd_arm_q     = rospy.Subscriber("mj/cmd_arm_q",     Float64MultiArray, callback=lambda q_msg: self.robot.arm.set_q(q=q_msg.data), buff_size=1)
+        self._cmd_gripper_q = rospy.Subscriber("mj/cmd_gripper_q", Float64MultiArray, callback=lambda q_msg: self.robot.gripper.set_q(q=q_msg.data), buff_size=1)
+        self._cmd_robot_q   = rospy.Subscriber("mj/cmd_robot_q",   Float64MultiArray, callback=lambda q_msg: self.robot.set_q(q=q_msg.data), buff_size=1)
+        self._cmd_arm_ee    = rospy.Subscriber("mj/cmd_arm_q",     Pose, callback=self._cmd_ee_callback, buff_size=1)
+
+        self._pub_arm_q     = rospy.Publisher("mj/arm_q",     Float64MultiArray, queue_size=1)
+        self._pub_gripper_q = rospy.Publisher("mj/gripper_q", Float64MultiArray, queue_size=1)
+        self._pub_robot_q   = rospy.Publisher("mj/robot_q",   Float64MultiArray, queue_size=1)
+        self._pub_arm_ee    = rospy.Publisher("mj/arm_ee",    Pose, queue_size=1)
 
         self._ur10e = UR10e(self._model, self._data, args)
         self._rh = ShadowHand(self._model, self._data, args)
@@ -45,9 +64,34 @@ class PickNPlaceSim(BaseMuJuCoSim):
             args    = args)
         self.robot.home()
 
+        self._pub_lock = Lock()
+        self._pub_thrd = Thread(target=self._pub_robot_info)
+        self._pub_thrd.daemon = True
+        self._pub_thrd.start()
+
         mj.set_mjcb_control(self.controller_callback)
 
-    # # Handles keyboard button events to interact with simulator
+    def _pub_robot_info(self):
+        rate = rospy.Rate(self._args.pub_freq)  # Set the publishing rate (1 Hz in this example)
+
+        while not rospy.is_shutdown():
+            with self._pub_lock:
+
+                self._pub_arm_q.publish(     geometry.mk_float64multiarray(self.robot.arm.get_q().joint_values    ) )
+                self._pub_gripper_q.publish( geometry.mk_float64multiarray(self.robot.gripper.get_q().joint_values) )
+                self._pub_robot_q.publish(   geometry.mk_float64multiarray(self.robot.get_q().joint_values        ) )
+
+                arm_ee_pose = self.robot.arm.get_ee_pose()
+                self._pub_arm_ee.publish( geometry.mk_pose(arm_ee_pose.t,ori=arm_ee_pose.R) )
+
+            rate.sleep()
+
+    def _cmd_ee_callback(self, pose_msg: Pose):
+        pos = [pose_msg.position.x, pose_msg.position.y, pose_msg.position.z]
+        quat = [pose_msg.orientation.w, pose_msg.orientation.x, pose_msg.orientation.y, pose_msg.orientation.z]
+        self.robot.arm.set_ee_pose(pos=pos, quat=quat)
+
+    # Handles keyboard button events to interact with simulator
     def keyboard_callback(self, key):
         box1_pose = get_object_pose("box1", model=self._model, data=self._data)
         box2_pose = get_object_pose("box2", model=self._model, data=self._data)
@@ -98,6 +142,12 @@ class PickNPlaceSim(BaseMuJuCoSim):
             self.robot.gripper.set_q(q = "open")
             self.robot.arm.set_ee_pose(T_w_box2)
 
+        elif key == glfw.KEY_ESCAPE:
+            print("Pressed ESC...")
+            print("Killing ros node...")
+            rospy.signal_shutdown("pressed esc...")
+            print("Killing MuJoCo...")
+            exit()
 
         elif key == glfw.KEY_J:
             print("doing nothing...")
@@ -106,11 +156,3 @@ class PickNPlaceSim(BaseMuJuCoSim):
     def controller_callback(self, model: mj.MjModel, data: mj.MjData) -> None:
         if not self.robot.is_done:
             self.robot.step()
-
-    # # Runs GLFW main loop
-    # def run(self):
-    #     self.viewer_thrd = Thread(target=self.viewer_callback, daemon=True)
-    #     self.viewer_thrd.daemon = True
-    #     self.viewer_thrd.start()
-    #     input()
-    #     print("done simulating...")

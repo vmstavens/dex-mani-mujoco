@@ -149,6 +149,8 @@ class Robot(BaseRobot):
         robot_joint_names = []
         robot_joint_values = []
         for an in get_joint_names(self.mj_model):
+            if an == '':
+                continue
             prefix = an.split("_")[0]
             if self.arm.name in prefix or self.gripper.name:
                 robot_joint_names.append(an)

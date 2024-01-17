@@ -1,6 +1,11 @@
-from typing import List
+from typing import List, Dict, Union
 import mujoco as mj
 from math import degrees
+import numpy as np
+from spatialmath import SE3
+import spatialmath.base as smb
+from utils.rtb import make_tf
+
 
 def get_actuator_names(model: mj.MjModel) -> List[str]:
     """
@@ -58,5 +63,29 @@ def get_joint_actuator_diff(data: mj.MjData, joint_name:str ,actuator_name: str)
     q_actuator = get_actuator_value(data,actuator_name)
     return q_joint - q_actuator
 
+def set_object_pose(data: mj.MjData, model: mj.MjModel, object_name:str, 
+            pos: List = [0.5,0.5,0.5], 
+            ori: Union[np.ndarray,SE3] = [1,0,0,0], 
+            pose: Union[None, List[float], np.ndarray, SE3] = None) -> None:
 
+    if pose is not None:
+        if isinstance(pose, SE3):
+            target_pose = pose
+        else:
+            # Assuming pose is a list or numpy array [x, y, z, qw, qx, qy, qz]
+            target_pose = SE3(pose[:3], pose[3:])
+    else:
+        # Use the provided position and orientation
+        target_pose = make_tf(pos=pos, ori=ori)
 
+    # print(data.body("flexcell"))
+        # base
+    # print(data)
+    # print(data.mocap_pos[0,0])
+    # data.mocap_pos[0,0] += 0.1
+    # data.mocap_pos("arm")
+    # data.mocap_pos[0,0] = 2
+    # data.body("base").xpos[:3] = target_pose.t
+
+def set_robot_pose(data: mj.MjData, model: mj.MjModel, robot_name:str, pose):
+    pass

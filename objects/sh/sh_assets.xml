@@ -6,17 +6,17 @@
       <material name="gray" specular="0.0" shininess="0.25" rgba="0.80848 0.80848 0.80848 1"/>
       <material name="metallic" specular="0" shininess="0.25" rgba="0.9 0.9 0.9 1"/>
 
-      <mesh class="right_hand" file="sh/assets/sh_forearm_0.obj"/>
-      <mesh class="right_hand" file="sh/assets/sh_forearm_1.obj"/>
-      <mesh class="right_hand" file="sh/assets/sh_forearm_collision.obj"/>
-      <mesh class="right_hand" file="sh/assets/sh_wrist.obj"/>
-      <mesh class="right_hand" file="sh/assets/sh_palm.obj"/>
-      <mesh class="right_hand" file="sh/assets/sh_f_knuckle.obj"/>
-      <mesh class="right_hand" file="sh/assets/sh_f_proximal.obj"/>
-      <mesh class="right_hand" file="sh/assets/sh_f_middle.obj"/>
-      <mesh class="right_hand" file="sh/assets/sh_f_distal_pst.obj"/>
-      <mesh class="right_hand" file="sh/assets/sh_lf_metacarpal.obj"/>
-      <mesh class="right_hand" file="sh/assets/sh_th_proximal.obj"/>
-      <mesh class="right_hand" file="sh/assets/sh_th_middle.obj"/>
-      <mesh class="right_hand" file="sh/assets/sh_th_distal_pst.obj"/>
+      <mesh class="right_hand" file="../sh/assets/sh_forearm_0.obj"/>
+      <mesh class="right_hand" file="../sh/assets/sh_forearm_1.obj"/>
+      <mesh class="right_hand" file="../sh/assets/sh_forearm_collision.obj"/>
+      <mesh class="right_hand" file="../sh/assets/sh_wrist.obj"/>
+      <mesh class="right_hand" file="../sh/assets/sh_palm.obj"/>
+      <mesh class="right_hand" file="../sh/assets/sh_f_knuckle.obj"/>
+      <mesh class="right_hand" file="../sh/assets/sh_f_proximal.obj"/>
+      <mesh class="right_hand" file="../sh/assets/sh_f_middle.obj"/>
+      <mesh class="right_hand" file="../sh/assets/sh_f_distal_pst.obj"/>
+      <mesh class="right_hand" file="../sh/assets/sh_lf_metacarpal.obj"/>
+      <mesh class="right_hand" file="../sh/assets/sh_th_proximal.obj"/>
+      <mesh class="right_hand" file="../sh/assets/sh_th_middle.obj"/>
+      <mesh class="right_hand" file="../sh/assets/sh_th_distal_pst.obj"/>
 </mujocoinclude>

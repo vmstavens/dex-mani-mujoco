@@ -1,0 +1,7 @@
+<!DOCTYPE FilterScript>
+<FilterScript>
+
+<filter name="Compute Normals for Point Sets" />
+<filter name="Consistent Vertex Order" />
+
+</FilterScript>

@@ -149,7 +149,6 @@ class BaseRobot(ABC):
     def _clamp_q(self, q: List[float]) -> List[float]:
         actuator_names = self._get_actuator_names()
         actuator_limits = [get_actuator_range(self.mj_model, jn) for jn in actuator_names]
-        print(actuator_limits)
         clamped_qs = []
         for i in range(len(q)):
             clamped_q = np.clip(a = q[i], a_min = actuator_limits[i][0], a_max = actuator_limits[i][1])

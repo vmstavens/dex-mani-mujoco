@@ -1,0 +1,14 @@
+		
+<mujocoinclude>
+	<asset>
+		<mesh name="task_board" file="../rgmc_practice_task_board/output_mesh.obj" scale="0.001 0.001 0.001" />
+		<!-- <mesh name="task_board" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - 2PinHousing-1.obj" scale="0.001 0.001 0.001" /> -->
+	</asset>
+
+	<worldbody>
+		<body name="task_board" pos="0.5 0.5 0.5" quat="1 0 0 1"> 
+			<joint type="free"/>
+			<geom type="mesh" mesh="task_board" mass="0.2"/>
+		</body>
+	</worldbody>
+</mujocoinclude>

@@ -5,6 +5,12 @@ from mujoco.glfw import glfw
 from simulator.base_mujoco_sim import BaseMuJuCoSim
 from robots import Robot, UR10e, HandE
 
+from utils.mj import (
+    set_object_pose, 
+    set_robot_pose,
+    get_joint_names,
+    )
+
 class TaskBoardSim(BaseMuJuCoSim):
     def __init__(self, args):
         self.args = args
@@ -15,6 +21,8 @@ class TaskBoardSim(BaseMuJuCoSim):
         self._window  = self._get_mj_window()
         self._scene   = self._get_mj_scene()
 
+        self._set_scene()
+
         self._arm = UR10e(self._model, self._data, args)
         self._gripper = HandE(self._model, self._data, args)
 
@@ -22,11 +30,21 @@ class TaskBoardSim(BaseMuJuCoSim):
 
         mj.set_mjcb_control(self.controller_callback)
 
-    # # Handles keyboard button events to interact with simulator
+    def _set_scene(self):
+        pass
+        # flexcell dim (0.4, 0.6, 0.3) = (x, y, z)
+        # set_robot_pose()
+        # set_object_pose(data=self._data, model=self._model, object_name="flexcell",pos=[0.4, 0.6, 0.0])
+
+    # Handles keyboard button events to interact with simulator
     def keyboard_callback(self, key):
         if key == glfw.KEY_SPACE:
-            self.robot.gripper.set_q(q = [0.025, 0.025])
-            print(self.robot.gripper.info)
+            print(self._data.geom)
+            # print(self._data.geom("task_board"))
+            print(self._data.body("tb"))
+
+            # set_object_pose(data=self._data, model=self._model, object_name="flexcell",pos=[0.4, 0.6, 0.0])
+
 
     # Defines controller behavior
     def controller_callback(self, model: mj.MjModel, data: mj.MjData) -> None:

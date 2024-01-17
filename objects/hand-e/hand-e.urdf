@@ -3,7 +3,7 @@
   
   <mujoco>
         <compiler 
-        meshdir="." 
+        meshdir="assets/stl" 
         balanceinertia="true" 
         discardvisual="false" />
   </mujoco>
@@ -17,7 +17,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="assets/stl/hand_e.stl" scale="1.0 1.0 1.0"/>
+        <mesh filename="assets/stl/hand-e.stl" scale="1.0 1.0 1.0"/>
       </geometry>
       <material name="Dark">
         <color rgba=".1 0.1 0.1 1.0"/>
@@ -26,7 +26,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="assets/stl/hand_e.stl" scale="1.0 1.0 1.0"/>
+        <mesh filename="assets/stl/hand-e.stl" scale="1.0 1.0 1.0"/>
       </geometry>
     </collision>
   </link>

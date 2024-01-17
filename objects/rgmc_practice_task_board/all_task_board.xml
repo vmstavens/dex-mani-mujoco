@@ -1,0 +1,602 @@
+
+<mujocoinclude>
+    <asset>
+      <mesh name="task_board_0" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - AT04_2P-1 AT04_2P_5-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_1" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - 3mm NUT-6.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_2" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M8x20-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_3" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - 4mm NUT-25.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_4" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M6x25-17.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_5" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - Pulley Tensioner-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_6" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - Washer for wire hook-4.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_7" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M4 bolt (2)-4.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_8" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - CSH-STN-M4-16-3.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_9" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - MBRF48_2_H10-2.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_10" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - 4mm NUT-29.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_11" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M3-short-7.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_12" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - 4mm NUT-26.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_13" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - CSH-STN-M4-16-10.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_14" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M4 bolt (2)-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_15" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M6x25-25.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_16" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - 4mm NUT-27.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_17" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - KET12_Square_12mm-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_18" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - CSH-STN-M4-16-4.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_19" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - wire corner post High-2.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_20" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - 3mm NUT-12.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_21" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - SFAD10-31-F20-B16-P8-N6-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_22" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - ICRA2022_Practice_Base-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_23" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - AT06_2S_LED1220-1 AT06_2S_LED1220_3-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_24" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M6x25-20.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_25" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - 3mm NUT-11.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_26" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - BNC-R-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_27" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - PoweronnectorHousing-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_28" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - EUBH30-1 _B608ZZ_4-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_29" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M3-short-6.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_30" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - NSQA-SUS-M6-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_31" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M6x25-21.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_32" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M4 bolt (2)-2.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_33" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - 4mm NUT-32.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_34" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - CSH-STN-M4-16-7.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_35" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - 4mm NUT-31.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_36" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - IROS2020_Fastener_Plate-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_37" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - AT06_2S_LED1220-1 AT06_2S_LED1220_5-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_38" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - CSH-STN-M4-16-9.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_39" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - RGOCG16-50_16mm-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_40" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - round belt 500mm-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_41" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - 4mm NUT-34.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_42" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - SFAD10-31-F20-B16-P8-N6-2.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_43" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - EUBH30-1 _EUBH30mb_2-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_44" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - 3mm NUT-7.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_45" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M6x25-27.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_46" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - CSH-STN-M4-16-2.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_47" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - 3mm NUT-9.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_48" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - KET8-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_49" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M3-short-10.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_50" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - EUBH30-1 _EUBH30s_6-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_51" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - wire rack-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_52" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - 2PinHousing-2.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_53" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M8x20-2.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_54" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M4 bolt (2)-6.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_55" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - CSH-STN-M4-16-5.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_56" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - 3mm NUT-8.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_57" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - AT06_2S_LED1220-2 AT06_2S_LED1220_9-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_58" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - AT06_2S_LED1220-2 AT06_2S_LED1220_3-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_59" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M3-long-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_60" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M6x25-26.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_61" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M4 bolt (2)-14.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_62" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M3-short-9.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_63" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M4 bolt (2)-13.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_64" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - 4mm NUT-30.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_65" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - CSH-STN-M4-16-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_66" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M8x20-3.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_67" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M6x25-19.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_68" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - elastic retainer-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_69" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - NCLC10-12-20.0-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_70" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M8x20-6.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_71" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - wire rack-2.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_72" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - 2PinHousing-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_73" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - AT04_2P-1 AT04_2P_3-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_74" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M8x1.0 12mm Hex Nut-2.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_75" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M6x25-23.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_76" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - AT06_2S_LED1220-1 AT06_2S_LED1220_7-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_77" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - CSH-STN-M4-16-6.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_78" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - Elastic retainer stool-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_79" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - 4mm NUT-28.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_80" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - SPTR10-20-M6-SC12_Tapped_Shaft_M6_10mm-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_81" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - RGOCG8-50_8mm-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_82" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M4 bolt (2)-15.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_83" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - MBRF60_2_H10-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_84" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - RJ45_female-2.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_85" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - AT04_2P-2 AT04_2P_5-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_86" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - 4mm NUT-23.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_87" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - AT06_2S_LED1220-1 AT06_2S_LED1220_9-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_88" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - 4mm NUT-33.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_89" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - GEABP1.0-20-10-B-10_Gear_20teeth-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_90" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M4 bolt (2)-5.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_91" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - RJ45 Housing-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_92" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - 4mm NUT-20.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_93" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - SPTR10-20-M6-SC12_Tapped_Shaft_M6_10mm-2.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_94" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - CSH-STN-M4-16-8.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_95" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - BNCP-1.5A-K-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_96" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M4 bolt (2)-3.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_97" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - AT06_2S_LED1220-2 AT06_2S_LED1220_5-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_98" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - 3mm NUT-10.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_99" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - 4mm NUT-24.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_100" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - AT06_2S_LED1220-2 AT06_2S_LED1220_7-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_101" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M3-short-8.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_102" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M3-long-2.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_103" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M4 bolt (2)-11.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_104" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M3-short-11.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_105" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M6x25-18.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_106" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - GEABP1.0-60-10-B-10_Gear_60teeth-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_107" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - wire corner post High-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_108" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M8x1.0 12mm Hex Nut-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_109" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - Washer for wire hook-3.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_110" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M6x25-22.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_111" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - NCLC10-12-20.0-2.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_112" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - 4mm NUT-19.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_113" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M8x20-4.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_114" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - M8x20-5.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_115" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - ethernet cable head-2.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_116" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - 4mm NUT-17.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_117" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - AT04_2P-2 AT04_2P_3-1.obj" scale="0.001 0.001 0.001" />
+      <mesh name="task_board_118" file="../rgmc_practice_task_board/obj/ICRA2022_Practice - bolt_rack-1.obj" scale="0.001 0.001 0.001" />
+   </asset>
+   <worldbody>
+      <body name="task_board_0" pos="0.0 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_0" mass="0.2"/> 
+      </body>
+      <body name="task_board_1" pos="0.1 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_1" mass="0.2"/> 
+      </body>
+      <body name="task_board_2" pos="0.2 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_2" mass="0.2"/> 
+      </body>
+      <body name="task_board_3" pos="0.3 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_3" mass="0.2"/> 
+      </body>
+      <body name="task_board_4" pos="0.4 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_4" mass="0.2"/> 
+      </body>
+      <body name="task_board_5" pos="0.5 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_5" mass="0.2"/> 
+      </body>
+      <body name="task_board_6" pos="0.6 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_6" mass="0.2"/> 
+      </body>
+      <body name="task_board_7" pos="0.7 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_7" mass="0.2"/> 
+      </body>
+      <body name="task_board_8" pos="0.8 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_8" mass="0.2"/> 
+      </body>
+      <body name="task_board_9" pos="0.9 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_9" mass="0.2"/> 
+      </body>
+      <body name="task_board_10" pos="1.0 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_10" mass="0.2"/> 
+      </body>
+      <body name="task_board_11" pos="1.1 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_11" mass="0.2"/> 
+      </body>
+      <body name="task_board_12" pos="1.2 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_12" mass="0.2"/> 
+      </body>
+      <body name="task_board_13" pos="1.3 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_13" mass="0.2"/> 
+      </body>
+      <body name="task_board_14" pos="1.4 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_14" mass="0.2"/> 
+      </body>
+      <body name="task_board_15" pos="1.5 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_15" mass="0.2"/> 
+      </body>
+      <body name="task_board_16" pos="1.6 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_16" mass="0.2"/> 
+      </body>
+      <body name="task_board_17" pos="1.7 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_17" mass="0.2"/> 
+      </body>
+      <body name="task_board_18" pos="1.8 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_18" mass="0.2"/> 
+      </body>
+      <body name="task_board_19" pos="1.9 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_19" mass="0.2"/> 
+      </body>
+      <body name="task_board_20" pos="2.0 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_20" mass="0.2"/> 
+      </body>
+      <body name="task_board_21" pos="2.1 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_21" mass="0.2"/> 
+      </body>
+      <body name="task_board_22" pos="2.2 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_22" mass="0.2"/> 
+      </body>
+      <body name="task_board_23" pos="2.3 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_23" mass="0.2"/> 
+      </body>
+      <body name="task_board_24" pos="2.4 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_24" mass="0.2"/> 
+      </body>
+      <body name="task_board_25" pos="2.5 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_25" mass="0.2"/> 
+      </body>
+      <body name="task_board_26" pos="2.6 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_26" mass="0.2"/> 
+      </body>
+      <body name="task_board_27" pos="2.7 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_27" mass="0.2"/> 
+      </body>
+      <body name="task_board_28" pos="2.8 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_28" mass="0.2"/> 
+      </body>
+      <body name="task_board_29" pos="2.9 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_29" mass="0.2"/> 
+      </body>
+      <body name="task_board_30" pos="3.0 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_30" mass="0.2"/> 
+      </body>
+      <body name="task_board_31" pos="3.1 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_31" mass="0.2"/> 
+      </body>
+      <body name="task_board_32" pos="3.2 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_32" mass="0.2"/> 
+      </body>
+      <body name="task_board_33" pos="3.3 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_33" mass="0.2"/> 
+      </body>
+      <body name="task_board_34" pos="3.4 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_34" mass="0.2"/> 
+      </body>
+      <body name="task_board_35" pos="3.5 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_35" mass="0.2"/> 
+      </body>
+      <body name="task_board_36" pos="3.6 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_36" mass="0.2"/> 
+      </body>
+      <body name="task_board_37" pos="3.7 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_37" mass="0.2"/> 
+      </body>
+      <body name="task_board_38" pos="3.8 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_38" mass="0.2"/> 
+      </body>
+      <body name="task_board_39" pos="3.9 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_39" mass="0.2"/> 
+      </body>
+      <body name="task_board_40" pos="4.0 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_40" mass="0.2"/> 
+      </body>
+      <body name="task_board_41" pos="4.1 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_41" mass="0.2"/> 
+      </body>
+      <body name="task_board_42" pos="4.2 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_42" mass="0.2"/> 
+      </body>
+      <body name="task_board_43" pos="4.3 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_43" mass="0.2"/> 
+      </body>
+      <body name="task_board_44" pos="4.4 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_44" mass="0.2"/> 
+      </body>
+      <body name="task_board_45" pos="4.5 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_45" mass="0.2"/> 
+      </body>
+      <body name="task_board_46" pos="4.6 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_46" mass="0.2"/> 
+      </body>
+      <body name="task_board_47" pos="4.7 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_47" mass="0.2"/> 
+      </body>
+      <body name="task_board_48" pos="4.8 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_48" mass="0.2"/> 
+      </body>
+      <body name="task_board_49" pos="4.9 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_49" mass="0.2"/> 
+      </body>
+      <body name="task_board_50" pos="5.0 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_50" mass="0.2"/> 
+      </body>
+      <body name="task_board_51" pos="5.1 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_51" mass="0.2"/> 
+      </body>
+      <body name="task_board_52" pos="5.2 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_52" mass="0.2"/> 
+      </body>
+      <body name="task_board_53" pos="5.3 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_53" mass="0.2"/> 
+      </body>
+      <body name="task_board_54" pos="5.4 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_54" mass="0.2"/> 
+      </body>
+      <body name="task_board_55" pos="5.5 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_55" mass="0.2"/> 
+      </body>
+      <body name="task_board_56" pos="5.6 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_56" mass="0.2"/> 
+      </body>
+      <body name="task_board_57" pos="5.7 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_57" mass="0.2"/> 
+      </body>
+      <body name="task_board_58" pos="5.8 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_58" mass="0.2"/> 
+      </body>
+      <body name="task_board_59" pos="5.9 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_59" mass="0.2"/> 
+      </body>
+      <body name="task_board_60" pos="6.0 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_60" mass="0.2"/> 
+      </body>
+      <body name="task_board_61" pos="6.1 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_61" mass="0.2"/> 
+      </body>
+      <body name="task_board_62" pos="6.2 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_62" mass="0.2"/> 
+      </body>
+      <body name="task_board_63" pos="6.3 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_63" mass="0.2"/> 
+      </body>
+      <body name="task_board_64" pos="6.4 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_64" mass="0.2"/> 
+      </body>
+      <body name="task_board_65" pos="6.5 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_65" mass="0.2"/> 
+      </body>
+      <body name="task_board_66" pos="6.6 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_66" mass="0.2"/> 
+      </body>
+      <body name="task_board_67" pos="6.7 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_67" mass="0.2"/> 
+      </body>
+      <body name="task_board_68" pos="6.8 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_68" mass="0.2"/> 
+      </body>
+      <body name="task_board_69" pos="6.9 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_69" mass="0.2"/> 
+      </body>
+      <body name="task_board_70" pos="7.0 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_70" mass="0.2"/> 
+      </body>
+      <body name="task_board_71" pos="7.1 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_71" mass="0.2"/> 
+      </body>
+      <body name="task_board_72" pos="7.2 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_72" mass="0.2"/> 
+      </body>
+      <body name="task_board_73" pos="7.3 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_73" mass="0.2"/> 
+      </body>
+      <body name="task_board_74" pos="7.4 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_74" mass="0.2"/> 
+      </body>
+      <body name="task_board_75" pos="7.5 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_75" mass="0.2"/> 
+      </body>
+      <body name="task_board_76" pos="7.6 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_76" mass="0.2"/> 
+      </body>
+      <body name="task_board_77" pos="7.7 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_77" mass="0.2"/> 
+      </body>
+      <body name="task_board_78" pos="7.8 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_78" mass="0.2"/> 
+      </body>
+      <body name="task_board_79" pos="7.9 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_79" mass="0.2"/> 
+      </body>
+      <body name="task_board_80" pos="8.0 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_80" mass="0.2"/> 
+      </body>
+      <body name="task_board_81" pos="8.1 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_81" mass="0.2"/> 
+      </body>
+      <body name="task_board_82" pos="8.2 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_82" mass="0.2"/> 
+      </body>
+      <body name="task_board_83" pos="8.3 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_83" mass="0.2"/> 
+      </body>
+      <body name="task_board_84" pos="8.4 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_84" mass="0.2"/> 
+      </body>
+      <body name="task_board_85" pos="8.5 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_85" mass="0.2"/> 
+      </body>
+      <body name="task_board_86" pos="8.6 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_86" mass="0.2"/> 
+      </body>
+      <body name="task_board_87" pos="8.7 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_87" mass="0.2"/> 
+      </body>
+      <body name="task_board_88" pos="8.8 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_88" mass="0.2"/> 
+      </body>
+      <body name="task_board_89" pos="8.9 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_89" mass="0.2"/> 
+      </body>
+      <body name="task_board_90" pos="9.0 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_90" mass="0.2"/> 
+      </body>
+      <body name="task_board_91" pos="9.1 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_91" mass="0.2"/> 
+      </body>
+      <body name="task_board_92" pos="9.2 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_92" mass="0.2"/> 
+      </body>
+      <body name="task_board_93" pos="9.3 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_93" mass="0.2"/> 
+      </body>
+      <body name="task_board_94" pos="9.4 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_94" mass="0.2"/> 
+      </body>
+      <body name="task_board_95" pos="9.5 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_95" mass="0.2"/> 
+      </body>
+      <body name="task_board_96" pos="9.6 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_96" mass="0.2"/> 
+      </body>
+      <body name="task_board_97" pos="9.7 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_97" mass="0.2"/> 
+      </body>
+      <body name="task_board_98" pos="9.8 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_98" mass="0.2"/> 
+      </body>
+      <body name="task_board_99" pos="9.9 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_99" mass="0.2"/> 
+      </body>
+      <body name="task_board_100" pos="10.0 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_100" mass="0.2"/> 
+      </body>
+      <body name="task_board_101" pos="10.1 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_101" mass="0.2"/> 
+      </body>
+      <body name="task_board_102" pos="10.2 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_102" mass="0.2"/> 
+      </body>
+      <body name="task_board_103" pos="10.3 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_103" mass="0.2"/> 
+      </body>
+      <body name="task_board_104" pos="10.4 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_104" mass="0.2"/> 
+      </body>
+      <body name="task_board_105" pos="10.5 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_105" mass="0.2"/> 
+      </body>
+      <body name="task_board_106" pos="10.6 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_106" mass="0.2"/> 
+      </body>
+      <body name="task_board_107" pos="10.7 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_107" mass="0.2"/> 
+      </body>
+      <body name="task_board_108" pos="10.8 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_108" mass="0.2"/> 
+      </body>
+      <body name="task_board_109" pos="10.9 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_109" mass="0.2"/> 
+      </body>
+      <body name="task_board_110" pos="11.0 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_110" mass="0.2"/> 
+      </body>
+      <body name="task_board_111" pos="11.1 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_111" mass="0.2"/> 
+      </body>
+      <body name="task_board_112" pos="11.2 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_112" mass="0.2"/> 
+      </body>
+      <body name="task_board_113" pos="11.3 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_113" mass="0.2"/> 
+      </body>
+      <body name="task_board_114" pos="11.4 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_114" mass="0.2"/> 
+      </body>
+      <body name="task_board_115" pos="11.5 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_115" mass="0.2"/> 
+      </body>
+      <body name="task_board_116" pos="11.6 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_116" mass="0.2"/> 
+      </body>
+      <body name="task_board_117" pos="11.7 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_117" mass="0.2"/> 
+      </body>
+      <body name="task_board_118" pos="11.8 0.0 0.0" quat="1 0 0 1"> 
+          <joint type="free"/> 
+          <geom type="mesh" mesh="task_board_118" mass="0.2"/> 
+      </body>
+   </worldbody>
+</mujocoinclude>

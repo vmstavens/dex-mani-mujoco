@@ -1,18 +1,16 @@
 		
 <mujocoinclude>
 	<asset>
-		<mesh name="flexcell" file="flexcell/flexcell_table_top.obj" scale="1 1 1" />
+		<mesh name="flexcell" file="../flexcell/flexcell_table_top.obj" scale="1 1 1" />
 	</asset>
 
 	<worldbody>
-	<body name="flexcell"> 
-		<!-- <joint type="free" /> -->
-		<body name="table" pos="1 1 0.3">
+	<body name="flexcell" pos="0.4 0.6 0"> 
+		<body pos="0 0 0.3">
 			<geom type="box" size="0.4 0.6 0.3"  rgba="0.8 0.8 0.8 1" mass="500"/>
 		</body>
-		<body name="flexcell_table_top" pos="1 1 -0.2" quat="1 1 1 1">
-			<geom type="mesh" file="flexcell/flexcell_table_top.obj" mass="10"/>
-			<!-- <geom type="mesh" mesh="flexcell" mass="10"/> -->
+		<body pos="0 0 -0.2" quat="1 1 1 1">
+			<geom type="mesh" mesh="flexcell" mass="100"/>
 		</body>
 	</body>
 	</worldbody>

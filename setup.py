@@ -11,7 +11,8 @@ setup(
         'mujoco',
         'pandas',
         'numpy',
-        'roboticstoolbox-python'
+        'roboticstoolbox-python',
+        'rospy'
         # Add more dependencies here
     ],
 )

@@ -8,9 +8,11 @@ flexcell.stl
 flexcell.stp
 flexcell-binary.stl
 *.stl
+*.STL
 *.obj
 *.mtl
 ICRA2022_Practice*
+utils/ros_utils/
 
 
 # added - end ############################

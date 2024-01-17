@@ -1,4 +1,4 @@
-<mujoco model="ur10e_rh">
+<mujoco model="ur10e">
 	<compiler angle="radian" meshdir="ur10e_rh/assets" autolimits="true"/>
 
 	<default>
@@ -15,6 +15,7 @@
 		<light name="spotlight" mode="targetbodycom" target="wrist_2_link" pos="0 -1 2"/>
 
 		<body name="base" quat="1 0 0 0" pos="0 0 0" childclass="ur10e">
+
 			<inertial mass="4.0" pos="0 0 0" diaginertia="0.0061063308908 0.0061063308908 0.01125"/>
 			<geom mesh="ur10e_base_0" material="urblack" class="visual"/>
 			<geom mesh="ur10e_base_1" material="jointgray" class="visual"/>

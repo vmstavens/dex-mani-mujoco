@@ -1,5 +1,5 @@
 <mujocoinclude>
-	<mesh name="hand-e"   file="hand-e/assets/stl/hand-e.stl" />
-	<mesh name="finger_1" file="hand-e/assets/stl/finger_1.stl" />
-	<mesh name="finger_2" file="hand-e/assets/stl/finger_2.stl" />
+	<mesh name="hand-e"   file="../hand-e/assets/stl/hand-e.stl" />
+	<mesh name="finger_1" file="../hand-e/assets/stl/finger_1.stl" />
+	<mesh name="finger_2" file="../hand-e/assets/stl/finger_2.stl" />
 </mujocoinclude>

@@ -8,15 +8,23 @@ from threading import Lock, Thread
 import time
 
 class BaseMuJuCoSim:
+
+    @abstractmethod
     def __init__(self):
         pass
 
     @property
     @abstractmethod
     def args(self):
-        self._args
+        pass
+
+    @property
+    @abstractmethod
+    def ros_node(self):
+        pass
 
     @args.setter
+    @abstractmethod
     def args(self, args) -> None:
         self._args = args
 
