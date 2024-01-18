@@ -1,6 +1,7 @@
 import mujoco as mj
 import numpy as np
 import cv2
+from typing import Tuple
 
 class Camera:
 	def __init__(self, model: mj.MjModel, data: mj.MjData, args, cam_name:str = "") -> None:
@@ -22,7 +23,8 @@ class Camera:
 
 		self._viewport = mj.MjrRect(0, 0, self.x_res, self.y_res)
 
-	def shoot(self,save_path:str = "test_img.png"):
+	def shoot(self,save_path:str = "test_img.png") -> Tuple[np.ndarray, np.ndarray]:
+
 		context = mj.MjrContext(self._model, mj.mjtFontScale.mjFONTSCALE_150)
 		mj.mjv_updateScene(self._model, self._data, self._options, self._pert, self._camera, mj.mjtCatBit.mjCAT_ALL, self._scene)
 		mj.mjr_render(self._viewport, self._scene, context)
@@ -33,12 +35,32 @@ class Camera:
 		mj.mjr_readPixels(image, depth_hat_buf, self._viewport, context)
 
 		# OpenGL renders with inverted y axis
-		image         = image.squeeze()
+		img         = image.squeeze()
 		# image         = np.flip(image, axis=0).squeeze()
-		depth_hat_buf = depth_hat_buf.squeeze() * 255.0
+		dimg = depth_hat_buf.squeeze() * 255.0
 		# depth_hat_buf = np.flip(depth_hat_buf, axis=0).squeeze()
 
-		cv2.imwrite("/home/vims/git/dex-mani-mujoco/simulator/test.png", cv2.cvtColor( image,cv2.COLOR_RGB2BGR ))
+		cv2.imwrite("/home/vims/git/dex-mani-mujoco/simulator/test.png", cv2.cvtColor( image, cv2.COLOR_RGB2BGR ))
 		cv2.imwrite("/home/vims/git/dex-mani-mujoco/simulator/test_d.png",depth_hat_buf)
-		print(depth_hat_buf)
-		print(image)
+		return img, dimg
+	
+	def test(self):
+		# very much testing
+		# see: /home/vims/git/mujoco_camera_depth_test/camera_depth_test.py
+		zfar  = self._model.vis.map.zfar * self._model.stat.extent
+		znear = self._model.vis.map.znear * self._model.stat.extent
+		# depth_hat = ogl_zbuf_inv(depth_hat_buf, znear, zfar)
+		def opengl_depth_to_meters(depth_value, near, far):
+			"""
+			Convert OpenGL depth units to meters.
+
+			Parameters:
+			- depth_value: The depth value from OpenGL (typically in the range [0, 1]).
+			- near: The near clipping plane value of the camera.
+			- far: The far clipping plane value of the camera.
+
+			Returns:
+			- Depth in meters.
+			"""
+			depth_meters = (far - near) / (depth_value * (far / (near - far)) + near / (near - far))
+			return depth_meters
