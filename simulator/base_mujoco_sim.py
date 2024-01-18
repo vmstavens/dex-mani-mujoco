@@ -81,9 +81,19 @@ class BaseMuJuCoSim:
     def _get_mj_data(self, model) -> mj.MjData:
         return mj.MjData(model)
     
-    def _get_mj_camera(self) -> mj.MjData:
-        return mj.MjvCamera()
-    
+    def _get_mj_camera(self, cam_name:str = "") -> mj.MjData:
+        # return mj.MjvCamera(cam_name)
+
+        if cam_name == "":
+            return mj.MjvCamera()
+
+        camera_id = mj.mj_name2id(self._model, mj.mjtObj.mjOBJ_CAMERA, cam_name)
+        print(camera_id)
+        if camera_id != -1:
+            # Camera with the specified name exists
+            return mj.MjvCamera(id=camera_id, type=mj.mjtCamera.mjCAMERA_FIXED, fixedcamid=camera_id)
+        return 
+
     def _get_mj_options(self) -> mj.MjvOption:
         return mj.MjvOption()
     
@@ -92,3 +102,6 @@ class BaseMuJuCoSim:
     
     def _get_mj_scene(self, maxgeom:int = 10000) -> mj.MjvScene:
         return mj.MjvScene(self._model, maxgeom=maxgeom)
+    
+    def _get_mj_pertubation(self) -> mj.MjvPerturb:
+        return mj.MjvPerturb()

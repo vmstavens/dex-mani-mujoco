@@ -40,9 +40,15 @@ class Robot(BaseRobot):
     def __init__(self, args, arm: BaseRobot = None, gripper: BaseRobot = None) -> None:
         super().__init__() 
         self._args           = args
-        self._model          = arm.mj_model
-        self._data           = arm.mj_data
-        
+        if arm is None:
+            self._model = gripper.mj_model
+            self._data = gripper.mj_data
+        elif gripper is None:
+            self._model = arm.mj_model
+            self._data = arm.mj_data
+        else:
+            print("Warning! arm and gripper is None...")
+
         self._arm            = arm
         
         self._gripper        = gripper
@@ -85,7 +91,15 @@ class Robot(BaseRobot):
 
     @property
     def name(self) -> str:
-        return self._arm.name if not self._has_gripper else self._arm.name + "_" + self._gripper.name
+        name = ""
+        if self._has_arm and self._has_gripper:
+            return self._arm.name + "_" + self._gripper.name
+        elif self._has_arm and not self._has_gripper:
+            return self._arm.name
+        elif self._has_gripper and not self._arm:
+            return self._gripper.name
+        else:
+            return ""
 
     @property
     def is_done(self) -> bool:
@@ -121,8 +135,12 @@ class Robot(BaseRobot):
     def _get_actuator_names(self) -> List[str]:
         result = []
         for ac_name in get_actuator_names(self.mj_model):
-            if self.arm.name in ac_name or self.gripper.name in ac_name:
-                result.append(ac_name)
+            if self._has_arm:
+                if self.arm.name in ac_name:
+                    result.append(ac_name)
+            if self._has_gripper:
+                if self.gripper.name in ac_name:
+                    result.append(ac_name)
         return result
 
     def _config_to_q(self, config: str) -> List[float]:
@@ -137,7 +155,7 @@ class Robot(BaseRobot):
         robot_actuator_names = []
         actuator_names = get_actuator_names(self._model)
         for an in actuator_names:
-            if self.arm.name in an or self.gripper:
+            if self.name:
                 robot_actuator_names.append(an)
         for i in range(len(robot_actuator_names)):
             set_actuator_value(data=self._data, q=q[i], actuator_name=robot_actuator_names[i])
@@ -152,7 +170,7 @@ class Robot(BaseRobot):
             if an == '':
                 continue
             prefix = an.split("_")[0]
-            if self.arm.name in prefix or self.gripper.name:
+            if self.name:
                 robot_joint_names.append(an)
         for ran in robot_joint_names:
             robot_joint_values.append(get_joint_value(self.mj_data, ran))

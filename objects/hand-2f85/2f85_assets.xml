@@ -1,0 +1,15 @@
+<mujocoinclude>
+    <material name="2f85_metal" rgba="0.58 0.58 0.58 1"/>
+    <material name="2f85_silicone" rgba="0.1882 0.1882 0.1882 1"/>
+    <material name="2f85_gray" rgba="0.4627 0.4627 0.4627 1"/>
+    <material name="2f85_black" rgba="0.149 0.149 0.149 1"/>
+
+    <mesh class="2f85" file="../hand-2f85/assets/2f85_base_mount.stl"/>
+    <mesh class="2f85" file="../hand-2f85/assets/2f85_base.stl"/>
+    <mesh class="2f85" file="../hand-2f85/assets/2f85_driver.stl"/>
+    <mesh class="2f85" file="../hand-2f85/assets/2f85_coupler.stl"/>
+    <mesh class="2f85" file="../hand-2f85/assets/2f85_follower.stl"/>
+    <mesh class="2f85" file="../hand-2f85/assets/2f85_pad.stl"/>
+    <mesh class="2f85" file="../hand-2f85/assets/2f85_silicone_pad.stl"/>
+    <mesh class="2f85" file="../hand-2f85/assets/2f85_spring_link.stl"/>
+</mujocoinclude>
