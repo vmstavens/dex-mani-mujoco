@@ -6,6 +6,7 @@ import mujoco.viewer
 from mujoco.viewer import Handle
 from threading import Lock, Thread
 import time
+from dm_control.mujoco.engine import Physics
 
 class BaseMuJuCoSim:
 
@@ -81,18 +82,17 @@ class BaseMuJuCoSim:
     def _get_mj_data(self, model) -> mj.MjData:
         return mj.MjData(model)
     
-    def _get_mj_camera(self, cam_name:str = "") -> mj.MjData:
-        # return mj.MjvCamera(cam_name)
+    def _get_mj_camera(self, cam_name:str = "") -> mj.MjvCamera:
+        return mj.MjvCamera()
 
-        if cam_name == "":
-            return mj.MjvCamera()
+        # if cam_name == "":
+        #     return mj.MjvCamera()
 
-        camera_id = mj.mj_name2id(self._model, mj.mjtObj.mjOBJ_CAMERA, cam_name)
-        print(camera_id)
-        if camera_id != -1:
-            # Camera with the specified name exists
-            return mj.MjvCamera(id=camera_id, type=mj.mjtCamera.mjCAMERA_FIXED, fixedcamid=camera_id)
-        return 
+        # camera_id = mj.mj_name2id(self._model, mj.mjtObj.mjOBJ_CAMERA, cam_name)
+        # if camera_id != -1:
+        #     # Camera with the specified name exists
+        #     return mj.MjvCamera(id=camera_id, type=mj.mjtCamera.mjCAMERA_FIXED, fixedcamid=camera_id)
+        # return None
 
     def _get_mj_options(self) -> mj.MjvOption:
         return mj.MjvOption()
@@ -105,3 +105,11 @@ class BaseMuJuCoSim:
     
     def _get_mj_pertubation(self) -> mj.MjvPerturb:
         return mj.MjvPerturb()
+    
+    def _get_mj_physics(self) -> Physics:
+        return Physics.from_xml_path(file_path=self._scene_path)
+    
+    def _get_mj_context(self, model:mj.MjModel = None) -> mj.MjrContext:
+        if model is not None:
+            return mj.MjrContext(model)
+        return mj.MjrContext()

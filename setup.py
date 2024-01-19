@@ -12,7 +12,8 @@ setup(
         'pandas',
         'numpy',
         'roboticstoolbox-python',
-        'rospy'
+        'rospy',
+        'dm_control'
         # Add more dependencies here
     ],
 )
