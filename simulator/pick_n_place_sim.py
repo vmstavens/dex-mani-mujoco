@@ -42,18 +42,6 @@ class PickNPlaceSim(BaseMuJuCoSim):
         self._options = self._get_mj_options()
         self._window  = self._get_mj_window()
         self._scene   = self._get_mj_scene()
- 
-        rospy.init_node(name=self._args.sim_name)
-
-        self._cmd_arm_q     = rospy.Subscriber("mj/cmd_arm_q",     Float64MultiArray, callback=lambda q_msg: self.robot.arm.set_q(q=q_msg.data), buff_size=1)
-        self._cmd_gripper_q = rospy.Subscriber("mj/cmd_gripper_q", Float64MultiArray, callback=lambda q_msg: self.robot.gripper.set_q(q=q_msg.data), buff_size=1)
-        self._cmd_robot_q   = rospy.Subscriber("mj/cmd_robot_q",   Float64MultiArray, callback=lambda q_msg: self.robot.set_q(q=q_msg.data), buff_size=1)
-        self._cmd_arm_ee    = rospy.Subscriber("mj/cmd_arm_q",     Pose, callback=self._cmd_ee_callback, buff_size=1)
-
-        self._pub_arm_q     = rospy.Publisher("mj/arm_q",     Float64MultiArray, queue_size=1)
-        self._pub_gripper_q = rospy.Publisher("mj/gripper_q", Float64MultiArray, queue_size=1)
-        self._pub_robot_q   = rospy.Publisher("mj/robot_q",   Float64MultiArray, queue_size=1)
-        self._pub_arm_ee    = rospy.Publisher("mj/arm_ee",    Pose, queue_size=1)
 
         self._ur10e = UR10e(self._model, self._data, args)
         self._rh = ShadowHand(self._model, self._data, args)
@@ -64,32 +52,9 @@ class PickNPlaceSim(BaseMuJuCoSim):
             args    = args)
         self.robot.home()
 
-        self._pub_lock = Lock()
-        self._pub_thrd = Thread(target=self._pub_robot_info)
-        self._pub_thrd.daemon = True
-        self._pub_thrd.start()
-
         mj.set_mjcb_control(self.controller_callback)
 
-    def _pub_robot_info(self):
-        rate = rospy.Rate(self._args.pub_freq)  # Set the publishing rate (1 Hz in this example)
 
-        while not rospy.is_shutdown():
-            with self._pub_lock:
-
-                self._pub_arm_q.publish(     geometry.mk_float64multiarray(self.robot.arm.get_q().joint_values    ) )
-                self._pub_gripper_q.publish( geometry.mk_float64multiarray(self.robot.gripper.get_q().joint_values) )
-                self._pub_robot_q.publish(   geometry.mk_float64multiarray(self.robot.get_q().joint_values        ) )
-
-                arm_ee_pose = self.robot.arm.get_ee_pose()
-                self._pub_arm_ee.publish( geometry.mk_pose(arm_ee_pose.t,ori=arm_ee_pose.R) )
-
-            rate.sleep()
-
-    def _cmd_ee_callback(self, pose_msg: Pose):
-        pos = [pose_msg.position.x, pose_msg.position.y, pose_msg.position.z]
-        quat = [pose_msg.orientation.w, pose_msg.orientation.x, pose_msg.orientation.y, pose_msg.orientation.z]
-        self.robot.arm.set_ee_pose(pos=pos, quat=quat)
 
     # Handles keyboard button events to interact with simulator
     def keyboard_callback(self, key):

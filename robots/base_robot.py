@@ -117,7 +117,7 @@ class BaseRobot(ABC):
             set_actuator_value(data=self.mj_data, q=q[i], actuator_name=robot_actuator_names[i])
 
     def home(self) -> None:
-        self.set_q(q_robot = "home")
+        self.set_q(q = "home")
 
     def _get_actuator_values(self) -> List[str]:
         result = []

@@ -53,7 +53,7 @@ class HandE(BaseRobot):
 
     @property
     def name(self) -> str:
-        return "hand-e"
+        return "hande"
 
     def _set_robot_handle(self, robot_handle):
         self._robot_handle = robot_handle

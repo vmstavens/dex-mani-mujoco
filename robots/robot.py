@@ -13,6 +13,11 @@ import sys
 import random
 import time
 
+import rospy
+from geometry_msgs.msg import Pose
+from std_msgs.msg import Float64MultiArray
+from threading import Lock, Thread
+from utils.geometry import geometry
 from robots.base_robot import BaseRobot
 
 from spatialmath import SE3
@@ -46,11 +51,13 @@ class Robot(BaseRobot):
         elif gripper is None:
             self._model = arm.mj_model
             self._data = arm.mj_data
+        if arm is not None and gripper is not None:
+            self._model = arm.mj_model
+            self._data = arm.mj_data
         else:
             print("Warning! arm and gripper is None...")
 
         self._arm            = arm
-        
         self._gripper        = gripper
 
         self._has_gripper    = True if gripper is not None else False
@@ -63,11 +70,48 @@ class Robot(BaseRobot):
         # to also give access to high level arm.set_q and gripper.set_q
         if self._has_gripper:
             self._gripper._set_robot_handle(self)
+            self._sub_gripper_q = rospy.Subscriber(f"mj/{self.gripper.name}_cmd_q", Float64MultiArray, callback=lambda q_msg: self.gripper.set_q(q=q_msg.data), buff_size=1)
+            self._pub_gripper_q = rospy.Publisher(f"mj/{self.gripper.name}_q", Float64MultiArray, queue_size=1)
         if self._has_arm:
             self._arm._set_robot_handle(self)
+            self._sub_arm_q = rospy.Subscriber(f"mj/{self.arm.name}_cmd_q", Float64MultiArray, callback=lambda q_msg: self.arm.set_q(q=q_msg.data), buff_size=1)
+            self._pub_arm_q     = rospy.Publisher(f"mj/{self.arm.name}_q", Float64MultiArray, queue_size=1)
+            self._sub_arm_ee    = rospy.Subscriber(f"mj/{self.arm.name}_cmd_q", Pose, callback=self._cmd_ee_callback, buff_size=1)
+            self._pub_arm_ee    = rospy.Publisher(f"mj/{self.arm.name}_ee", Pose, queue_size=1)
+        if self._has_arm and self._has_gripper:
+            self._sub_robot_q   = rospy.Subscriber(f"mj/{self.name}_cmd_q", Float64MultiArray, callback=lambda q_msg: self.set_q(q=q_msg.data), buff_size=1)
+            self._pub_robot_q   = rospy.Publisher(f"mj/{self.name}_q", Float64MultiArray, queue_size=1)
 
         self._trajectory_timeout = self._args.trajectory_timeout
         self._trajectory_time = 0.0 # s
+
+        rospy.init_node(name=self.name)
+
+        self._pub_lock = Lock()
+        self._pub_thrd = Thread(target=self._pub_robot_info)
+        self._pub_thrd.daemon = True
+        self._pub_thrd.start()
+
+    def _cmd_ee_callback(self, pose_msg: Pose):
+        pos = [pose_msg.position.x, pose_msg.position.y, pose_msg.position.z]
+        quat = [pose_msg.orientation.w, pose_msg.orientation.x, pose_msg.orientation.y, pose_msg.orientation.z]
+        self.robot.arm.set_ee_pose(pos=pos, quat=quat)
+
+    def _pub_robot_info(self):
+        rate = rospy.Rate(self._args.pub_freq)  # Set the publishing rate (1 Hz in this example)
+
+        while not rospy.is_shutdown():
+            with self._pub_lock:
+                if self._has_arm:
+                    self._pub_arm_q.publish( geometry.mk_float64multiarray(self.arm.get_q().joint_values    ) )
+                    arm_ee_pose = self.arm.get_ee_pose()
+                    self._pub_arm_ee.publish( geometry.mk_pose(arm_ee_pose.t,ori=arm_ee_pose.R) )
+                if self._has_gripper:
+                    self._pub_gripper_q.publish( geometry.mk_float64multiarray(self.gripper.get_q().joint_values) )
+                if self._has_arm and self._has_gripper:
+                    self._pub_robot_q.publish( geometry.mk_float64multiarray(self.get_q().joint_values        ) )
+
+            rate.sleep()
 
     @property
     def arm(self) -> BaseRobot:
@@ -243,3 +287,8 @@ class Robot(BaseRobot):
     def get_ee_pose(self) -> SE3:
             raise NotImplementedError(self.__class__.__name__ + ' cannot get ee pose for Robot')
 
+    def home(self):
+        if self._has_arm:
+            self.arm.home()
+        if self._has_gripper:
+            self.gripper.home()

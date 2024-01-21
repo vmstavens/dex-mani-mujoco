@@ -3,44 +3,13 @@ import os
 import numpy as np
 from typing import Tuple
 from datetime import datetime
+from sensor_msgs.msg import Image
 import cv2
+import rospy
+from threading import Lock, Thread
 
 class Camera:
     """Class representing a camera in a Mujoco simulation.
-
-    Args:
-    - args: Arguments containing camera width and height.
-    - model: Mujoco model.
-    - data: Mujoco data.
-    - cam_name: Name of the camera.
-    - save_dir: Directory to save captured images.
-
-    Attributes:
-    - _args: Arguments containing camera width and height.
-    - _cam_name: Name of the camera.
-    - _model: Mujoco model.
-    - _data: Mujoco data.
-    - _save_dir: Directory to save captured images.
-    - _width: Width of the camera image.
-    - _height: Height of the camera image.
-    - _options: Mujoco viewer options.
-    - _pert: Perturbation data for the viewer.
-    - _scene: Mujoco viewer scene.
-    - _camera: Mujoco viewer camera.
-    - _viewport: Viewport for rendering.
-    - _img: Array to store RGB camera image.
-    - _dimg: Array to store depth information.
-
-    Properties:
-    - height: Returns the height of the camera image.
-    - width: Returns the width of the camera image.
-    - save_dir: Returns the directory to save captured images.
-    - name: Returns the name of the camera.
-    - matrices: Returns the image, focal, rotation, and translation matrices of the camera.
-
-    Methods:
-    - shoot: Captures a new image from the camera.
-    - _save: Saves the captured image and depth information.
 
     Note: This class assumes the use of the Mujoco physics engine and its Python bindings.
     """
@@ -78,6 +47,17 @@ class Camera:
 
         if not os.path.exists(self._save_dir):
             os.makedirs(self._save_dir)
+
+        rospy.init_node(self.name)
+
+        self._pub_rpg = rospy.Publisher(f"mj/{self.name}_img_rpg",Image)
+        self._pub_depth = rospy.Publisher(f"mj/{self.name}_img_depth", Image)
+        # self._sub_shoot = rospy.Subscriber(f"mj/{self.name}_shoot", bool, callback=shoot_callback)
+
+        self._pub_lock = Lock()
+        self._pub_thrd = Thread(target=self._pub_robot_info)
+        self._pub_thrd.daemon = True
+        self._pub_thrd.start()
 
     @property
     def heigth(self) -> int:
@@ -154,7 +134,12 @@ class Camera:
 
         return (img_matrix, focal_matrix, T)
 
-    def shoot(self) -> None:
+    def _pub_cam(self) -> None:
+        rate = rospy.Rate(self._args.pub_freq)  # Set the publishing rate (1 Hz in this example)
+
+        img = img_msg.data
+
+    def shoot(self, autosave: bool = True) -> None:
         """Captures a new image from the camera."""
         self._context  = mj.MjrContext(self._model, mj.mjtFontScale.mjFONTSCALE_150)
         mj.mjv_updateScene(self._model, self._data, self._options, self._pert, self._camera, mj.mjtCatBit.mjCAT_ALL, self._scene)
@@ -171,9 +156,10 @@ class Camera:
         far = self._model.vis.map.zfar * extent
         self._dimg = np.flipud(near / (1 - self._dimg * (1 - near / far)))
 
-        self._save()
+        if autosave:
+            self.save()
 
-    def _save(self, img_name:str = "") -> None:
+    def save(self, img_name:str = "") -> None:
         """Saves the captured image and depth information.
 
         Args:

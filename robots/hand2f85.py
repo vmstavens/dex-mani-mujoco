@@ -52,7 +52,7 @@ class Hand2F85(BaseRobot):
 
     @property
     def name(self) -> str:
-        return "hand-2f85"
+        return "2f85"
 
     def _set_robot_handle(self, robot_handle):
         self._robot_handle = robot_handle
@@ -79,6 +79,7 @@ class Hand2F85(BaseRobot):
         return np.all(actuator_checks)
 
     def set_q(self, q : Union[str, List, RobotConfig]):
+        print("my q =",q)
         if isinstance(q, str):
             q: List[float] = self._config_to_q(config=q)
         if isinstance(q, RobotConfig):
