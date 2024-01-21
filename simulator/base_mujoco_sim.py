@@ -85,15 +85,6 @@ class BaseMuJuCoSim:
     def _get_mj_camera(self, cam_name:str = "") -> mj.MjvCamera:
         return mj.MjvCamera()
 
-        # if cam_name == "":
-        #     return mj.MjvCamera()
-
-        # camera_id = mj.mj_name2id(self._model, mj.mjtObj.mjOBJ_CAMERA, cam_name)
-        # if camera_id != -1:
-        #     # Camera with the specified name exists
-        #     return mj.MjvCamera(id=camera_id, type=mj.mjtCamera.mjCAMERA_FIXED, fixedcamid=camera_id)
-        # return None
-
     def _get_mj_options(self) -> mj.MjvOption:
         return mj.MjvOption()
     

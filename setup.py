@@ -13,7 +13,7 @@ setup(
         'numpy',
         'roboticstoolbox-python',
         'rospy',
-        'dm_control'
+        # 'dm_control'
         # Add more dependencies here
     ],
 )

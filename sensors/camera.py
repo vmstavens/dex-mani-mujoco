@@ -1,187 +1,188 @@
 import mujoco as mj
+import os
 import numpy as np
-import cv2
 from typing import Tuple
-
-from .cam_utils import ogl_zbuf_default_inv
-import spatialmath as sm
-# from dm_control.mujoco.engine import Physics
-import dm_control.mujoco.engine as dmje
+from datetime import datetime
+import cv2
 
 class Camera:
-	def __init__(self, args, context, cam_name:str = "") -> None:
+    """Class representing a camera in a Mujoco simulation.
 
-		self._args        = args
-		self._cam_name    = cam_name
-		self._scene_path  = self._args.scene_path
-		self._model       = mj.MjModel.from_xml_path(filename=self._scene_path)
-		self._data        = mj.MjData(self._model)
-		self._scene       = mj.MjvScene(self._model, maxgeom=10_000)
-		self._options     = mj.MjvOption()
-		self._pertubation = mj.MjvPerturb()
-		self._camera      = mj.MjvCamera()
-		self._camera_id   = mj.mj_name2id(self._model, mj.mjtObj.mjOBJ_CAMERA, self._cam_name)
-		self._camera.fixedcamid = self._camera_id
-		self._camera.type = mj.mjtCamera.mjCAMERA_FIXED
+    Args:
+    - args: Arguments containing camera width and height.
+    - model: Mujoco model.
+    - data: Mujoco data.
+    - cam_name: Name of the camera.
+    - save_dir: Directory to save captured images.
 
-		self._pertubation.active = 0
-		self._pertubation.select = 0
-		self._width        = self._args.cam_x_res
-		self._height       = self._args.cam_y_res
-		self._rect = mj.MjrRect(0, 0, self._width, self._height)
+    Attributes:
+    - _args: Arguments containing camera width and height.
+    - _cam_name: Name of the camera.
+    - _model: Mujoco model.
+    - _data: Mujoco data.
+    - _save_dir: Directory to save captured images.
+    - _width: Width of the camera image.
+    - _height: Height of the camera image.
+    - _options: Mujoco viewer options.
+    - _pert: Perturbation data for the viewer.
+    - _scene: Mujoco viewer scene.
+    - _camera: Mujoco viewer camera.
+    - _viewport: Viewport for rendering.
+    - _img: Array to store RGB camera image.
+    - _dimg: Array to store depth information.
 
-		self._img  = np.empty((self._height, self._width, 3), dtype=np.uint8)
-		self._dimg = np.empty((self._height, self._width), dtype=np.float32)
+    Properties:
+    - height: Returns the height of the camera image.
+    - width: Returns the width of the camera image.
+    - save_dir: Returns the directory to save captured images.
+    - name: Returns the name of the camera.
+    - matrices: Returns the image, focal, rotation, and translation matrices of the camera.
 
-		self._rgb_buffer = np.empty((self._height, self._width, 3), dtype=np.uint8)
-		self._depth_buffer = np.empty((self._height, self._width), dtype=np.float32)
-		self._context = context
-		# self._context = mj.MjrContext(self._model)
-		# self._context = mj.MjrContext(self._model, mj.mjtFontScale.mjFONTSCALE_150)
+    Methods:
+    - shoot: Captures a new image from the camera.
+    - _save: Saves the captured image and depth information.
 
-	@property
-	def matrix(self):
-		"""
-		Returns the 3x4 camera matrix.
-		For a description of the camera matrix see, e.g.,
-		https://en.wikipedia.org/wiki/Camera_matrix.
-		For a usage example, see the associated test.
-		"""
-		image, focal, rotation, translation = self.matrices()
-		return image @ focal @ rotation @ translation
+    Note: This class assumes the use of the Mujoco physics engine and its Python bindings.
+    """
+    def __init__(self, args, model, data, cam_name:str = "", save_dir="data/img/"):
+        """Initialize Camera instance.
 
-	def matrices(self) -> Tuple[sm.SE3,sm.SE3,sm.SE3]:
-		"""Computes the component matrices used to compute the camera matrix.
+        Args:
+        - args: Arguments containing camera width and height.
+        - model: Mujoco model.
+        - data: Mujoco data.
+        - cam_name: Name of the camera.
+        - save_dir: Directory to save captured images.
+        """
+        self._args = args
+        self._cam_name = cam_name
+        self._model = model
+        self._data = data
+        self._save_dir = save_dir + self._cam_name + "/"
 
-		Returns:
-		returns a tuple of [image matrix (not an image), focal matrix, extrinsic parameters SE3]
-		"""
-		camera_id = self._camera.fixedcamid
-		if camera_id == -1:
-			# If the camera is a 'free' camera, we get its position and orientation
-			# from the scene data structure. It is a stereo camera, so we average over
-			# the left and right channels. Note: we call `self.update()` in order to
-			# ensure that the contents of `scene.camera` are correct.
-			self.update()
-			pos = np.mean([camera.pos for camera in self.scene.camera], axis=0)
-			z = -np.mean([camera.forward for camera in self.scene.camera], axis=0)
-			y = np.mean([camera.up for camera in self.scene.camera], axis=0)
-			rot = np.vstack((np.cross(y, z), y, z))
-			fov = self._model.vis.global_.fovy
-		else:
-			pos = self._data.cam_xpos[camera_id]
-			rot = self._data.cam_xmat[camera_id].reshape(3, 3).T
-			fov = self._model.cam_fovy[camera_id]
+        self._width = self._args.cam_width
+        self._height = self._args.cam_height
 
-		# Translation matrix (4x4).
-		translation = np.eye(4)
-		translation[0:3, 3] = -pos
-		# Rotation matrix (4x4).
-		rotation = np.eye(4)
-		rotation[0:3, 0:3] = rot
-		# Focal transformation matrix (3x4).
-		focal_scaling = (1./np.tan(np.deg2rad(fov)/2)) * self.height / 2.0
-		focal_matrix = np.diag([-focal_scaling, focal_scaling, 1.0, 0])[0:3, :]
-		# Image matrix (3x3).
-		image_matrix = np.eye(3)
-		image_matrix[0, 2] = (self.width - 1) / 2.0
-		image_matrix[1, 2] = (self.height - 1) / 2.0
+        self._options = mj.MjvOption()
+        self._pert = mj.MjvPerturb()
+        self._scene = mj.MjvScene(self._model, maxgeom=10_000)
 
-		T = sm.SE3()
-		T.t = translation
-		T.R = rotation
+        self._camera = mj.MjvCamera()
+        self._camera.type = mj.mjtCamera.mjCAMERA_FIXED
+        self._camera.fixedcamid = mj.mj_name2id(self._model, mj.mjtObj.mjOBJ_CAMERA, self._cam_name)
+        
+        self._viewport = mj.MjrRect(0, 0, self._width, self._height)
 
-		return (image_matrix, focal_matrix, T)
+        self._img  = np.empty((self._height, self._width, 3), dtype=np.uint8)
+        self._dimg = np.empty((self._height, self._width, 1),dtype=np.float32)
 
-	def shoot(self,save_path:str = "test_img.png") -> Tuple[np.ndarray, np.ndarray]:
-		depth = True
-		print(f"{depth=}")
-		mj.mjr_readPixels(self._rgb_buffer if not depth else None,
-						self._depth_buffer if depth else None, self._rect,
-						self._context)
-		# with self._context.gl.make_current() as ctx:
-		# 	ctx.call(self._render_on_gl_thread, depth=True)
-		# return
-		print("0")
-		# Render scene and text overlays, read contents of RGB or depth buffer.
-		print("1")
-		print("2")
-		# Convert from [0 1] to depth in meters, see links below:
-		# http://stackoverflow.com/a/6657284/1461210
-		# https://www.khronos.org/opengl/wiki/Depth_Buffer_Precision
-		extent = self._model.stat.extent
-		near = self._model.vis.map.znear * extent
-		far = self._model.vis.map.zfar * extent
-		self._dimg = np.flipud(near / (1 - self._depth_buffer * (1 - near / far)))
-		self._img = np.flipud(self._rgb_buffer)
-		print("3")
+        if not os.path.exists(self._save_dir):
+            os.makedirs(self._save_dir)
 
-		print("in shoot")
-		# img = self._camera.render(  scene_option=self._options, depth=False)
-		# print(img)
-		# dimg = self._camera.render( scene_option=self._options, depth=True)
+    @property
+    def heigth(self) -> int:
+        """Return the height of the camera image."""
+        return self._height
+    
+    @property
+    def width(self) -> int:
+        """Return the width of the camera image."""
+        return self._width
+    
+    @property
+    def save_dir(self) -> str:
+        """Return the directory to save captured images."""
+        return self._save_dir
 
-		# context = mj.MjrContext(self._model, mj.mjtFontScale.mjFONTSCALE_150)
-		# mj.mjv_updateScene(self._model, self._data, self._options, self._pert, self._camera, mj.mjtCatBit.mjCAT_ALL, self._scene)
-		# mj.mjr_render(self._viewport, self._scene, context)
+    @property
+    def name(self) -> str:
+        """Return the name of the camera."""
+        return self._cam_name
 
-		# image         = np.empty((self.y_res, self.x_res, 3), dtype=np.uint8)
-		# depth_hat_buf = np.empty((self.y_res, self.x_res, 1), dtype=np.float32)
+    @property
+    def matrices(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray] :
+        """Compute the component matrices for constructing the camera matrix.
 
-		# # depth_hat_buf = np.empty((self.y_res, self.x_res, 1),dtype=np.float32)
+        This property calculates and returns the image matrix, focal matrix, and translation matrix,
+        essential for constructing the camera matrix. The camera matrix represents the transformation
+        from 3D world coordinates to 2D image coordinates.
 
-		# mj.mjr_readPixels(image, depth_hat_buf, self._viewport, context)
+        If the camera is a 'free' camera (fixedcamid == -1), the position and orientation are obtained
+        from the scene data structure. For stereo cameras, the left and right channels are averaged.
+        Note: The method `self.update()` is called to ensure the correctness of `scene.camera` contents.
 
-		# # OpenGL renders with inverted y axis
-		# img         = image.squeeze()
-		# # image         = np.flip(image, axis=0).squeeze()
-		# dimg = depth_hat_buf.squeeze()
-		
-		# # depth is a float array, in meters.
-		# depth = self._physics.render(depth=True)
-		# # Shift nearest values to the origin.
-		# depth -= depth.min()
-		# # Scale by 2 mean distances of near rays.
-		# depth /= 2*depth[depth <= 1].mean()
-		# # Scale to [0, 255]
-		# pixels = 255*np.clip(depth, 0, 1)
-		# pixels = pixels.astype(np.uint8)
+        If the camera is not 'free', the position, rotation, and field of view (fov) are extracted
+        from the Mujoco data and model.
 
-		# dimg = depth_hat_buf.squeeze() * 255.0
+        Returns:
+        A tuple containing the image matrix, focal matrix, and translation matrix of the camera.
+        """
 
-		# zfar  = self._model.vis.map.zfar * self._model.stat.extent
-		# znear = self._model.vis.map.znear * self._model.stat.extent
-		# dimg = ogl_zbuf_default_inv(depth_hat_buf, znear, zfar)
-		# dimg = ogl_zbuf_inv(depth_hat_buf, znear, zfar)
-		# depth_hat_buf = np.flip(depth_hat_buf, axis=0).squeeze()
+        camera_id = self._camera.fixedcamid
+        if camera_id == -1:
+            # If the camera is a 'free' camera, we get its position and orientation
+            # from the scene data structure. It is a stereo camera, so we average over
+            # the left and right channels. Note: we call `self.update()` in order to
+            # ensure that the contents of `scene.camera` are correct.
+            self.update()
+            pos = np.mean([camera.pos for camera in self._scene.camera], axis=0)
+            z = -np.mean([camera.forward for camera in self._scene.camera], axis=0)
+            y = np.mean([camera.up for camera in self._scene.camera], axis=0)
+            rot = np.vstack((np.cross(y, z), y, z))
+            fov = self._model.vis.global_.fovy
+        else:
+            pos = self._data.cam_xpos[camera_id]
+            rot = self._data.cam_xmat[camera_id].reshape(3, 3).T
+            fov = self._model.cam_fovy[camera_id]
 
-		cv2.imwrite("/home/vims/git/dex-mani-mujoco/simulator/test.png", cv2.cvtColor( self._img, cv2.COLOR_RGB2BGR ))
-		cv2.imwrite("/home/vims/git/dex-mani-mujoco/simulator/test_d.png",self._dimg)
-		print("saved images...")
-		return self._img, self._dimg
-	
-	def linearize_depth(self, depth):
-		depth_img = self.z_near * self.z_far * self.extent / (self.z_far - depth * (self.z_far - self.z_near))
-		return depth_img
+        # Translation matrix (4x4).
+        translation = np.eye(4)
+        translation[0:3, 3] = -pos
+        # Rotation matrix (4x4).
+        rotation = np.eye(4)
+        rotation[0:3, 0:3] = rot
+        # homogeneous transformation matrix (4,4)
+        T = translation @ rotation
 
-	def set_camera_intrinsics(self, model, camera, viewport):
-		fovy = model.cam_fovy[camera.fixedcamid] / 180 * np.pi / 2
-		self.f = viewport.height / (2 * np.tan(fovy))
-		self.cx = viewport.width / 2
-		self.cy = viewport.height / 2
+        # Focal transformation matrix (3x4).
+        focal_scaling = (1./np.tan(np.deg2rad(fov)/2)) * self._height / 2.0
+        focal_matrix = np.diag([-focal_scaling, focal_scaling, 1.0, 0])[0:3, :]
+        # Image matrix (3x3).
+        img_matrix = np.eye(3)
+        img_matrix[0, 2] = (self._width - 1) / 2.0
+        img_matrix[1, 2] = (self._height - 1) / 2.0
 
-	def get_RGBD_buffer(self, model, viewport, context):
-		self.color_buffer = np.zeros((viewport.height * viewport.width * 3,), dtype=np.uint8)
-		self.depth_buffer = np.zeros((viewport.height * viewport.width,), dtype=np.float32)
-		context.read_pixels(self.color_buffer, self.depth_buffer, viewport)
-		
-		self.extent = model.stat.extent
-		self.z_near = model.vis.map.znear
-		self.z_far = model.vis.map.zfar
+        return (img_matrix, focal_matrix, T)
 
-		img_size = (viewport.width, viewport.height)
-		self.color_image = cv2.cvtColor(self.color_buffer.reshape((img_size[1], img_size[0], 3), order='C'), cv2.COLOR_BGR2RGB)
-		self.color_image = np.flipud(self.color_image)
-		
-		self.depth_image = self.linearize_depth(np.flipud(self.depth_buffer).reshape(img_size))
-		return self.depth_buffer
+    def shoot(self) -> None:
+        """Captures a new image from the camera."""
+        self._context  = mj.MjrContext(self._model, mj.mjtFontScale.mjFONTSCALE_150)
+        mj.mjv_updateScene(self._model, self._data, self._options, self._pert, self._camera, mj.mjtCatBit.mjCAT_ALL, self._scene)
+        mj.mjr_render(self._viewport, self._scene, self._context)
+        mj.mjr_readPixels(self._img, self._dimg, self._viewport, self._context)
+
+        # OpenGL renders with inverted y axis
+        self._img  = self._img.squeeze()
+        self._dimg = self._img.squeeze()
+        
+        # in order to convert opengl units to meters
+        extent = self._model.stat.extent
+        near = self._model.vis.map.znear * extent
+        far = self._model.vis.map.zfar * extent
+        self._dimg = np.flipud(near / (1 - self._dimg * (1 - near / far)))
+
+        self._save()
+
+    def _save(self, img_name:str = "") -> None:
+        """Saves the captured image and depth information.
+
+        Args:
+        - img_name: Name for the saved image file.
+        """
+        if img_name == "":
+            cv2.imwrite(self._save_dir + f"{datetime.now()}_rpg.png", cv2.cvtColor( self._img, cv2.COLOR_RGB2BGR ))
+            cv2.imwrite(self._save_dir + f"{datetime.now()}_depth.png",self._dimg)
+        else:
+            cv2.imwrite(self._save_dir + f"{img_name}._rpg.png", cv2.cvtColor( self._img, cv2.COLOR_RGB2BGR ))
+            cv2.imwrite(self._save_dir + f"{img_name}_depth.png",self._dimg)
+

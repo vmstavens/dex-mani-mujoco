@@ -16,8 +16,8 @@ def main():
     parser.add_argument('--trajectory_timeout', type=float, default=5.0, help="the trajectory execution timeout in seconds.")
     parser.add_argument('--sim_name',           type=str,   default="node_name", help="MuJoCo simulation ros node name.")
     parser.add_argument('--pub_freq',           type=float, default=1.0, help="The publish frequency of robot information.")
-    parser.add_argument('--cam_x_res',          type=int,   default=640, help="camera image width.")
-    parser.add_argument('--cam_y_res',          type=int,   default=480, help="camera image height.")
+    parser.add_argument('--cam_width',          type=int,   default=640, help="camera image width.")
+    parser.add_argument('--cam_height',          type=int,   default=480, help="camera image height.")
 
     args, _ = parser.parse_known_args()
 
