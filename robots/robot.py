@@ -85,8 +85,6 @@ class Robot(BaseRobot):
         self._trajectory_timeout = self._args.trajectory_timeout
         self._trajectory_time = 0.0 # s
 
-        rospy.init_node(name=self.name)
-
         self._pub_lock = Lock()
         self._pub_thrd = Thread(target=self._pub_robot_info)
         self._pub_thrd.daemon = True
@@ -98,18 +96,18 @@ class Robot(BaseRobot):
         self.robot.arm.set_ee_pose(pos=pos, quat=quat)
 
     def _pub_robot_info(self):
-        rate = rospy.Rate(self._args.pub_freq)  # Set the publishing rate (1 Hz in this example)
+        rate = rospy.Rate(self._args.robot_pub_freq)  # Set the publishing rate (1 Hz in this example)
 
         while not rospy.is_shutdown():
             with self._pub_lock:
                 if self._has_arm:
-                    self._pub_arm_q.publish( geometry.mk_float64multiarray(self.arm.get_q().joint_values    ) )
+                    self._pub_arm_q.publish(geometry.mk_float64multiarray(self.arm.get_q().joint_values))
                     arm_ee_pose = self.arm.get_ee_pose()
-                    self._pub_arm_ee.publish( geometry.mk_pose(arm_ee_pose.t,ori=arm_ee_pose.R) )
+                    self._pub_arm_ee.publish(geometry.mk_pose(arm_ee_pose.t,ori=arm_ee_pose.R))
                 if self._has_gripper:
-                    self._pub_gripper_q.publish( geometry.mk_float64multiarray(self.gripper.get_q().joint_values) )
+                    self._pub_gripper_q.publish(geometry.mk_float64multiarray(self.gripper.get_q().joint_values))
                 if self._has_arm and self._has_gripper:
-                    self._pub_robot_q.publish( geometry.mk_float64multiarray(self.get_q().joint_values        ) )
+                    self._pub_robot_q.publish(geometry.mk_float64multiarray(self.get_q().joint_values))
 
             rate.sleep()
 
@@ -135,7 +133,6 @@ class Robot(BaseRobot):
 
     @property
     def name(self) -> str:
-        name = ""
         if self._has_arm and self._has_gripper:
             return self._arm.name + "_" + self._gripper.name
         elif self._has_arm and not self._has_gripper:

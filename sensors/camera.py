@@ -7,13 +7,20 @@ from sensor_msgs.msg import Image
 import cv2
 import rospy
 from threading import Lock, Thread
+from utils.geometry import geometry
+from cv_bridge import CvBridge
+
+import mujoco.viewer as viewer
+
+import time
+import OpenGL.GL as gl
 
 class Camera:
     """Class representing a camera in a Mujoco simulation.
 
     Note: This class assumes the use of the Mujoco physics engine and its Python bindings.
     """
-    def __init__(self, args, model, data, cam_name:str = "", save_dir="data/img/"):
+    def __init__(self, args, model, data, data_lock, cam_name:str = "", save_dir="data/img/"):
         """Initialize Camera instance.
 
         Args:
@@ -28,6 +35,7 @@ class Camera:
         self._model = model
         self._data = data
         self._save_dir = save_dir + self._cam_name + "/"
+        self._data_lock = data_lock
 
         self._width = self._args.cam_width
         self._height = self._args.cam_height
@@ -35,10 +43,21 @@ class Camera:
         self._options = mj.MjvOption()
         self._pert = mj.MjvPerturb()
         self._scene = mj.MjvScene(self._model, maxgeom=10_000)
+        # self._context  = mj.MjrContext(self._model, mj.mjtFontScale.mjFONTSCALE_150)
+        # self._context  = mj.GLContext(self.width,self.heigth)
+        self._context  = mj.MjrContext()
+        # self._context = context
+        # self._viewer = viewer.Handle(
+        #     sim=self._model,
+        #     cam=self._camera,
+        #     opt=self._options,
+        #     pert=self._pert,
+        #     user_scn=self._scene)
+
 
         self._camera = mj.MjvCamera()
         self._camera.type = mj.mjtCamera.mjCAMERA_FIXED
-        self._camera.fixedcamid = mj.mj_name2id(self._model, mj.mjtObj.mjOBJ_CAMERA, self._cam_name)
+        self._camera.fixedcamid = mj.mj_name2id(self._model, mj.mjtObj.mjOBJ_CAMERA, self.name)
         
         self._viewport = mj.MjrRect(0, 0, self._width, self._height)
 
@@ -48,16 +67,22 @@ class Camera:
         if not os.path.exists(self._save_dir):
             os.makedirs(self._save_dir)
 
-        rospy.init_node(self.name)
-
-        self._pub_rpg = rospy.Publisher(f"mj/{self.name}_img_rpg",Image)
-        self._pub_depth = rospy.Publisher(f"mj/{self.name}_img_depth", Image)
-        # self._sub_shoot = rospy.Subscriber(f"mj/{self.name}_shoot", bool, callback=shoot_callback)
+        self._pub_rgb = rospy.Publisher(f"mj/{self.name}_img_rpg",Image,queue_size=1)
+        self._pub_depth = rospy.Publisher(f"mj/{self.name}_img_depth", Image,queue_size=1)
 
         self._pub_lock = Lock()
-        self._pub_thrd = Thread(target=self._pub_robot_info)
+        self._pub_thrd = Thread(target=self._pub_cam)
         self._pub_thrd.daemon = True
         self._pub_thrd.start()
+
+    @property
+    def context(self):
+        return self._context
+    
+    @context.setter
+    def context(self, new_context):
+        print("updated context")
+        self._context = new_context
 
     @property
     def heigth(self) -> int:
@@ -135,29 +160,55 @@ class Camera:
         return (img_matrix, focal_matrix, T)
 
     def _pub_cam(self) -> None:
-        rate = rospy.Rate(self._args.pub_freq)  # Set the publishing rate (1 Hz in this example)
+        rate = rospy.Rate(1)
+        # rate = rospy.Rate(self._args.camera_pub_freq)  # Set the publishing rate (1 Hz in this example)
+        while not rospy.is_shutdown():
 
-        img = img_msg.data
+            # get new images
+            with self._pub_lock:
+                self.shoot(autosave=False)
+                bridge = CvBridge()
+                image_msg_rgb = bridge.cv2_to_imgmsg(self._img, encoding="bgr8")
+                image_msg_depth = bridge.cv2_to_imgmsg(self._dimg, encoding="32FC1")
+
+                self._pub_rgb.publish( image_msg_rgb )
+                self._pub_depth.publish( image_msg_depth )
+                self.save("test")
+            rate.sleep()
 
     def shoot(self, autosave: bool = True) -> None:
         """Captures a new image from the camera."""
-        self._context  = mj.MjrContext(self._model, mj.mjtFontScale.mjFONTSCALE_150)
-        mj.mjv_updateScene(self._model, self._data, self._options, self._pert, self._camera, mj.mjtCatBit.mjCAT_ALL, self._scene)
-        mj.mjr_render(self._viewport, self._scene, self._context)
-        mj.mjr_readPixels(self._img, self._dimg, self._viewport, self._context)
 
-        # OpenGL renders with inverted y axis
-        self._img  = self._img.squeeze()
-        self._dimg = self._img.squeeze()
-        
-        # in order to convert opengl units to meters
-        extent = self._model.stat.extent
-        near = self._model.vis.map.znear * extent
-        far = self._model.vis.map.zfar * extent
-        self._dimg = np.flipud(near / (1 - self._dimg * (1 - near / far)))
+        with self._data_lock:
+            self._context = mj.MjrContext()
+            # mj.mjv_updateScene(self._model, self._data, mj.MjvOption(), mj.MjvPerturb(), self._camera, mj.mjtCatBit.mjCAT_ALL, self._scene)
+            mj.mjr_render(self._viewport, self._scene, self._context)
+            mj.mjv_updateScene(self._model, self._data, self._options, self._pert, self._camera, mj.mjtCatBit.mjCAT_ALL, self._scene)
+            # mj.mjr_render(self._viewport, self._scene, mj.MjrContext())
+            # mj.mjr_readPixels(self._img, self._dimg, self._viewport, mj.MjrContext())
+            print(type(self._img),type(self._dimg),type(self._viewport),type(self._context))
+            mj.mjr_readPixels(self._img, self._dimg, self._viewport, self._context)
+            # mj.mjr_drawPixels(self._img, self._dimg, self._viewport, self._context)
+            print(np.mean(self._img), np.mean(self._dimg))
 
-        if autosave:
-            self.save()
+            temp_img = self._img.copy()
+            temp_depth = self._dimg.copy()
+
+            # OpenGL renders with inverted y axis
+            temp_img  = temp_img.squeeze()
+            temp_depth = temp_depth.squeeze()
+            
+            # in order to convert opengl units to meters
+            extent = self._model.stat.extent
+            near = self._model.vis.map.znear * extent
+            far = self._model.vis.map.zfar * extent
+            temp_depth = np.flipud(near / (1 - temp_depth * (1 - near / far)))
+
+            self._dimg = temp_depth.copy()
+            self._img = temp_img.copy()
+            self.save("test")
+            if autosave:
+                self.save()
 
     def save(self, img_name:str = "") -> None:
         """Saves the captured image and depth information.
@@ -166,9 +217,9 @@ class Camera:
         - img_name: Name for the saved image file.
         """
         if img_name == "":
-            cv2.imwrite(self._save_dir + f"{datetime.now()}_rpg.png", cv2.cvtColor( self._img, cv2.COLOR_RGB2BGR ))
+            cv2.imwrite(self._save_dir + f"{datetime.now()}_rgb.png", cv2.cvtColor( self._img, cv2.COLOR_RGB2BGR ))
             cv2.imwrite(self._save_dir + f"{datetime.now()}_depth.png",self._dimg)
         else:
-            cv2.imwrite(self._save_dir + f"{img_name}._rpg.png", cv2.cvtColor( self._img, cv2.COLOR_RGB2BGR ))
+            cv2.imwrite(self._save_dir + f"{img_name}._rgb.png", cv2.cvtColor( self._img, cv2.COLOR_RGB2BGR ))
             cv2.imwrite(self._save_dir + f"{img_name}_depth.png",self._dimg)
 

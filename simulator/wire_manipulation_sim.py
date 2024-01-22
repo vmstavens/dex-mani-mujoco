@@ -16,7 +16,7 @@ from utils.mj import (
     set_robot_pose,
     get_joint_names,
 )
-
+import rospy
 from sensors import Camera
 
 class WiremanipulationSim(BaseMuJuCoSim):
@@ -29,16 +29,24 @@ class WiremanipulationSim(BaseMuJuCoSim):
         self._window  = self._get_mj_window()
         self._scene   = self._get_mj_scene()
         self._pert    = self._get_mj_pertubation()
+        self._data_lock = self._get_data_lock()
         self._context = self._get_mj_context()
+
+        rospy.init_node(self._args.sim_name)
 
         self._arm = UR10e(self._model, self._data, args)
         self._gripper = Hand2F85(self._model, self._data, args)
         self.robot = Robot(arm=self._arm, gripper=self._gripper, args=args)
         self.robot.home()
 
-        mj.set_mjcb_control(self.controller_callback)
+        self.cam = Camera(
+            args=args, 
+            model=self._model,
+            data_lock=self._data_lock,
+            data=self._data, cam_name="cam")
+            # cam_name="cam")
 
-        self.cam = Camera(args=args, model=self._model, data=self._data, cam_name="cam")
+        mj.set_mjcb_control(self.controller_callback)
 
     def _set_scene(self):
         pass
@@ -48,7 +56,8 @@ class WiremanipulationSim(BaseMuJuCoSim):
         if key == glfw.KEY_SPACE:
             # try:
             print("pressed space...")
-            self.cam.shoot()
+
+
 
     # Defines controller behavior
     def controller_callback(self, model: mj.MjModel, data: mj.MjData) -> None:

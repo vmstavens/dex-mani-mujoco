@@ -13,6 +13,7 @@ flexcell-binary.stl
 *.mtl
 ICRA2022_Practice*
 utils/ros_utils/
+data/img/
 
 
 # added - end ############################

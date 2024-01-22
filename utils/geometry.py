@@ -10,9 +10,17 @@ import numpy as np
 from spatialmath import SE3, UnitQuaternion
 import spatialmath.base as smb
 from std_msgs.msg import Float64MultiArray
-
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge
 
 class geometry:
+
+	@staticmethod
+	def mk_img(img: np.ndarray) -> Image:
+		"""Convert a NumPy array to a ROS Image message."""
+		bridge = CvBridge()
+		image_msg = bridge.cv2_to_imgmsg(img, encoding="passthrough")
+		return image_msg
 
 	@staticmethod
 	def mk_float64multiarray(l: list) -> Float64MultiArray:

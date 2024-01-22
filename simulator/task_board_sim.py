@@ -39,9 +39,7 @@ class TaskBoardSim(BaseMuJuCoSim):
     # Handles keyboard button events to interact with simulator
     def keyboard_callback(self, key):
         if key == glfw.KEY_SPACE:
-            print(self._data.geom)
-            # print(self._data.geom("task_board"))
-            print(self._data.body("tb"))
+            pass
 
             # set_object_pose(data=self._data, model=self._model, object_name="flexcell",pos=[0.4, 0.6, 0.0])
 

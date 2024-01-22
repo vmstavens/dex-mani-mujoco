@@ -86,14 +86,11 @@ class UR10e(BaseRobot):
                 )
 
     def set_q(self, q : Union[str, List, RobotConfig]):
-        print("my q =",q)
         if isinstance(q, str):
             q: List[float] = self._config_to_q(config=q)
         if isinstance(q, RobotConfig):
             q: List[float] = q.joint_values
         assert len(q) == self.n_actuators, f"Length of q should be {self.n_actuators}, q had length {len(q)}"
-        
-        print(q)
 
         qf = self._robot_handle._traj[-1].copy()
 

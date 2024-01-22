@@ -6,7 +6,6 @@ import mujoco.viewer
 from mujoco.viewer import Handle
 from threading import Lock, Thread
 import time
-from dm_control.mujoco.engine import Physics
 
 class BaseMuJuCoSim:
 
@@ -33,10 +32,6 @@ class BaseMuJuCoSim:
     def _scene_path(self) -> str:
         return self._args.scene_path
 
-    @property
-    def _data_lock(self) -> Lock:
-        return Lock()
-
     @abstractmethod
     def controller_callback(self, model: mj.MjModel, data: mj.MjData) -> None:
         pass
@@ -48,10 +43,10 @@ class BaseMuJuCoSim:
     def viewer_callback(self):
         with self._window as viewer:
             while viewer.is_running():
-                step_start = time.time()
-                viewer.sync()
-
                 with self._data_lock:
+                    step_start = time.time()
+                    viewer.sync()
+                    # with self._data_lock:
                     mj.mjv_updateScene(
                         self._model,
                         self._data,
@@ -76,6 +71,9 @@ class BaseMuJuCoSim:
         input()
         print("done simulating...")
 
+    def _get_data_lock(self) -> Lock:
+        return Lock()
+
     def _get_mj_model(self) -> mj.MjModel:
         return mj.MjModel.from_xml_path(filename=self._scene_path)
     
@@ -97,10 +95,7 @@ class BaseMuJuCoSim:
     def _get_mj_pertubation(self) -> mj.MjvPerturb:
         return mj.MjvPerturb()
     
-    def _get_mj_physics(self) -> Physics:
-        return Physics.from_xml_path(file_path=self._scene_path)
-    
-    def _get_mj_context(self, model:mj.MjModel = None) -> mj.MjrContext:
+    def _get_mj_context(self, model:mj.MjModel = None, font_code: int = None) -> mj.MjrContext:
         if model is not None:
-            return mj.MjrContext(model)
+            return mj.MjrContext(model, mj.mjtFontScale.mjFONTSCALE_150)
         return mj.MjrContext()
