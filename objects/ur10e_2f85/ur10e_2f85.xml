@@ -79,6 +79,18 @@
 
 										<!-- ====== hand-e hand ====== -->
 										<include file="../hand-2f85/2f85.xml" />
+
+										<!-- <body pos="0.0 0.0 0.0" quat="1 0 0 0">
+											<geom type="box" size="0.01 0.01 0.01" rgba=".1 .5 .1 1"/>
+											<camera name="cam" mode="fixed" fovy="45"/>
+										</body> -->
+
+										<!-- <body pos="-0.2 0.5 0.3" quat="1 0 0 0" mocap="true">
+											<geom type="box" size="0.01 0.01 0.01" rgba=".1 .5 .1 1"/>
+											<camera name="cam" mode="fixed" fovy="45"/>
+										</body> -->
+
+
 									</body>
 								</body>
 							</body>

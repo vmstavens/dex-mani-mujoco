@@ -21,16 +21,16 @@ from sensors import Camera
 
 class WiremanipulationSim(BaseMuJuCoSim):
     def __init__(self, args):
-        self.args = args
-        self._model   = self._get_mj_model()
-        self._data    = self._get_mj_data(self._model)
-        self._camera  = self._get_mj_camera()
-        self._options = self._get_mj_options()
-        self._window  = self._get_mj_window()
-        self._scene   = self._get_mj_scene()
-        self._pert    = self._get_mj_pertubation()
+        self._args      = args
+        self._model     = self._get_mj_model()
+        self._data      = self._get_mj_data(self._model)
+        self._camera    = self._get_mj_camera()
+        self._options   = self._get_mj_options()
+        self._window    = self._get_mj_window()
+        self._scene     = self._get_mj_scene()
+        self._pert      = self._get_mj_pertubation()
         self._data_lock = self._get_data_lock()
-        self._context = self._get_mj_context()
+        self._context   = self._get_mj_context()
 
         rospy.init_node(self._args.sim_name)
 
@@ -39,25 +39,15 @@ class WiremanipulationSim(BaseMuJuCoSim):
         self.robot = Robot(arm=self._arm, gripper=self._gripper, args=args)
         self.robot.home()
 
-        self.cam = Camera(
-            args=args, 
-            model=self._model,
-            data_lock=self._data_lock,
-            data=self._data, cam_name="cam")
-            # cam_name="cam")
+        self.cam = Camera(args=args, model=self._model, data=self._data, cam_name="cam_left" , live = True)
+        self.cam = Camera(args=args, model=self._model, data=self._data, cam_name="cam_right", live = True)
 
         mj.set_mjcb_control(self.controller_callback)
-
-    def _set_scene(self):
-        pass
 
     # Handles keyboard button events to interact with simulator
     def keyboard_callback(self, key):
         if key == glfw.KEY_SPACE:
-            # try:
             print("pressed space...")
-
-
 
     # Defines controller behavior
     def controller_callback(self, model: mj.MjModel, data: mj.MjData) -> None:

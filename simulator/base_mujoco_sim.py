@@ -46,12 +46,12 @@ class BaseMuJuCoSim:
                 with self._data_lock:
                     step_start = time.time()
                     viewer.sync()
-                    # with self._data_lock:
+                    
                     mj.mjv_updateScene(
                         self._model,
                         self._data,
                         self._options,
-                        None,
+                        self._pert,
                         self._camera,
                         mj.mjtCatBit.mjCAT_ALL.value,
                         self._scene

@@ -43,6 +43,11 @@
               <geom class="2f85_visual" mesh="2f85_pad"/>
               <body name="right_silicone_pad">
                 <geom class="2f85_visual" mesh="2f85_silicone_pad" material="2f85_black"/>
+
+                    <body pos="0.0 0.0 0.025" quat="1 -1 0 0">
+											<geom type="box" size="0.01 0.01 0.01" rgba=".1 .5 .1 1"/>
+											<camera name="cam_right" mode="fixed" fovy="45"/>
+										</body>
               </body>
             </body>
           </body>
@@ -82,6 +87,13 @@
               <geom class="2f85_visual" mesh="2f85_pad"/>
               <body name="left_silicone_pad">
                 <geom class="2f85_visual" mesh="2f85_silicone_pad" material="2f85_black"/>
+
+
+										<body pos="0.0 0.0 0.025" quat="1 -1 0 0">
+											<geom type="box" size="0.01 0.01 0.01" rgba=".1 .5 .1 1"/>
+											<camera name="cam_left" mode="fixed" fovy="45"/>
+										</body>
+
               </body>
             </body>
           </body>
