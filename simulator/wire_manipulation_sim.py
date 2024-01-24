@@ -39,8 +39,8 @@ class WiremanipulationSim(BaseMuJuCoSim):
         self.robot = Robot(arm=self._arm, gripper=self._gripper, args=args)
         self.robot.home()
 
-        self.cam = Camera(args=args, model=self._model, data=self._data, cam_name="cam_left" , live = True)
-        self.cam = Camera(args=args, model=self._model, data=self._data, cam_name="cam_right", live = True)
+        self.cam_left = Camera(args=args, model=self._model, data=self._data, cam_name="cam_left" , live = True)
+        self.cam_right = Camera(args=args, model=self._model, data=self._data, cam_name="cam_right", live = True)
 
         mj.set_mjcb_control(self.controller_callback)
 

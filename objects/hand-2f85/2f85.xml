@@ -44,17 +44,15 @@
               <body name="right_silicone_pad">
                 <geom class="2f85_visual" mesh="2f85_silicone_pad" material="2f85_black"/>
 
-                  <body pos="0.0 0.0 0.025" quat="1 -1 0 0"> 
-                    <geom type="box" size="0.01 0.01 0.02" rgba="1 0 0 1"/>
-                  </body> 
-
-                  
-
-
                     <body pos="0.0 0.0 0.025" quat="1 -1 0 0">
 											<geom type="box" size="0.01 0.01 0.01" rgba=".1 .5 .1 1"/>
 											<camera name="cam_right" mode="fixed" fovy="45"/>
 										</body>
+
+                    <body pos="0.0 0.0 0.025" axisangle="1 0 0 3.1415">
+											<geom type="mesh" mesh="gelsight"/>
+										</body>
+
               </body>
             </body>
           </body>
@@ -99,6 +97,10 @@
 										<body pos="0.0 0.0 0.025" quat="1 -1 0 0">
 											<geom type="box" size="0.01 0.01 0.01" rgba=".1 .5 .1 1"/>
 											<camera name="cam_left" mode="fixed" fovy="45"/>
+										</body>
+
+                    <body pos="0.0 0.0 0.025" axisangle="1 0 0 3.1415">
+											<geom type="mesh" mesh="gelsight"/>
 										</body>
 
               </body>

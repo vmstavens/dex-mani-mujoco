@@ -83,9 +83,9 @@
 										<!-- ====== hand-e hand ====== -->
 										<include file="../hand-2f85/2f85.xml" />
 
-										<body pos="0.0 0.0 0.0" quat="1 0 0 0">
+										<!-- <body pos="0.0 0.0 0.0" quat="1 0 0 0">
 											<geom mesh="gelsight" />
-										</body>
+										</body> -->
 
 										<!-- <body pos="0.0 0.0 0.0" quat="1 0 0 0">
 											<geom type="box" size="0.01 0.01 0.01" rgba=".1 .5 .1 1"/>
@@ -96,7 +96,6 @@
 											<geom type="box" size="0.01 0.01 0.01" rgba=".1 .5 .1 1"/>
 											<camera name="cam" mode="fixed" fovy="45"/>
 										</body> -->
-
 
 									</body>
 								</body>
