@@ -42,7 +42,7 @@ class Camera:
 
         self._renderer = mj.Renderer(self._model, self._height, self._width)
 
-        self._cv2_bridge = CvBridge()
+        self._bridge = CvBridge()
 
         self._img  = np.zeros((self._height, self._width, 3), dtype=np.uint8)
         self._dimg = np.zeros((self._height, self._width, 1), dtype=np.float32)
@@ -155,8 +155,8 @@ class Camera:
                 self.shoot(autosave=False)
                 
                 # images to messages
-                image_msg_rgb   = self._cv2_bridge.cv2_to_imgmsg(self._img, encoding="passthrough")
-                image_msg_depth = self._cv2_bridge.cv2_to_imgmsg(self._dimg, encoding="passthrough")
+                image_msg_rgb   = self._bridge.cv2_to_imgmsg(self._img, encoding="passthrough")
+                image_msg_depth = self._bridge.cv2_to_imgmsg(self._dimg, encoding="passthrough")
 
                 # publish messages
                 self._pub_rgb.publish( image_msg_rgb )
