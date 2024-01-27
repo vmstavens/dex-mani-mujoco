@@ -5,12 +5,13 @@
 	<!-- <option timestep="0.0025" integrator="RK4" solver="Newton" gravity="0 0 -9.82" cone="elliptic" impratio="100" /> -->
 	<!-- <option timestep="0.0005" integrator="RK4" solver="Newton" gravity="0 0 -9.82" cone="elliptic" impratio="100" /> -->
 
-	<include file="../flexcell/flexcell.xml"/>
+	<!-- <include file="../flexcell/flexcell.xml"/> -->
 
 	<!-- <include file="../ur10e_hand-e/ur10e_hand-e.xml"/> -->
 	
 	<!-- <include file="../rgmc_practice_task_board/task_board.xml"/> -->
 	<include file="../ur10e_2f85/ur10e_2f85.xml"/>
+	<!-- <include file="../ur10e/ur10e.xml"/> -->
 	<!-- <include file="../hand-2f85/2f85.xml" /> -->
 	<!-- <include file="../rgmc_practice_task_board/all_task_board.xml" /> -->
 
@@ -30,7 +31,8 @@
 	
 	<worldbody>
 
-		<body name="rope" pos="0.3 0.5 0.75">
+		<body name="rope" pos="0.3 0.5 0.1">
+		<!-- <body name="rope" pos="0.3 0.5 0.75"> -->
 			<!-- <freejoint/> -->
 			<geom type="capsule" size="0.01" fromto="0 0 0  .3 0 0"/>
 			<!-- <geom type="box" size="0.05 0.05 0.02"  rgba="0.8 0.8 0.8 1" mass="2" solref=" 0.1 0.1"/> -->

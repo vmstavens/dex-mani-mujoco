@@ -41,6 +41,7 @@ class WiremanipulationSim(BaseMuJuCoSim):
 
         self._arm = UR10e(self._model, self._data, args)
         self._gripper = Hand2F85(self._model, self._data, args)
+        # self.robot = Robot(arm=self._arm, args=args)
         self.robot = Robot(arm=self._arm, gripper=self._gripper, args=args)
         self.robot.home()
 
@@ -80,22 +81,19 @@ class WiremanipulationSim(BaseMuJuCoSim):
             print("T_w_d =")
             print(T_w_d)
 
-            
-            T_ee_d = T_b_ee.inv() * T_w_b.inv() * T_w_d
-            # T_ee_d = T_w_b.inv() * T_w_d * T_b_ee.inv()
-            # temp = base_pose @ grasp_pose @ sm.SE3.Tz(0.1)
+            # T_ee_d = T_b_ee.inv() * T_w_b.inv() * T_w_d
+
+            T_ee_d = make_tf(pos=rope_pose.t + [0.2,0,0.155], ori = ee_pose.R)
             print("T_ee_d =")
             print(T_ee_d)
 
-            test_pose = make_tf(pos = [0.4, 0.4, 0.5], ori=ee_pose.R)
-            print("test_pose =")
-            print(test_pose)
-
-            self.robot.arm.set_ee_pose(test_pose)
+            self.robot.arm.set_ee_pose(T_ee_d)
             # self.robot.arm.set_ee_pose(T_ee_d)
         elif key == glfw.KEY_PERIOD:
-            print(self.robot.arm.get_ee_pose())
-
+            print(self.robot.info)
+        elif key == glfw.KEY_M:
+            print("setting gripper q...")
+            self.robot.gripper.set_q([110])
 
     # Defines controller behavior
     def controller_callback(self, model: mj.MjModel, data: mj.MjData) -> None:

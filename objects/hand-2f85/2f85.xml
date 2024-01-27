@@ -52,7 +52,7 @@
 											<!-- <camera name="cam_right" mode="fixed" fovy="45"/> -->
 										</body>
 
-                    <body pos="0.0 -0.01 0.025" axisangle="1 0 0 3.1415">
+                    <body pos="0.0 -0.012 0.025" axisangle="1 0 0 3.1415">
 											<geom type="mesh" mesh="gelsight"/>
 										</body>
 
@@ -104,7 +104,8 @@
 											<!-- <camera name="cam_left" mode="fixed" fovy="45"/> -->
 										</body>
 
-                    <body pos="0.0 -0.01 0.025" axisangle="1 0 0 3.1415">
+                    <body pos="0.0 -0.012 0.025" axisangle="1 0 0 3.1415">
+                    <!-- <body pos="0.0 -0.01 0.025" axisangle="1 0 0 3.1415"> -->
 											<geom type="mesh" mesh="gelsight"/>
 										</body>
 

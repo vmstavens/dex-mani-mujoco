@@ -11,7 +11,8 @@ def cb_func(data: Image):
     print("----")
     # print(cv_image)
     cv2.waitKey(100)
-    print(np.mean(cv_image))
+    print(np.mean(cv_image), np.max(cv_image), np.min(cv_image))
+    cv_image = cv2.normalize(cv_image, None, 0, 1.0, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
     cv2.imshow("test",  cv2.cvtColor(cv_image,cv2.COLOR_RGB2BGR ))
     # print(np.mean(cv_image))
 
@@ -24,7 +25,7 @@ def main():
     # [] make sure passive depth is equal for gazebo and mujoco
 
     rospy.init_node("test_sensor")
-    sub = rospy.Subscriber("/mj/cam_right_img_gelsight",Image,callback=cb_func, queue_size=1)
+    sub = rospy.Subscriber("/mj/cam_right_img_depth",Image,callback=cb_func, queue_size=1)
     # sub = rospy.Subscriber("/mj/cam_left_img_depth",Image,callback=cb_func, queue_size=1)
     print("....")
     # sub = rospy.Subscriber("/mj/cam_left_img_rgb",Image,callback=cb_func, queue_size=1)

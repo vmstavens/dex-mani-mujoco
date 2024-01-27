@@ -94,6 +94,7 @@ class UR10e(BaseRobot):
 
         qf = self._robot_handle._traj[-1].copy()
 
+
         qf[:self.n_actuators] = self._clamp_q(q)
 
         self._robot_handle._traj.extend([qf])
@@ -116,8 +117,6 @@ class UR10e(BaseRobot):
             target_pose = make_tf(pos=pos, ori=ori)
 
         q_sols = []
-        print("target_pose =")
-        print(target_pose)
         for _ in range(solution_pool):
             q_sol, success, iterations, searches, residual = self._robot.ik_NR(Tep=target_pose)
             q_sols.append( (q_sol, success, iterations, searches, residual) )

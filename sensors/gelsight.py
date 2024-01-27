@@ -14,6 +14,8 @@ from .gelsight_utils import (
     tangent
 )
 
+from typing import Tuple
+
 class GelSightMini:
     def __init__(self, args, cam_name:str) -> None:
                 #  rgb_img_topic:str = "/mj/cam_left_img_rgb", 
@@ -104,8 +106,7 @@ class GelSightMini:
         self._dimg = img
 
     def _generate_gelsight_img(self, obj_depth, return_depth=False):
-        # print('-----------> ', np.shape(obj_depth))
-        # cv2.imwrite('object_depth.png', obj_depth)
+
         not_in_touch, in_touch = self.segments(obj_depth)
         protrusion_depth = self.protrusion_map(obj_depth, not_in_touch)
         elastomer_depth = self.apply_elastic_deformation(protrusion_depth, not_in_touch, in_touch)
@@ -265,7 +266,7 @@ class GelSightMini:
         protrusion_map[not_in_touch >= self._max_depth] = self._max_depth
         return protrusion_map
 
-    def segments(self, depth_map: np.ndarray) -> np.ndarray:
+    def segments(self, depth_map: np.ndarray) -> Tuple[np.ndarray,np.ndarray]:
         """
         Segment the depth map into regions in touch and regions not in touch based on the max depth.
 
@@ -275,11 +276,17 @@ class GelSightMini:
         Returns:
         - Tuple[numpy.ndarray, numpy.ndarray]: Two binary maps representing regions not in touch and in touch, respectively.
         """
+        # 0.03 vs 0.025791787
+        # TODO : Fix from here
         not_in_touch = np.copy(depth_map)
         not_in_touch[not_in_touch < self._max_depth] = 0.0
         not_in_touch[not_in_touch >= self._max_depth] = 1.0
 
+        print(np.mean(not_in_touch))
+
         in_touch = 1 - not_in_touch
+        cv2.imwrite("/home/vims/git/dex-mani-mujoco/sensors/not_in_touch.png",not_in_touch * 255)
+        cv2.imwrite("/home/vims/git/dex-mani-mujoco/sensors/in_touch.png",in_touch * 255)
 
         return not_in_touch, in_touch
 

@@ -1,14 +1,14 @@
 <mujoco model="ur10e">
-	<compiler angle="radian" meshdir="ur10e_rh/assets" autolimits="true"/>
+	<compiler angle="radian" meshdir="" autolimits="true"/>
 
 	<default>
 		<!-- ======= UR control classes ======= -->
-		<include file="ur10e_rh/ur10e/ur10e_classes.xml" />
+		<include file="../ur10e/ur10e_classes.xml" />
 	</default>
 
 	<asset>
 		<!-- ======= UR Assets ======= -->
-		<include file="ur10e_rh/ur10e/ur10e_assets.xml"/>
+		<include file="../ur10e/ur10e_assets.xml"/>
 	</asset>
 
 	<worldbody>
@@ -70,8 +70,6 @@
 										<geom size="0.005 0.005 0.005" pos="-0.01 0 0" type="box" />
 										<site name="ur10e_ee" pos="0 0 1" quat="1 2 1 1"/>
 
-										<!-- ====== shadow hand ====== -->
-										<include file="ur10e_rh/sh/sh_right_hand.xml" />
 									</body>
 								</body>
 							</body>
@@ -82,13 +80,9 @@
 		</body>
 	</worldbody>
 
-	<!-- ======= Shadow setup ======= -->
-	<include file="ur10e_rh/sh/sh_setup.xml"/>
-
 	<actuator>
 		<!-- ======= UR actuators ======= -->
-		<include file="ur10e_rh/ur10e/ur10e_actuators.xml" />
-		<!-- ======= Shadow actuators ======= -->
-		<include file="ur10e_rh/sh/sh_actuators.xml" />
+		<include file="../ur10e/ur10e_actuators.xml" />
+
 	</actuator>
 </mujoco>

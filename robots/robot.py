@@ -51,7 +51,7 @@ class Robot(BaseRobot):
         elif gripper is None:
             self._model = arm.mj_model
             self._data = arm.mj_data
-        if arm is not None and gripper is not None:
+        elif arm is not None and gripper is not None:
             self._model = arm.mj_model
             self._data = arm.mj_data
         else:
@@ -264,8 +264,17 @@ class Robot(BaseRobot):
 
         self._traj.extend([ qf ])
 
+    def _are_done_actuators(self) -> bool:
+        arm_done = True
+        gripper_done = True
+        if self._has_arm:
+            arm_done = self.arm._are_done_actuators()
+        if self._has_gripper:
+            gripper_done = self.gripper._are_done_actuators()
+        return arm_done and gripper_done
+
     def step(self) -> None:
-        if ( self.arm._are_done_actuators() and self.gripper._are_done_actuators() ) or self.is_timout():
+        if self._are_done_actuators() or self.is_timout():
             # to ensure an element always exsists in _traj. otherwise 
             # gripper and arm cant be controlled independently
             self._trajectory_time = time.monotonic()
@@ -286,6 +295,7 @@ class Robot(BaseRobot):
 
     def home(self):
         if self._has_arm:
+            print("test")
             self.arm.home()
         if self._has_gripper:
             self.gripper.home()
