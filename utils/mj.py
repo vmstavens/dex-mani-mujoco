@@ -5,6 +5,7 @@ import numpy as np
 from spatialmath import SE3
 import spatialmath.base as smb
 from utils.rtb import make_tf
+import spatialmath as sm
 
 
 def get_actuator_names(model: mj.MjModel) -> List[str]:
@@ -63,10 +64,51 @@ def get_joint_actuator_diff(data: mj.MjData, joint_name:str ,actuator_name: str)
     q_actuator = get_actuator_value(data,actuator_name)
     return q_joint - q_actuator
 
-def set_object_pose(data: mj.MjData, model: mj.MjModel, object_name:str, 
-            pos: List = [0.5,0.5,0.5], 
-            ori: Union[np.ndarray,SE3] = [1,0,0,0], 
-            pose: Union[None, List[float], np.ndarray, SE3] = None) -> None:
+def set_robot_pose(data: mj.MjData, model: mj.MjModel, robot_name:str, pose):
+    pass
+
+def get_object_pose(data: mj.MjData, object_name: str) -> SE3:
+    """
+    Get the current pose of an object in the MuJoCo simulation.
+
+    Parameters:
+    - data (mj.MjData): MuJoCo data object.
+    - object_name (str): Name of the object whose pose needs to be retrieved.
+
+    Returns:
+    - smb.SE3: The current pose of the object as a spatialmath SE3 object.
+    """
+    # Retrieve the current position and quaternion orientation of the object
+    xpos = data.body(object_name).xpos[:3]
+    xquat = data.body(object_name).xquat
+
+    # Convert quaternion to rotation matrix
+    rotation_matrix = smb.q2r(xquat)
+
+    # Create spatialmath SE3 object
+    current_pose = make_tf(pos=xpos,ori=rotation_matrix)
+
+    return current_pose
+
+
+def set_object_pose(data: mj.MjData, model: mj.MjModel, object_name: str,
+                    pos: List = [0.5, 0.5, 0.5],
+                    ori: Union[np.ndarray, SE3] = [1, 0, 0, 0],
+                    pose: Union[None, List[float], np.ndarray, SE3] = None) -> np.ndarray:
+    """
+    Set the pose of an object in the MuJoCo simulation.
+
+    Parameters:
+    - data (mj.MjData): MuJoCo data object.
+    - model (mj.MjModel): MuJoCo model object.
+    - object_name (str): Name of the object whose pose needs to be set.
+    - pos (List): Position [x, y, z] of the object.
+    - ori (Union[np.ndarray, SE3]): Orientation of the object as a quaternion [qw, qx, qy, qz] or SE3 object.
+    - pose (Union[None, List[float], np.ndarray, SE3]): If provided, set the pose directly.
+
+    Returns:
+    - np.ndarray: The current pose of the object [x, y, z, qw, qx, qy, qz].
+    """
 
     if pose is not None:
         if isinstance(pose, SE3):
@@ -78,14 +120,10 @@ def set_object_pose(data: mj.MjData, model: mj.MjModel, object_name:str,
         # Use the provided position and orientation
         target_pose = make_tf(pos=pos, ori=ori)
 
-    # print(data.body("flexcell"))
-        # base
-    # print(data)
-    # print(data.mocap_pos[0,0])
-    # data.mocap_pos[0,0] += 0.1
-    # data.mocap_pos("arm")
-    # data.mocap_pos[0,0] = 2
-    # data.body("base").xpos[:3] = target_pose.t
+    # Set the pose
+    data.body(object_name).xpos[:3] = target_pose.t
+    data.body(object_name).xquat[:] = target_pose.R.q
 
-def set_robot_pose(data: mj.MjData, model: mj.MjModel, robot_name:str, pose):
-    pass
+    # Return the current pose
+    current_pose = np.concatenate([data.body(object_name).xpos[:3], data.body(object_name).xquat])
+    return current_pose

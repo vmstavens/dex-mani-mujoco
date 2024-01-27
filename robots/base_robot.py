@@ -4,6 +4,8 @@ import warnings
 import mujoco as mj
 import numpy as np
 
+import spatialmath as sm
+import spatialmath.base as smb
 from spatialmath import SE3
 
 from utils.sim import (
@@ -23,7 +25,9 @@ from utils.mj import (
     is_done_actuator
 )
 
-from abc import ABC, abstractmethod, abstractproperty
+from utils.rtb import make_tf
+
+from abc import ABC, abstractmethod
 
 
 class BaseRobot(ABC):
@@ -184,6 +188,33 @@ class BaseRobot(ABC):
             config      = self.get_q(),
             config_name = config_name
         )
+
+    def get_base_pose(self) -> sm.SE3:
+    # def get_base_pose(self, data: mj.MjData, model: mj.MjModel) -> sm.SE3:
+        """
+        Get the current pose of the base frame in the MuJoCo simulation.
+
+        Parameters:
+        - data (mj.MjData): MuJoCo data object.
+        - model (mj.MjModel): MuJoCo model object.
+
+        Returns:
+        - smb.SE3: The current pose of the base frame as a spatialmath SE3 object.
+        """
+        # Assuming the base is represented by a body named "base" in the MuJoCo model
+        base_body_name = "base"
+
+        # Retrieve the current positions and quaternion orientation of the base body
+        base_pos = self._data.body(base_body_name).xpos
+        base_ori = self._data.body(base_body_name).xquat
+
+        base_pose = make_tf(
+            pos = base_pos,
+            ori = base_ori
+        )
+
+        return base_pose
+
 
     def _get_config_dir(self) -> str:
         return self.args.config_dir + self.name + ".json"

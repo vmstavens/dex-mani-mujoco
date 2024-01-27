@@ -46,7 +46,9 @@
 
                     <body pos="0.0 0.0 0.025" quat="1 -1 0 0">
 											<geom type="box" size="0.005 0.005 0.005" rgba=".1 .5 .1 1"/>
-											<camera name="cam_right" mode="fixed" fovy="40"/>
+                      <!-- we use 0.5 rad i.e. 28.6478898 deg since it is used in https://github.com/danfergo/gelsight_simulation/tree/master -->
+											<camera name="cam_right" mode="fixed" fovy="28.6478898"/>
+											<!-- <camera name="cam_right" mode="fixed" fovy="40"/> -->
 											<!-- <camera name="cam_right" mode="fixed" fovy="45"/> -->
 										</body>
 
@@ -96,7 +98,8 @@
 
 										<body pos="0.0 0.0 0.025" quat="1 -1 0 0">
 											<geom type="box" size="0.005 0.005 0.005" rgba=".1 .5 .1 1"/>
-											<camera name="cam_left" mode="fixed" fovy="40"/>
+                      <!-- we use 0.5 rad i.e. 28.6478898 deg since it is used in https://github.com/danfergo/gelsight_simulation/tree/master -->
+											<camera name="cam_left" mode="fixed" fovy="28.6478898"/>
 											<!-- <camera name="cam_left" mode="fixed" fovy="45"/> -->
 											<!-- <camera name="cam_left" mode="fixed" fovy="45"/> -->
 										</body>

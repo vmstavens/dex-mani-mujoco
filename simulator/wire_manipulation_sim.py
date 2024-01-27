@@ -15,9 +15,14 @@ from utils.mj import (
     set_object_pose, 
     set_robot_pose,
     get_joint_names,
+    get_object_pose,
 )
+
+from utils.rtb import make_tf
+
 import rospy
 from sensors import Camera, GelSightMini
+import spatialmath as sm
 
 class WiremanipulationSim(BaseMuJuCoSim):
     def __init__(self, args):
@@ -42,7 +47,8 @@ class WiremanipulationSim(BaseMuJuCoSim):
         self.cam_left = Camera(args=args, model=self._model, data=self._data, cam_name="cam_left" , live = True)
         self.cam_right = Camera(args=args, model=self._model, data=self._data, cam_name="cam_right", live = True)
 
-        self.gs = GelSightMini(args=self._args)
+        self.gs_left = GelSightMini(args=self._args, cam_name="cam_left")
+        self.gs_right = GelSightMini(args=self._args, cam_name="cam_right")
 
         mj.set_mjcb_control(self.controller_callback)
 
@@ -50,6 +56,46 @@ class WiremanipulationSim(BaseMuJuCoSim):
     def keyboard_callback(self, key):
         if key == glfw.KEY_SPACE:
             print("pressed space...")
+            self.robot.home()
+        elif key == glfw.KEY_COMMA:
+            print("pressed comma...")
+            rope_pose = get_object_pose(self._data, "rope")
+            ee_pose = self.robot.arm.get_ee_pose()
+            print("ee_pose =")
+            print(ee_pose)
+
+            base_pose = self.robot.arm.get_base_pose()
+            print("base_pose =")
+            print(base_pose)
+
+            grasp_pose = rope_pose * sm.SE3.Tz(0.1)
+
+            T_w_b = self.robot.arm.get_base_pose()
+            print("T_w_b =")
+            print(T_w_b)
+            T_b_ee = self.robot.arm.get_ee_pose()
+            print("T_b_ee =")
+            print(T_b_ee)
+            T_w_d = grasp_pose
+            print("T_w_d =")
+            print(T_w_d)
+
+            
+            T_ee_d = T_b_ee.inv() * T_w_b.inv() * T_w_d
+            # T_ee_d = T_w_b.inv() * T_w_d * T_b_ee.inv()
+            # temp = base_pose @ grasp_pose @ sm.SE3.Tz(0.1)
+            print("T_ee_d =")
+            print(T_ee_d)
+
+            test_pose = make_tf(pos = [0.4, 0.4, 0.5], ori=ee_pose.R)
+            print("test_pose =")
+            print(test_pose)
+
+            self.robot.arm.set_ee_pose(test_pose)
+            # self.robot.arm.set_ee_pose(T_ee_d)
+        elif key == glfw.KEY_PERIOD:
+            print(self.robot.arm.get_ee_pose())
+
 
     # Defines controller behavior
     def controller_callback(self, model: mj.MjModel, data: mj.MjData) -> None:

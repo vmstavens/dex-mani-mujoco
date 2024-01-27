@@ -10,7 +10,7 @@
 			<geom type="box" size="0.4 0.6 0.3"  rgba="0.8 0.8 0.8 1" mass="500"/>
 		</body>
 		<body pos="0 0 -0.2" quat="1 1 1 1">
-			<geom type="mesh" mesh="flexcell" mass="100"/>
+			<geom type="mesh" mesh="flexcell" mass="100" solref=" 0.01 0.01"/>
 		</body>
 	</body>
 	</worldbody>

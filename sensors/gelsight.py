@@ -15,23 +15,23 @@ from .gelsight_utils import (
 )
 
 class GelSightMini:
-    def __init__(self, args, 
-                 rgb_img_topic:str = "/mj/cam_left_img_rgb", 
-                 depth_img_topic:str = "/mj/cam_left_img_depth", 
-                 tac_img_topic:str = "/gelsight/tactile_image"
-                 ) -> None:
+    def __init__(self, args, cam_name:str) -> None:
+                #  rgb_img_topic:str = "/mj/cam_left_img_rgb", 
+                #  depth_img_topic:str = "/mj/cam_left_img_depth", 
+                #  tac_img_topic:str = "/gelsight/tactile_image"
         
         self._args = args
         self._bridge = CvBridge()
         self._name = "gelsight"
+        self._cam_name = cam_name
 
         self._pub_freq = self._args.gelsight_pub_freq
         self._pkg_path = os.path.dirname(os.path.abspath(__file__))
         self._background_img = cv2.imread(self._pkg_path + '/assets/background_gelsight2017.jpg')
         
-        self._rgb_img_topic = rgb_img_topic
-        self._depth_img_topic = depth_img_topic
-        self._tac_img_topic = tac_img_topic
+        self._rgb_img_topic = f"/mj/{self._cam_name}_img_rgb"
+        self._depth_img_topic = f"/mj/{self._cam_name}_img_depth"
+        self._tac_img_topic = f"/mj/{self._cam_name}_img_gelsight"
 
         self._sub_rpg     = rospy.Subscriber(self._rgb_img_topic,   Image, self._get_rgb_img, queue_size=1)
         self._sub_depth   = rospy.Subscriber(self._depth_img_topic, Image, self._get_depth_img, queue_size=1)

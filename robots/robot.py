@@ -282,7 +282,7 @@ class Robot(BaseRobot):
         raise NotImplementedError(self.__class__.__name__ + ' cannot set ee pose for Robot') 
 
     def get_ee_pose(self) -> SE3:
-            raise NotImplementedError(self.__class__.__name__ + ' cannot get ee pose for Robot')
+        raise NotImplementedError(self.__class__.__name__ + ' cannot get ee pose for Robot')
 
     def home(self):
         if self._has_arm:

@@ -1,7 +1,9 @@
 <mujoco model="scene_wire_manipulation">
 	<compiler angle="radian" meshdir="" />
 
-	<option timestep="0.0005" integrator="RK4" solver="Newton" gravity="0 0 -9.82" cone="elliptic" impratio="100" />
+	<option timestep="0.002" integrator="RK4" solver="Newton" gravity="0 0 -9.82" cone="elliptic" impratio="100" />
+	<!-- <option timestep="0.0025" integrator="RK4" solver="Newton" gravity="0 0 -9.82" cone="elliptic" impratio="100" /> -->
+	<!-- <option timestep="0.0005" integrator="RK4" solver="Newton" gravity="0 0 -9.82" cone="elliptic" impratio="100" /> -->
 
 	<include file="../flexcell/flexcell.xml"/>
 
@@ -27,6 +29,16 @@
 	</asset>
 	
 	<worldbody>
+
+		<body name="rope" pos="0.3 0.5 0.75">
+			<!-- <freejoint/> -->
+			<geom type="capsule" size="0.01" fromto="0 0 0  .3 0 0"/>
+			<!-- <geom type="box" size="0.05 0.05 0.02"  rgba="0.8 0.8 0.8 1" mass="2" solref=" 0.1 0.1"/> -->
+		</body>
+		<!-- <body name="box" pos="0.3 0.5 0.75">
+			<freejoint/>
+			<geom type="box" size="0.05 0.05 0.05"  rgba="0.8 0.8 0.8 1" mass="2" solref=" 0.1 0.1"/>
+		</body> -->
 
 		<!-- <body pos="-0.2 0.5 0.3" quat="1 0 0 0" mocap="true">
 			<geom type="box" size="0.01 0.01 0.01" rgba=".1 .5 .1 1"/>
