@@ -7,34 +7,12 @@ import numpy as np
 from threading import Lock, Thread
 import cv2
 import os
-from gelsight_utils import (
+from .gelsight_utils import (
     gkern2D,
     gauss_noise,
     add_overlay,
     tangent
 )
-
-class SimApproach:
-    def __init__(self) -> None:
-        self.light_sources = config['light_sources']
-        self.background = config['background_img']
-        self.px2m_ratio = config['px2m_ratio']
-        self.elastomer_thickness = config['elastomer_thickness']
-        self.min_depth = config['min_depth']
-
-        self.default_ks = 0.15
-        self.default_kd = 0.5
-        self.default_alpha = 5
-
-        self.ka = config['ka'] or 0.8
-
-        self.texture_sigma = config['texture_sigma'] or 0.00001
-        self.t = config['t'] if 't' in config else 3
-        self.sigma = config['sigma'] if 'sigma' in config else 7
-        self.kernel_size = config['sigma'] if 'sigma' in config else 21
-
-        self.max_depth = self.min_depth + self.elastomer_thickness
-
 
 class GelSightMini:
     def __init__(self, args, 
@@ -43,17 +21,17 @@ class GelSightMini:
                  tac_img_topic:str = "/gelsight/tactile_image"
                  ) -> None:
         
-        self._bridge = CvBridge()
         self._args = args
-        self._rgb_img_topic = rgb_img_topic
-        self._depth_img_topic = depth_img_topic
-        self._tac_img_topic = tac_img_topic
+        self._bridge = CvBridge()
         self._name = "gelsight"
+
         self._pub_freq = self._args.gelsight_pub_freq
         self._pkg_path = os.path.dirname(os.path.abspath(__file__))
         self._background_img = cv2.imread(self._pkg_path + '/assets/background_gelsight2017.jpg')
-
-        rospy.init_node(self._name)
+        
+        self._rgb_img_topic = rgb_img_topic
+        self._depth_img_topic = depth_img_topic
+        self._tac_img_topic = tac_img_topic
 
         self._sub_rpg     = rospy.Subscriber(self._rgb_img_topic,   Image, self._get_rgb_img, queue_size=1)
         self._sub_depth   = rospy.Subscriber(self._depth_img_topic, Image, self._get_depth_img, queue_size=1)
@@ -66,12 +44,31 @@ class GelSightMini:
         self._tac_img: np.ndarray = None
 
         # TODO : Fix these params
+        # constants from: https://github.com/danfergo/gelsight_simulation/tree/master
         self._min_depth = 0.026  # distance from the image sensor to the rigid glass outer surface
-        self._ELASTOMER_THICKNESS = 0.004
+        self._ELASTOMER_THICKNESS = 0.004 # m
+        self._kernel_1_sigma = 7
+        self._kernel_1_kernel_size = 21
+        self._kernel_2_sigma = 9
+        self._kernel_2_kernel_size = 52
+        self._Ka = 0.8
+        self._Ks = None
+        self._Kd = None
+        self._t = 3
+        self._texture_sigma = 0.00001
+        self._px2m_ratio = 5.4347826087e-05
+        
+        self._default_ks = 0.15
+        self._default_kd = 0.5
+        self._default_alpha = 5
 
         self._max_depth = self._min_depth + self._ELASTOMER_THICKNESS
-
-
+        self._light_sources = [
+            {'position': [0, 1, 0.25],  'color': (255, 255, 255), 'kd': 0.6, 'ks': 0.5},  # white, top
+            {'position': [-1, 0, 0.25], 'color': (255, 130, 115), 'kd': 0.5, 'ks': 0.3},  # blue, right
+            {'position': [0, -1, 0.25], 'color': (108, 82, 255),  'kd': 0.6, 'ks': 0.4},  # red, bottom
+            {'position': [1, 0, 0.25],  'color': (120, 255, 153), 'kd': 0.1, 'ks': 0.1},  # green, left
+        ]
 
         self._pub_lock = Lock()
         self._pub_thrd = Thread(target=self._pub_gelsight)
@@ -99,7 +96,7 @@ class GelSightMini:
         return self._tac_img
 
     def _get_rgb_img(self, img_msg: Image) -> None:
-        self._img = self._bridge.imgmsg_to_cv2(img_msg, desired_encoding="bgr8")
+        self._img = self._bridge.imgmsg_to_cv2(img_msg, desired_encoding="passthrough")
 
     def _get_depth_img(self, img_msg: Image) -> None:
         img = self._bridge.imgmsg_to_cv2(img_msg, desired_encoding="32FC1")
@@ -113,17 +110,17 @@ class GelSightMini:
         protrusion_depth = self.protrusion_map(obj_depth, not_in_touch)
         elastomer_depth = self.apply_elastic_deformation(protrusion_depth, not_in_touch, in_touch)
 
-        textured_elastomer_depth = gauss_noise(elastomer_depth, self.texture_sigma)
+        textured_elastomer_depth = gauss_noise(elastomer_depth, self._texture_sigma)
 
-        out = self.ka * self.background
+        out = self._Ka * self._background_img
         out = add_overlay(out, self.internal_shadow(protrusion_depth), (0.0, 0.0, 0.0))
 
-        T = tangent(textured_elastomer_depth / self.px2m_ratio)
+        T = tangent(textured_elastomer_depth / self._px2m_ratio)
         # show_normalized_img('tangent', T)
-        for light in self.light_sources:
-            ks = light['ks'] if 'ks' in light else self.default_ks
-            kd = light['kd'] if 'kd' in light else self.default_kd
-            alpha = light['alpha'] if 'alpha' in light else self.default_alpha
+        for light in self._light_sources:
+            ks = light['ks'] if 'ks' in light else self._default_ks
+            kd = light['kd'] if 'kd' in light else self._default_kd
+            alpha = light['alpha'] if 'alpha' in light else self._default_alpha
             out = add_overlay(out, self.phong_illumination(T, light['position'], kd, ks, alpha), light['color'])
 
         kernel = gkern2D(3, 1)
@@ -139,8 +136,8 @@ class GelSightMini:
     def _pub_gelsight(self) -> None:
         while not rospy.is_shutdown():
 
-            # if self._img is None or self._dimg is None:
-            #     continue
+            if self._img is None or self._dimg is None:
+                continue
 
             # get new images
             with self._pub_lock:
@@ -148,10 +145,14 @@ class GelSightMini:
                 self._tac_img = self._generate_gelsight_img(self._dimg)
 
                 # images to messages
-                gelsight_image: Image = self._bridge.cv2_to_imgmsg(self._dimg, encoding="passthrough")
+                # gelsight_image: Image = self._bridge.cv2_to_imgmsg(self._dimg, encoding="bgr8")
+                gelsight_image: Image = self._bridge.cv2_to_imgmsg(self._tac_img, encoding="bgr8")
+                # gelsight_image: Image = self._bridge.cv2_to_imgmsg(self._tac_img, encoding="passthrough")
+
 
                 # publish messages
                 self._pub_tac_img.publish( gelsight_image )
+                # self._pub_tac_img.publish( gelsight_image )
 
             self._rate.sleep()
 
@@ -223,13 +224,13 @@ class GelSightMini:
         """
 
         protrusion_depth = - (protrusion_depth - self._max_depth)
-        kernel = gkern2D(self.kernel_size, self.sigma)
+        kernel = gkern2D(self._kernel_1_kernel_size, self._kernel_1_sigma)
         deformation = protrusion_depth
 
         deformation2 = protrusion_depth
-        kernel2 = gkern2D(52, 9)
+        kernel2 = gkern2D(self._kernel_2_kernel_size, self._kernel_2_sigma)
 
-        for i in range(self.t):
+        for i in range(self._t):
             deformation_ = cv2.filter2D(deformation, -1, kernel)
             r = np.max(protrusion_depth) / np.max(deformation_) if np.max(deformation_) > 0 else 1
             deformation = np.maximum(r * deformation_, protrusion_depth)
@@ -240,7 +241,7 @@ class GelSightMini:
 
         deformation_v1 = self.apply_elastic_deformation_gauss(protrusion_depth, not_in_touch, in_touch)
 
-        for i in range(self.t):
+        for i in range(self._t):
             deformation_ = cv2.filter2D(deformation2, -1, kernel)
             r = np.max(protrusion_depth) / np.max(deformation_) if np.max(deformation_) > 0 else 1
             deformation2 = np.maximum(r * deformation_, protrusion_depth)
@@ -292,8 +293,8 @@ class GelSightMini:
         Returns:
         - numpy.ndarray: Internal shadow map indicating regions of the elastomer that are shadowed.
         """
-        elastomer_depth_inv = self.max_depth - elastomer_depth
-        elastomer_depth_inv = np.interp(elastomer_depth_inv, (0, self.elastomer_thickness), (0.0, 1.0))
+        elastomer_depth_inv = self._max_depth - elastomer_depth
+        elastomer_depth_inv = np.interp(elastomer_depth_inv, (0, self._ELASTOMER_THICKNESS), (0.0, 1.0))
         return elastomer_depth_inv
 
 

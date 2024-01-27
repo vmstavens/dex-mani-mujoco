@@ -17,7 +17,7 @@ from utils.mj import (
     get_joint_names,
 )
 import rospy
-from sensors import Camera
+from sensors import Camera, GelSightMini
 
 class WiremanipulationSim(BaseMuJuCoSim):
     def __init__(self, args):
@@ -41,6 +41,8 @@ class WiremanipulationSim(BaseMuJuCoSim):
 
         self.cam_left = Camera(args=args, model=self._model, data=self._data, cam_name="cam_left" , live = True)
         self.cam_right = Camera(args=args, model=self._model, data=self._data, cam_name="cam_right", live = True)
+
+        self.gs = GelSightMini(args=self._args)
 
         mj.set_mjcb_control(self.controller_callback)
 
