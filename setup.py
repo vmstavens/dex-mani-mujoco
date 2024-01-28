@@ -6,7 +6,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'wheel',
-        'gym',  # Add other dependencies as needed
+        'gym',
         'mujoco_py',
         'mujoco',
         'pandas',
