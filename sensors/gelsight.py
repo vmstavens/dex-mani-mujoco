@@ -263,7 +263,9 @@ class GelSightMini:
         - numpy.ndarray: Protrusion map where values exceeding `max_depth` are clamped to `max_depth`.
         """
         protrusion_map = np.copy(original)
-        protrusion_map[not_in_touch >= self._max_depth] = self._max_depth
+        # protrusion_map[not_in_touch >= self._max_depth] = self._max_depth
+        # error
+        cv2.imwrite("/home/vims/git/dex-mani-mujoco/sensors/protrusion_map.png",protrusion_map * 255)
         return protrusion_map
 
     def segments(self, depth_map: np.ndarray) -> Tuple[np.ndarray,np.ndarray]:
@@ -282,9 +284,8 @@ class GelSightMini:
         not_in_touch[not_in_touch < self._max_depth] = 0.0
         not_in_touch[not_in_touch >= self._max_depth] = 1.0
 
-        print(np.mean(not_in_touch))
-
         in_touch = 1 - not_in_touch
+
         cv2.imwrite("/home/vims/git/dex-mani-mujoco/sensors/not_in_touch.png",not_in_touch * 255)
         cv2.imwrite("/home/vims/git/dex-mani-mujoco/sensors/in_touch.png",in_touch * 255)
 
