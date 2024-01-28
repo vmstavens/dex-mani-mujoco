@@ -295,7 +295,6 @@ class Robot(BaseRobot):
 
     def home(self):
         if self._has_arm:
-            print("test")
             self.arm.home()
         if self._has_gripper:
             self.gripper.home()

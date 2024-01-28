@@ -45,8 +45,8 @@ class WiremanipulationSim(BaseMuJuCoSim):
         self.robot = Robot(arm=self._arm, gripper=self._gripper, args=args)
         self.robot.home()
 
-        self.cam_left = Camera(args=args, model=self._model, data=self._data, cam_name="cam_left" , live = True)
-        self.cam_right = Camera(args=args, model=self._model, data=self._data, cam_name="cam_right", live = True)
+        self.cam_left = Camera(args=args, model=self._model, data=self._data, cam_name="cam_left")
+        self.cam_right = Camera(args=args, model=self._model, data=self._data, cam_name="cam_right")
 
         self.gs_left = GelSightMini(args=self._args, cam_name="cam_left")
         self.gs_right = GelSightMini(args=self._args, cam_name="cam_right")
@@ -83,7 +83,7 @@ class WiremanipulationSim(BaseMuJuCoSim):
 
             # T_ee_d = T_b_ee.inv() * T_w_b.inv() * T_w_d
 
-            T_ee_d = make_tf(pos=rope_pose.t + [0.2,0,0.155], ori = ee_pose.R)
+            T_ee_d = make_tf(pos=rope_pose.t + [0.2,0,0.157], ori = ee_pose.R)
             print("T_ee_d =")
             print(T_ee_d)
 
@@ -93,7 +93,7 @@ class WiremanipulationSim(BaseMuJuCoSim):
             print(self.robot.info)
         elif key == glfw.KEY_M:
             print("setting gripper q...")
-            self.robot.gripper.set_q([110])
+            self.robot.gripper.set_q([135])
 
     # Defines controller behavior
     def controller_callback(self, model: mj.MjModel, data: mj.MjData) -> None:

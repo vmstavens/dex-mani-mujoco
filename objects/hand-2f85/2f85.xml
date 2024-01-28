@@ -44,16 +44,17 @@
               <body name="right_silicone_pad">
                 <geom class="2f85_visual" mesh="2f85_silicone_pad" material="2f85_black"/>
 
-                    <body pos="0.0 0.0 0.025" quat="1 -1 0 0">
+                    <body pos="0.001 0.0 0.025" quat="1 -1 0 0">
 											<geom type="box" size="0.005 0.005 0.005" rgba=".1 .5 .1 1"/>
                       <!-- we use 0.5 rad i.e. 28.6478898 deg since it is used in https://github.com/danfergo/gelsight_simulation/tree/master -->
-											<camera name="cam_right" mode="fixed" fovy="28.6478898"/>
+											<camera name="cam_right" mode="fixed" fovy="35"/>
+											<!-- <camera name="cam_right" mode="fixed" fovy="28.6478898"/> -->
 											<!-- <camera name="cam_right" mode="fixed" fovy="40"/> -->
 											<!-- <camera name="cam_right" mode="fixed" fovy="45"/> -->
 										</body>
 
                     <body pos="0.0 -0.012 0.025" axisangle="1 0 0 3.1415">
-											<geom type="mesh" mesh="gelsight"/>
+											<geom type="mesh" mesh="gelsight" condim="6"/>
 										</body>
 
               </body>
@@ -96,17 +97,18 @@
               <body name="left_silicone_pad">
                 <geom class="2f85_visual" mesh="2f85_silicone_pad" material="2f85_black"/>
 
-										<body pos="0.0 0.0 0.025" quat="1 -1 0 0">
+										<body pos="0.001 -0.005 0.025" quat="1 -1 0 0">
 											<geom type="box" size="0.005 0.005 0.005" rgba=".1 .5 .1 1"/>
                       <!-- we use 0.5 rad i.e. 28.6478898 deg since it is used in https://github.com/danfergo/gelsight_simulation/tree/master -->
-											<camera name="cam_left" mode="fixed" fovy="28.6478898"/>
+											<camera name="cam_left" mode="fixed" fovy="35"/>
+											<!-- <camera name="cam_left" mode="fixed" fovy="28.6478898"/> -->
 											<!-- <camera name="cam_left" mode="fixed" fovy="45"/> -->
 											<!-- <camera name="cam_left" mode="fixed" fovy="45"/> -->
 										</body>
 
-                    <body pos="0.0 -0.012 0.025" axisangle="1 0 0 3.1415">
+                    <body pos="0.0 0.0 0.025" axisangle="1 0 0 3.1415">
                     <!-- <body pos="0.0 -0.01 0.025" axisangle="1 0 0 3.1415"> -->
-											<geom type="mesh" mesh="gelsight"/>
+											<geom type="mesh" mesh="gelsight" condim="6" />
 										</body>
 
               </body>

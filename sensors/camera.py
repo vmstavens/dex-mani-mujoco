@@ -20,7 +20,7 @@ class Camera:
 
     Note: This class assumes the use of the Mujoco physics engine and its Python bindings.
     """
-    def __init__(self, args, model, data, cam_name:str = "", save_dir="data/img/", live:bool = False):
+    def __init__(self, args, model, data, cam_name:str = "", save_dir="data/img/"):
         """Initialize Camera instance.
 
         Args:
@@ -49,8 +49,6 @@ class Camera:
 
         if not os.path.exists(self._save_dir):
             os.makedirs(self._save_dir)
-
-        self._live = live
 
         self._pub_rgb = rospy.Publisher(f"mj/{self.name}_img_rgb",     Image,queue_size=1)
         self._pub_depth = rospy.Publisher(f"mj/{self.name}_img_depth", Image,queue_size=1)
@@ -140,13 +138,42 @@ class Camera:
     def pub_freq(self) -> float:
         return self._pub_freq
 
-    @property
-    def is_live(self) -> bool:
-        return self._live
+    def depth_to_point_cloud(self):
+        # Get image dimensions
+        height, width = self._dimg.shape
+
+        # Create pixel grid
+        y, x = np.meshgrid(np.arange(height), np.arange(width), indexing='ij')
+
+        # Flatten arrays for vectorized computation
+        x_flat = x.flatten()
+        y_flat = y.flatten()
+        depth_flat = self._dimg.flatten()
+
+        # Stack flattened arrays to form homogeneous coordinates
+        homogeneous_coords = np.vstack((x_flat, y_flat, np.ones_like(x_flat)))
+
+        img_matrix, focal_matrix, camera_pose = self.matrices
+        intrinsic_matrix = img_matrix * focal_matrix
+        # Inverse of the intrinsic matrix
+        inv_intrinsic_matrix = np.linalg.inv(intrinsic_matrix)
+
+        # Calculate 3D points in camera coordinates
+        points_camera = np.dot(inv_intrinsic_matrix, homogeneous_coords) * depth_flat
+
+        # Homogeneous coordinates to 3D points
+        points_camera = np.vstack((points_camera, np.ones_like(x_flat)))
+
+        # Transform points to world coordinates using camera pose
+        points_world = np.dot(camera_pose, points_camera)
+
+        return points_world[:3, :].T
 
     def _pub_cam(self) -> None:
         
         while not rospy.is_shutdown():
+
+            A = self.depth_to_point_cloud()
 
             # get new images
             with self._pub_lock:
